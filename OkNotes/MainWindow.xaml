@@ -1,0 +1,64 @@
+﻿<Window x:Class="OkNotes.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OkNotes"
+        mc:Ignorable="d"
+        Height="600" Width="900"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="Transparent">
+
+    <Border Background= "#98dbe1"
+           CornerRadius="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width ="114.754"/>
+                <ColumnDefinition Width="85.246"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="43.716">
+                </RowDefinition>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="OkNotes"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Foreground="#ac3dac"
+                   FontSize="22"/>
+
+            <StackPanel Grid.Row="1">
+                <RadioButton Content="Home"
+                            Height="50"
+                            Foreground="#ac3dac"
+                            FontSize="14"
+                            Style="{StaticResource LauncherButtonTheme}"/>
+
+                <RadioButton Content="New Folder"
+                            Height="50"
+                            Foreground="#ac3dac"
+                            FontSize="14"
+                            Style="{StaticResource LauncherButtonTheme}"/>
+
+                <RadioButton Content="New File"
+                            Height="50"
+                            Foreground="#ac3dac"
+                            FontSize="14"
+                            Style="{StaticResource LauncherButtonTheme}"/>
+            </StackPanel>
+
+            <Grid Grid.Column="1" 
+                  HorizontalAlignment="Left" 
+                  Height="536" 
+                  Margin="10,0,0,0" 
+                  Grid.Row="1" 
+                  VerticalAlignment="Center" 
+                  Width="765"/>
+         
+        </Grid>
+
+    </Border>
+</Window>
