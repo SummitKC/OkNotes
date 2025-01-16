@@ -1,0 +1,67 @@
+﻿<Window x:Class="TwoOkNotes.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
+        mc:Ignorable="d"
+        Height="600" Width="900"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="Transparent">
+
+    <Window.DataContext>
+        <local:HomeViewModel />
+    </Window.DataContext>
+
+    <Border Background="#98dbe1"
+            CornerRadius="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="114.754"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="43.716"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="TwoOkNotes"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="#ac3dac"
+                       FontSize="20"/>
+
+            <StackPanel Grid.Row="1">
+                <RadioButton Content="Home"
+                             Height="50"
+                             Foreground="#ac3dac"
+                             FontSize="14"
+                             Style="{StaticResource LauncherButtonTheme}"/>
+
+                <RadioButton Content="New Folder"
+                             Height="50"
+                             Foreground="#ac3dac"
+                             FontSize="14"
+                             Style="{StaticResource LauncherButtonTheme}"/>
+
+                <RadioButton Content="New File"
+                             Height="50"
+                             Foreground="#ac3dac"
+                             FontSize="14"
+                             Style="{StaticResource LauncherButtonTheme}"
+                             Command="{Binding OpenWindow}"/>
+            </StackPanel>
+
+            <Frame x:Name="MainFrame"
+                   Grid.Column="1"
+                   Grid.Row="1"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   Width="765"
+                   Height="536"
+                   Margin="10,0,0,0"/>
+        </Grid>
+    </Border>
+</Window>

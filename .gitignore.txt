@@ -1,0 +1,40 @@
+# Build directories
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Rider/JetBrains files
+.idea/
+*.sln.iml
+
+# Temporary files
+*.tmp
+*.cache
+*.log
+*.db
+*.pid
+*.seed
+*.old
+*.backup
+
+# Build output
+*.exe
+*.dll
+*.pdb
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+
+# Generated files
+*.csproj.user
+*.csproj.vspscc
+*.vcxproj.user
+*.vcxproj.filters
+
+# Deployment files
+*.publish/
