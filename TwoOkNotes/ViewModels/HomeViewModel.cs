@@ -13,13 +13,17 @@ namespace TwoOkNotes.ViewModels
 {
     public class HomeViewModel : ObservableObject
     {
+
+        //Command Opeaning the editing window   
         public ICommand OpenWindow { get; }
 
+        //Initilizing the command
         public HomeViewModel()
         {
             OpenWindow = new RelayCommand(OpenNewWindow);
         }
 
+        //Command logic for opening the new window
         private void OpenNewWindow(object? obj)
         {
             Debug.WriteLine("Opening New Window");

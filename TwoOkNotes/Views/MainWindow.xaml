@@ -7,10 +7,9 @@
         mc:Ignorable="d"
         Height="600" Width="900"
         WindowStyle="None"
-        ResizeMode="NoResize"
-        Background="Transparent">
-
-    <Window.DataContext>
+        ResizeMode="NoResize">
+    
+<Window.DataContext>
         <local:HomeViewModel />
     </Window.DataContext>
 

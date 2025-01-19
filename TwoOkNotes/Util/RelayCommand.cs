@@ -7,6 +7,8 @@ using System.Windows.Input;
 
 namespace TwoOkNotes.Util
 {
+
+    //Relay Command class for the buttons
     internal class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;

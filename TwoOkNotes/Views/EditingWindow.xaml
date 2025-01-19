@@ -36,6 +36,16 @@
                 Command="{Binding LoadNoteCommand}"
                 Margin="1"/>
 
+            <Button 
+                Content="Undo"
+                Command="{Binding UndoCommand}"
+                Margin="1"/>
+
+            <Button 
+                Content="Redo"
+                Command="{Binding RedoCommand}"
+                Margin="1"/>
+
         </StackPanel>
         <ContentControl Content="{Binding CurrentCanvasModel}" />
     </DockPanel>
