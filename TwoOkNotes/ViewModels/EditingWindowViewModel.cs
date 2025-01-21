@@ -14,13 +14,14 @@ using System.Diagnostics;
 
 namespace TwoOkNotes.ViewModels
 {
-    public class EditingWIndowViewModel : ObservableObject
+    public class EditingWIndowViewModel
     {
         //TODO: Change this based on the user's chosen location 
-        private readonly string FilePath = "TempNoteFolder\\TestNote.idf";
+        private readonly string FilePath = "C:\\Users\\Summit\\Source\\Repos\\OkNotes\\TwoOkNotes\\TempNoteFolder\\TestNote.idf";
 
         //List the current Canvas Model, and I commands for the buttons
-        public CanvasModel CurrentCanvasModel { get; }
+        public CanvasModel CurrentCanvasModel { get; set; }
+        public PenModel CurrentPenModel { get; set; }
         public ICommand SaveNoteCommand { get; }
         public ICommand ClearInkCommand { get; }
         public ICommand DeleteNoteCommand { get; }
@@ -32,15 +33,14 @@ namespace TwoOkNotes.ViewModels
         public EditingWIndowViewModel()
         {
             CurrentCanvasModel = new CanvasModel("noteName", new Stack<Stroke>());
+            CurrentCanvasModel.SetPen(new PenModel());
             SaveNoteCommand = new RelayCommand(SaveNote);
             ClearInkCommand = new RelayCommand(ClearInk);
             DeleteNoteCommand = new RelayCommand(DeleteNote);
             LoadNoteCommand = new RelayCommand(LoadNote);
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
-
         }
-
 
         //Creating a file
         private void SaveNote(object? obj)

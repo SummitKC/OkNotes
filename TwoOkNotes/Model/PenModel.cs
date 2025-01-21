@@ -13,11 +13,14 @@ namespace TwoOkNotes.Model
 {
     public class PenModel : ObservableObject
     {
-        private Color _penColor = Colors.White;
+        private Color _penColor = Colors.Blue;
         private double _thickness = 2.0;
         private double _opacity = 1; 
         private StylusTip _penTip = StylusTip.Ellipse;
-        private bool _isEraser = false; 
+        private bool _isEraser = false;
+        private bool _isHighlighter = false;
+        private bool _ignorePreassure = false;
+        private bool _fitToCurve = false;
 
         public Color Color
         {
@@ -66,7 +69,22 @@ namespace TwoOkNotes.Model
             {
                 _isEraser = value;
                 OnPropertyChanged(nameof(IsEraser));
+
             }
+        }
+
+        public DrawingAttributes GetDrawingAttributes()
+        {
+            return new DrawingAttributes
+            {
+                Color = _penColor,
+                Width = _thickness,
+                Height = _thickness,
+                StylusTip = _penTip,
+                IsHighlighter = _isHighlighter,
+                IgnorePressure = _ignorePreassure,
+                FitToCurve = _fitToCurve,
+            };
         }
     }
 }

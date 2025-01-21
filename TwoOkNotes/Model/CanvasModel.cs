@@ -29,14 +29,11 @@ namespace TwoOkNotes.Model
         private void InitilizeCanvas()
         {
             Background = Brushes.Black;
-            DefaultDrawingAttributes = new DrawingAttributes
-            {
-                Color = Colors.White,
-                Height = 2,
-                Width = 2,
-                StylusTip = StylusTip.Ellipse
-            };
-            
+        }
+
+        public void SetPen (PenModel penModel)
+        {
+            DefaultDrawingAttributes = penModel.GetDrawingAttributes();
         }
 
         //Clear method for the canvas
