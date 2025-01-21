@@ -46,6 +46,11 @@
                 Command="{Binding RedoCommand}"
                 Margin="1"/>
 
+            <Button 
+                Content="Pen"
+                Command="{Binding ChangePenCommand}"
+                Margin="1"/>
+
         </StackPanel>
         <ContentControl Content="{Binding CurrentCanvasModel}" />
     </DockPanel>

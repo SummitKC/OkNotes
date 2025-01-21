@@ -17,7 +17,7 @@ namespace TwoOkNotes.ViewModels
     public class EditingWIndowViewModel
     {
         //TODO: Change this based on the user's chosen location 
-        private readonly string FilePath = "C:\\Users\\Summit\\Source\\Repos\\OkNotes\\TwoOkNotes\\TempNoteFolder\\TestNote.idf";
+        private readonly string FilePath = "TempNoteFolder\\TestNote.idf";
 
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
