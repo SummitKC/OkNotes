@@ -10,44 +10,46 @@ using System.Windows.Controls;
 using System.IO;
 using TwoOkNotes.Model;
 using System.Diagnostics;
+using System.Windows.Media;
 
 
 namespace TwoOkNotes.ViewModels
 {
-    public class EditingWIndowViewModel
+    public class EditingWIndowViewModel : ObservableObject
     {
         //TODO: Change this based on the user's chosen location 
         private readonly string FilePath = "TempNoteFolder\\TestNote.idf";
-
+        private bool _isPenSettingOpen;
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
         public PenModel CurrentPenModel { get; set; }
         public ICommand SaveNoteCommand { get; }
         public ICommand ClearInkCommand { get; }
         public ICommand DeleteNoteCommand { get; }
-        public ICommand LoadNoteCommand { get;  }
+        public ICommand LoadNoteCommand { get; }
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
-
+        public ICommand TogglePenSettingsCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel()
         {
             CurrentCanvasModel = new CanvasModel("noteName", new Stack<Stroke>());
-            CurrentCanvasModel.SetPen(new PenModel());
+            CurrentPenModel = new PenModel();
+            CurrentCanvasModel.SetPen(CurrentPenModel);
             SaveNoteCommand = new RelayCommand(SaveNote);
             ClearInkCommand = new RelayCommand(ClearInk);
             DeleteNoteCommand = new RelayCommand(DeleteNote);
             LoadNoteCommand = new RelayCommand(LoadNote);
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
+            TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
         }
 
         //Creating a file
         private void SaveNote(object? obj)
-            
+
         {
             Debug.WriteLine("Saving Note");
-            Console.WriteLine("Saving Note!");
             using FileStream fs = new(FilePath, FileMode.Create);
             CurrentCanvasModel.Strokes.Save(fs);
         }
@@ -55,7 +57,8 @@ namespace TwoOkNotes.ViewModels
         //If the given file exists for the filepath, load the note
         private void LoadNote(object? obj)
         {
-            if (File.Exists(FilePath)){
+            if (File.Exists(FilePath))
+            {
                 using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
                 {
                     CurrentCanvasModel.Strokes = new StrokeCollection(fs);
@@ -116,6 +119,23 @@ namespace TwoOkNotes.ViewModels
             {
                 Debug.WriteLine("File does not exist");
             }
+        }
+
+        //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 
+        public bool IsPenSettingOpen
+        {
+            get => _isPenSettingOpen;
+            set
+            {
+                _isPenSettingOpen = value;
+                OnPropertyChanged(nameof(IsPenSettingOpen));
+            }
+        }
+
+        //When called the visivility of the pen settings will change to the opposite of what it is currently
+        public void TogglePenSettings(object? obj)
+        {
+            IsPenSettingOpen = !IsPenSettingOpen;
         }
     }
 }

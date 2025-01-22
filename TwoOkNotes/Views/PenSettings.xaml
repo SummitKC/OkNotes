@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="TwoOkNotes.Views.PenSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TwoOkNotes.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="259.119" d:DesignWidth="258.709">
+    <Grid>
+        <StackPanel Margin="0,0,21,23">
+            <TextBlock Text="Pen Color" Margin="10"/>
+            <ComboBox SelectedItem="{Binding CurrentPenModel.PenColor}" Margin="10">
+                <ComboBoxItem Content="Red" Tag="Red"/>
+                <ComboBoxItem Content="Blue" Tag="Blue"/>
+                <ComboBoxItem Content="Green" Tag="Green"/>
+            </ComboBox>
+
+            <TextBlock Text="Pen Thickness" Margin="10"/>
+            <Slider Minimum="1" Maximum="50" Value="{Binding CurrentPenModel.ThickNess}" Margin="10"/>
+
+            <TextBlock Text="Pen Opacity" Margin="10"/>
+            <Slider Minimum="0" Maximum="1" Value="{Binding CurrentPenModel.Opacity}" Margin="10"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

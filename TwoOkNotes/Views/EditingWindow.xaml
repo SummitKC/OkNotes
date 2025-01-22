@@ -3,12 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TwoOkNotes.ViewModels"
+        xmlns:local="clr-namespace:TwoOkNotes.ViewModels" xmlns:views="clr-namespace:TwoOkNotes.Views"
         mc:Ignorable="d"
         Title="EditingWindow" Height="450" Width="800">
     <Window.DataContext>
         <local:EditingWIndowViewModel />
     </Window.DataContext>
+    <!--<Window.Resources>
+        <local:PenViewModel x:Key="PenViewModel" />
+    </Window.Resources>-->
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
 
     <DockPanel>
         <StackPanel 
@@ -47,12 +53,21 @@
                 Margin="1"/>
 
             <Button 
+                
                 Content="Pen"
-                Command="{Binding ChangePenCommand}"
+                Command="{Binding TogglePenSettingsCommand}" 
                 Margin="1"/>
 
         </StackPanel>
-        <ContentControl Content="{Binding CurrentCanvasModel}" />
+        <Grid>
+            <ContentControl Content="{Binding CurrentCanvasModel}" />
+            <views:PenSettings 
+               Visibility="{Binding IsPenSettingOpen, Converter={StaticResource BooleanToVisibilityConverter}}" 
+               HorizontalAlignment="Right" 
+               VerticalAlignment="Top" 
+               Width="200" 
+               Height="200"/>
+        </Grid>
     </DockPanel>
  
 </Window>

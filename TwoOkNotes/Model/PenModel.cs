@@ -14,7 +14,7 @@ namespace TwoOkNotes.Model
     public class PenModel : ObservableObject
     {
         private Color _penColor = Colors.Blue;
-        private double _thickness = 2.0;
+        private double _thickness = 20.0;
         private double _opacity = 1; 
         private StylusTip _penTip = StylusTip.Ellipse;
         private bool _isEraser = false;
@@ -22,13 +22,13 @@ namespace TwoOkNotes.Model
         private bool _ignorePreassure = false;
         private bool _fitToCurve = false;
 
-        public Color Color
+        public Color PenColor
         {
             get => _penColor;
             set
             {
                 _penColor = value;
-                OnPropertyChanged(nameof(Color));
+                OnPropertyChanged(nameof(PenColor));
             }
         }
 
@@ -73,17 +73,47 @@ namespace TwoOkNotes.Model
             }
         }
 
+        public bool IsHighlighter
+        {
+            get => _isHighlighter;
+            set
+            {
+                _isHighlighter = value;
+                OnPropertyChanged(nameof(IsHighlighter));
+            }
+        }
+
+        public bool IgnorePreassure
+        {
+            get => _ignorePreassure;
+            set
+            {
+                _ignorePreassure = value;
+                OnPropertyChanged(nameof(IgnorePreassure));
+            }
+        }
+
+        public bool FitToCurve
+        {
+            get => _fitToCurve;
+            set
+            {
+                _fitToCurve = value;
+                OnPropertyChanged(nameof(FitToCurve));
+            }
+        }
+
         public DrawingAttributes GetDrawingAttributes()
         {
             return new DrawingAttributes
             {
-                Color = _penColor,
-                Width = _thickness,
-                Height = _thickness,
-                StylusTip = _penTip,
-                IsHighlighter = _isHighlighter,
-                IgnorePressure = _ignorePreassure,
-                FitToCurve = _fitToCurve,
+                Color = PenColor,
+                Width = ThickNess,
+                Height = ThickNess,
+                StylusTip = Tip,
+                IsHighlighter = IsHighlighter,
+                IgnorePressure = IgnorePreassure,
+                FitToCurve = FitToCurve,
             };
         }
     }

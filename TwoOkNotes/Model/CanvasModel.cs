@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.IO;
 using System.Windows.Ink;
 using System.Windows.Media;
+using System.ComponentModel;
 
 namespace TwoOkNotes.Model
 {
@@ -16,6 +17,7 @@ namespace TwoOkNotes.Model
         public string CanvasNoteName { get; set; }
         //Redo stack used for the redo button
         public Stack<Stroke> RedoStack { get; set; }
+        public PenModel PenModel { get; set; }
 
         //Initilizing the canvas
         public CanvasModel(String name, Stack<Stroke> redoStack)
@@ -33,13 +35,23 @@ namespace TwoOkNotes.Model
 
         public void SetPen (PenModel penModel)
         {
+            PenModel = penModel;
             DefaultDrawingAttributes = penModel.GetDrawingAttributes();
+            PenModel.PropertyChanged += PenModelChanged;
+        }
+
+        private void PenModelChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                DefaultDrawingAttributes = PenModel.GetDrawingAttributes();
+            });
         }
 
         //Clear method for the canvas
         public void ClearCanvas()
         {
-            Strokes.Clear();
+            this.Strokes.Clear();
         }
 
     }
