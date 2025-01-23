@@ -62,11 +62,14 @@
         <Grid>
             <ContentControl Content="{Binding CurrentCanvasModel}" />
             <views:PenSettings 
-               Visibility="{Binding IsPenSettingOpen, Converter={StaticResource BooleanToVisibilityConverter}}" 
-               HorizontalAlignment="Right" 
+               DataContext="{Binding CurrentPenModel}"
+               Visibility="{Binding DataContext.IsPenSettingOpen, 
+                       RelativeSource={RelativeSource AncestorType=Window}, 
+                       Converter={StaticResource BooleanToVisibilityConverter}}"
+                 HorizontalAlignment="Right" 
                VerticalAlignment="Top" 
                Width="200" 
-               Height="200"/>
+               Height="250"/>
         </Grid>
     </DockPanel>
  

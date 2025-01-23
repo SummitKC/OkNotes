@@ -11,6 +11,7 @@ using TwoOkNotes.Util;
 
 namespace TwoOkNotes.Model
 {
+    //TODO: Change this logic to be in the viewmodel insted of the model, most functionality is working now 
     public class PenModel : ObservableObject
     {
         private Color _penColor = Colors.Blue;
@@ -22,6 +23,8 @@ namespace TwoOkNotes.Model
         private bool _ignorePreassure = false;
         private bool _fitToCurve = false;
 
+
+        //TODo it support ARBG for Opacity
         public Color PenColor
         {
             get => _penColor;
@@ -42,6 +45,7 @@ namespace TwoOkNotes.Model
             }
         }
 
+        //TODO: Use argb values to set opacity 
         public double Opacity
         {
             get => _opacity;

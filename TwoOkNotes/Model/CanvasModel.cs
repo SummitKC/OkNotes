@@ -25,6 +25,7 @@ namespace TwoOkNotes.Model
             CanvasNoteName = name;
             InitilizeCanvas();
             RedoStack = redoStack;
+            PenModel = new PenModel(); 
         }
 
         //default settings for the canvas
@@ -33,13 +34,15 @@ namespace TwoOkNotes.Model
             Background = Brushes.Black;
         }
 
-        public void SetPen (PenModel penModel)
+        //Set pen with the current, and update on when any aspect of the pen changes
+        public void SetPen(PenModel penModel)
         {
             PenModel = penModel;
             DefaultDrawingAttributes = penModel.GetDrawingAttributes();
             PenModel.PropertyChanged += PenModelChanged;
         }
 
+        //Event listener for when the pen model changes
         private void PenModelChanged(object? sender, PropertyChangedEventArgs e)
         {
             Dispatcher.Invoke(() =>
