@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoOkNotes.ViewModels" xmlns:views="clr-namespace:TwoOkNotes.Views"
         mc:Ignorable="d"
-        Title="EditingWindow" Height="450" Width="800">
+        Title="EditingWindow" Height="2560" Width="1440">
     <Window.DataContext>
         <local:EditingWIndowViewModel />
     </Window.DataContext>

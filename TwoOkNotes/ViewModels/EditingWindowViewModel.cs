@@ -33,7 +33,7 @@ namespace TwoOkNotes.ViewModels
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel()
         {
-            CurrentCanvasModel = new CanvasModel("noteName", new Stack<Stroke>());
+            CurrentCanvasModel = new("Note Name", new Stack<Stroke>());
             CurrentPenModel = new PenModel();
             CurrentCanvasModel.SetPen(CurrentPenModel);
             SaveNoteCommand = new RelayCommand(SaveNote);
@@ -55,27 +55,17 @@ namespace TwoOkNotes.ViewModels
         }
 
         //If the given file exists for the filepath, load the note
-        private void LoadNote(object? obj)
+        public void LoadNote(object? obj)
         {
+            Debug.WriteLine("Loading Note");
             if (File.Exists(FilePath))
-            {
-                using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
+                Debug.WriteLine("L");
+
+            using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
                 {
                     CurrentCanvasModel.Strokes = new StrokeCollection(fs);
-                    // TODO: Implement RedoStack
-                    /*
-                    CurrentCanvasModel.RedoStack = new Stack<Stroke>( Get from db);
-                    */
 
-                    /* foreach (Stroke stroke in CurrentCanvasModel.Strokes)
-                    {
-                        foreach (StylusPoint point in stroke.StylusPoints)
-                        {
-                            Debug.WriteLine(point.X + " " + point.Y);
-                        }
-                    } */
                 }
-            }
         }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas

@@ -8,14 +8,14 @@
         Height="600" Width="900"
         WindowStyle="None"
         ResizeMode="NoResize">
-    
-<Window.DataContext>
+
+    <Window.DataContext>
         <local:HomeViewModel />
     </Window.DataContext>
 
     <Border Background="#98dbe1"
             CornerRadius="10">
-        <Grid>
+        <Grid RenderTransformOrigin="0.567,0.537">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="114.754"/>
                 <ColumnDefinition Width="*"/>
@@ -53,14 +53,19 @@
                              Command="{Binding OpenWindow}"/>
             </StackPanel>
 
-            <Frame x:Name="MainFrame"
-                   Grid.Column="1"
-                   Grid.Row="1"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Center"
-                   Width="765"
-                   Height="536"
-                   Margin="10,0,0,0"/>
+            <Grid Grid.Column="1" Margin="10,10,10,10" Grid.Row="1">
+                <Button
+                    Command="{Binding LoadCurrentFileCommand}" Width="133" Height =" 153">
+                    <Button.Content>
+                        <Image Source="{Binding ImagePath}"
+                       Width="133"
+                       Height="153"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"/>
+                    </Button.Content>
+                </Button>
+            </Grid>
+
         </Grid>
     </Border>
 </Window>

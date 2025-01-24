@@ -25,11 +25,6 @@ namespace TwoOkNotes.Views
         {
             InitializeComponent();
         }
-
-        private void PenSettings_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 
 }
