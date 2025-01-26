@@ -1,4 +1,5 @@
-﻿using System;
+﻿//CanvasModel
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Windows.Ink;
 using System.Windows.Media;
 using System.ComponentModel;
+using TwoOkNotes.ViewModels;
 
 namespace TwoOkNotes.Model
 {
@@ -17,7 +19,8 @@ namespace TwoOkNotes.Model
         public string CanvasNoteName { get; set; }
         //Redo stack used for the redo button
         public Stack<Stroke> RedoStack { get; set; }
-        public PenModel PenModel { get; set; }
+        public PenViewModel PenViewModel { get; set; }
+
 
         //Initilizing the canvas
         public CanvasModel(String name, Stack<Stroke> redoStack)
@@ -25,7 +28,7 @@ namespace TwoOkNotes.Model
             CanvasNoteName = name;
             InitilizeCanvas();
             RedoStack = redoStack;
-            PenModel = new PenModel(); 
+            PenViewModel = new PenViewModel();
         }
 
         //default settings for the canvas
@@ -35,11 +38,11 @@ namespace TwoOkNotes.Model
         }
 
         //Set pen with the current, and update on when any aspect of the pen changes
-        public void SetPen(PenModel penModel)
+        public void SetPen(PenViewModel penModel)
         {
-            PenModel = penModel;
+            PenViewModel = penModel;
             DefaultDrawingAttributes = penModel.GetDrawingAttributes();
-            PenModel.PropertyChanged += PenModelChanged;
+            PenViewModel.PropertyChanged += PenModelChanged;
         }
 
         //Event listener for when the pen model changes
@@ -47,7 +50,7 @@ namespace TwoOkNotes.Model
         {
             Dispatcher.Invoke(() =>
             {
-                DefaultDrawingAttributes = PenModel.GetDrawingAttributes();
+                DefaultDrawingAttributes = PenViewModel.GetDrawingAttributes();
             });
         }
 
