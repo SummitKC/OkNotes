@@ -17,8 +17,9 @@ namespace TwoOkNotes.ViewModels
 {
     public class EditingWIndowViewModel : ObservableObject
     {
-        //TODO: Change this based on the user's chosen location 
-        private readonly string FilePath = "TempNoteFolder\\TestNote.idf";
+
+
+        private string _filePath;
         private bool _isPenSettingOpen;
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
@@ -43,6 +44,12 @@ namespace TwoOkNotes.ViewModels
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
+        }
+
+        public string FilePath
+        {
+            get => _filePath;
+            set => _filePath = value;
         }
 
         //Creating a file

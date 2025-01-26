@@ -9,11 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Images\Testingbook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Assets\Fonts\" />
-    <Folder Include="Assets\Images\" />
-    <Folder Include="Model\" />
     <Folder Include="TempNoteFolder\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Images\Testingbook.png" />
   </ItemGroup>
 
 </Project>
