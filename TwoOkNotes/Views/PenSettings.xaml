@@ -21,7 +21,7 @@
             <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Margin="10"/>
 
             <TextBlock Text="Pen Opacity" Margin="10"/>
-            <Slider Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}" Margin="10"/>
+            <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Margin="10"/>
         </StackPanel>
     </Grid>
 </UserControl>

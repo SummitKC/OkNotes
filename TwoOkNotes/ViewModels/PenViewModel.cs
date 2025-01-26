@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,10 +59,14 @@ namespace TwoOkNotes.ViewModels
             get => _penModel.Opacity;
             set
             {
+                
                 _penModel.Opacity = value;
+                _penModel.PenColor = Color.FromArgb((byte)_penModel.Opacity, _penModel.PenColor.R, _penModel.PenColor.G, _penModel.PenColor.B);
                 OnPropertyChanged(nameof(Opacity));
             }
         }
+
+
         public StylusTip Tip
         {
             get => _penModel.Tip;

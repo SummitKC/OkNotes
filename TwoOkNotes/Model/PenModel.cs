@@ -16,7 +16,7 @@ namespace TwoOkNotes.Model
     {
         public Color PenColor { get; set; } = Colors.Blue;
         public double Thickness { get; set; } = 20.0;
-        public double Opacity { get; set; } = 1.0;
+        public double Opacity { get; set; } = 255.0;
         public StylusTip Tip { get; set; } = StylusTip.Ellipse;
         public bool IsEraser { get; set; } = false;
         public bool IsHighlighter { get; set; } = false;
