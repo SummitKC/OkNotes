@@ -55,7 +55,7 @@ namespace TwoOkNotes.ViewModels
         private void LoadSavedPages()
         {
             //Change later 
-            string notesDirectory = @"C:\Users\Summit\Source\Repos\OkNotes\TwoOkNotes\TempNoteFolder";
+            string notesDirectory = @"C:\Users\wajee\Source\Repos\OkNotes\TwoOkNotes\TempNoteFolder";
 
             if (Directory.Exists(notesDirectory))
             {

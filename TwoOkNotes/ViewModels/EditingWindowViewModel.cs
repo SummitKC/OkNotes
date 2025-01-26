@@ -23,7 +23,7 @@ namespace TwoOkNotes.ViewModels
         private bool _isPenSettingOpen;
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
-        public PenModel CurrentPenModel { get; set; }
+        public PenViewModel CurrentPenModel { get; set; }
         public ICommand SaveNoteCommand { get; }
         public ICommand ClearInkCommand { get; }
         public ICommand DeleteNoteCommand { get; }
@@ -34,8 +34,8 @@ namespace TwoOkNotes.ViewModels
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel()
         {
-            CurrentCanvasModel = new("Note Name", new Stack<Stroke>());
-            CurrentPenModel = new PenModel();
+            CurrentCanvasModel = new CanvasModel("noteName", new Stack<Stroke>());
+            CurrentPenModel = new PenViewModel();
             CurrentCanvasModel.SetPen(CurrentPenModel);
             SaveNoteCommand = new RelayCommand(SaveNote);
             ClearInkCommand = new RelayCommand(ClearInk);
@@ -68,12 +68,25 @@ namespace TwoOkNotes.ViewModels
             if (File.Exists(FilePath))
                 Debug.WriteLine("L");
 
-            using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
+                using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
                 {
                     CurrentCanvasModel.Strokes = new StrokeCollection(fs);
+                    // TODO: Implement RedoStack
+                    /*
+                    CurrentCanvasModel.RedoStack = new Stack<Stroke>( Get from db);
+                    */
 
+                    /* foreach (Stroke stroke in CurrentCanvasModel.Strokes)
+                    {
+                        foreach (StylusPoint point in stroke.StylusPoints)
+                        {
+                            Debug.WriteLine(point.X + " " + point.Y);
+                        }
+                    } */
                 }
         }
+        
+        
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         public void Undo(object? obj)
