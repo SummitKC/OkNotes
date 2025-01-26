@@ -9,21 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\Images\Testingbook.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Page Remove="Assets\Themes\LauncherButtonTheme.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Assets\Fonts\" />
+    <Folder Include="Assets\Images\" />
     <Folder Include="TempNoteFolder\" />
     <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\Images\Testingbook.png" />
   </ItemGroup>
 
   <ItemGroup>
