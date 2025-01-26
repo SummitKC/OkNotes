@@ -14,109 +14,118 @@ namespace TwoOkNotes.Model
     //TODO: Change this logic to be in the viewmodel insted of the model, most functionality is working now 
     public class PenModel : ObservableObject
     {
-        private Color _penColor = Colors.Blue;
-        private double _thickness = 20.0;
-        private double _opacity = 1; 
-        private StylusTip _penTip = StylusTip.Ellipse;
-        private bool _isEraser = false;
-        private bool _isHighlighter = false;
-        private bool _ignorePreassure = false;
-        private bool _fitToCurve = false;
+        public Color PenColor { get; set; } = Colors.Blue;
+        public double Thickness { get; set; } = 20.0;
+        public double Opacity { get; set; } = 1.0;
+        public StylusTip Tip { get; set; } = StylusTip.Ellipse;
+        public bool IsEraser { get; set; } = false;
+        public bool IsHighlighter { get; set; } = false;
+        public bool IgnorePressure { get; set; } = false;
+        public bool FitToCurve { get; set; } = false;
+
+        //public Color _penColor = Colors.Blue;
+        //public double _thickness = 20.0;
+        //public double _opacity = 1;
+        //public StylusTip _penTip = StylusTip.Ellipse;
+        //public bool _isEraser = false;
+        //public bool _isHighlighter = false;
+        //public bool _ignorePreassure = false;
+        //public bool _fitToCurve = false;
 
 
         //TODo it support ARBG for Opacity
-        public Color PenColor
-        {
-            get => _penColor;
-            set
-            {
-                _penColor = value;
-                OnPropertyChanged(nameof(PenColor));
-            }
-        }
+        //public Color PenColor
+        //{
+        //    get => _penColor;
+        //    set
+        //    {
+        //        _penColor = value;
+        //        OnPropertyChanged(nameof(PenColor));
+        //    }
+        //}
 
-        public double ThickNess
-        {
-            get => _thickness;
-            set
-            {
-                _thickness = value;
-                OnPropertyChanged(nameof(ThickNess));
-            }
-        }
+        //public double ThickNess
+        //{
+        //    get => _thickness;
+        //    set
+        //    {
+        //        _thickness = value;
+        //        OnPropertyChanged(nameof(ThickNess));
+        //    }
+        //}
 
-        //TODO: Use argb values to set opacity 
-        public double Opacity
-        {
-            get => _opacity;
-            set
-            {
-                _opacity = value;
-                OnPropertyChanged(nameof(Opacity));
-            }
-        }
+        ////TODO: Use argb values to set opacity 
+        //public double Opacity
+        //{
+        //    get => _opacity;
+        //    set
+        //    {
+        //        _opacity = value;
+        //        OnPropertyChanged(nameof(Opacity));
+        //    }
+        //}
 
-        public StylusTip Tip
-        {
-            get => _penTip;
-            set
-            {
-                _penTip = value;
-                OnPropertyChanged(nameof(Tip));
-            }
-        }
+        //public StylusTip Tip
+        //{
+        //    get => _penTip;
+        //    set
+        //    {
+        //        _penTip = value;
+        //        OnPropertyChanged(nameof(Tip));
+        //    }
+        //}
 
-        public bool IsEraser
-        {
-            get => _isEraser;
-            set
-            {
-                _isEraser = value;
-                OnPropertyChanged(nameof(IsEraser));
+        //public bool IsEraser
+        //{
+        //    get => _isEraser;
+        //    set
+        //    {
+        //        _isEraser = value;
+        //        OnPropertyChanged(nameof(IsEraser));
 
-            }
-        }
+        //    }
+        //}
 
-        public bool IsHighlighter
-        {
-            get => _isHighlighter;
-            set
-            {
-                _isHighlighter = value;
-                OnPropertyChanged(nameof(IsHighlighter));
-            }
-        }
+        //public bool IsHighlighter
+        //{
+        //    get => _isHighlighter;
+        //    set
+        //    {
+        //        _isHighlighter = value;
+        //        OnPropertyChanged(nameof(IsHighlighter));
+        //    }
+        //}
 
-        public bool IgnorePreassure
-        {
-            get => _ignorePreassure;
-            set
-            {
-                _ignorePreassure = value;
-                OnPropertyChanged(nameof(IgnorePreassure));
-            }
-        }
+        //public bool IgnorePreassure
+        //{
+        //    get => _ignorePreassure;
+        //    set
+        //    {
+        //        _ignorePreassure = value;
+        //        OnPropertyChanged(nameof(IgnorePreassure));
+        //    }
+        //}
 
-        public bool FitToCurve
-        {
-            get => _fitToCurve;
-            set
-            {
-                _fitToCurve = value;
-                OnPropertyChanged(nameof(FitToCurve));
-            }
-        }
+        //public bool FitToCurve
+        //{
+        //    get => _fitToCurve;
+        //    set
+        //    {
+        //        _fitToCurve = value;
+        //        OnPropertyChanged(nameof(FitToCurve));
+        //    }
+        //}
 
-        public DrawingAttributes GetDrawingAttributes()
+        public DrawingAttributes getdrawingattributes()
         {
             return new DrawingAttributes
             {
                 Color = PenColor,
-                Width = ThickNess,
-                Height = ThickNess,
+                Width = Thickness,
+                Height = Thickness,
                 StylusTip = Tip,
                 IsHighlighter = IsHighlighter,
-                IgnorePressure = IgnorePreassure,
+                IgnorePressure = IgnorePressure,
                 FitToCurve = FitToCurve,
             };
         }

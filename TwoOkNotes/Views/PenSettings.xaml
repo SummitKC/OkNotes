@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TwoOkNotes.ViewModels" xmlns:model="clr-namespace:TwoOkNotes.Model" d:DataContext="{d:DesignInstance Type=model:PenModel}"
+             xmlns:local="clr-namespace:TwoOkNotes.ViewModels" xmlns:model="clr-namespace:TwoOkNotes.Model" 
              mc:Ignorable="d" 
              d:DesignHeight="259.119" d:DesignWidth="258.709">
     <Grid Background="Aqua">
