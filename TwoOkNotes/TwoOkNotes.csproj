@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="Assets\Themes\LauncherButtonTheme.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Assets\Fonts\" />
     <Folder Include="TempNoteFolder\" />
     <Folder Include="Services\" />
@@ -20,6 +24,10 @@
 
   <ItemGroup>
     <Resource Include="Assets\Images\Testingbook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Themes\LauncherButtonTheme.xaml" />
   </ItemGroup>
 
 </Project>
