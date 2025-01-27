@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,9 @@ using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 using TwoOkNotes.Model;
+using TwoOkNotes.Services;
 using TwoOkNotes.Util;
+using TwoOkNotes.Views;
 
 namespace TwoOkNotes.ViewModels
 {
@@ -18,66 +21,100 @@ namespace TwoOkNotes.ViewModels
     {
 
 
+        private readonly SettingsServices _settingsServices;
+        public PenModel PenSettings { get; set; }
 
-        public readonly PenModel _penModel = new();
 
 
         //public ICommand ChangePenColorCommand { get; } 
 
         public PenViewModel()
         {
-
-            PenModel penModel = new PenModel();
-
+            _settingsServices =  new SettingsServices();
+            PenSettings = _settingsServices.LoadPenSettings();
         }
 
 
         public Color PenColor
 
         {
-            get => _penModel.PenColor;
+            get => PenSettings.PenColor;
             set
             {
-                _penModel.PenColor = value;
+                PenSettings.PenColor = value;
                 OnPropertyChanged(nameof(PenColor));
             }
 
         }
         public double ThickNess
         {
-            get => _penModel.Thickness;
+            get => PenSettings.Thickness;
             set
             {
-                _penModel.Thickness = value;
+                PenSettings.Thickness = value;
                 OnPropertyChanged(nameof(ThickNess));
             }
         }
 
-        public double Opacity
+        public byte Red
         {
-            get => _penModel.Opacity;
+            get => _penModel.red;
             set
             {
-                _penModel.Opacity = value;
+                _penModel.red = (byte) value;
+                _penModel.PenColor = Color.FromArgb(_penModel.Opacity, _penModel.red, _penModel.green, _penModel.blue);
+                OnPropertyChanged(nameof(Red));
+            }
+        }
+        public byte Green
+        {
+            get => _penModel.green;
+            set
+            {
+                _penModel.green = (byte)value;
+                _penModel.PenColor = Color.FromArgb(_penModel.Opacity, _penModel.red, _penModel.green, _penModel.blue);
+                OnPropertyChanged(nameof(Green));
+            }
+        }
+        public byte Blue
+        {
+            get => _penModel.blue;
+            set
+            {
+                _penModel.blue = (byte)value;
+                _penModel.PenColor = Color.FromArgb(_penModel.Opacity, _penModel.red, _penModel.green, _penModel.blue);
+                OnPropertyChanged(nameof(Blue));
+            }
+        }
+        public byte Opacity
+        {
+            get => PenSettings.Opacity;
+            set
+            {
+
+                PenSettings.Opacity = value;
+                PenSettings.PenColor = Color.FromArgb((byte)PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
                 OnPropertyChanged(nameof(Opacity));
             }
         }
+
+
         public StylusTip Tip
         {
-            get => _penModel.Tip;
+            get => PenSettings.Tip;
             set
             {
-                _penModel.Tip = value;
+                PenSettings.Tip = value;
                 OnPropertyChanged(nameof(Tip));
             }
         }
 
         public bool IsEraser
         {
-            get => _penModel.IsEraser;
+            get => PenSettings.IsEraser;
             set
             {
-                _penModel.IsEraser = value;
+                PenSettings.IsEraser = value;
                 OnPropertyChanged(nameof(IsEraser));
 
             }
@@ -85,46 +122,42 @@ namespace TwoOkNotes.ViewModels
 
         public bool IsHighlighter
         {
-            get => _penModel.IsHighlighter;
+            get => PenSettings.IsHighlighter;
             set
             {
-                _penModel.IsHighlighter = value;
+                PenSettings.IsHighlighter = value;
                 OnPropertyChanged(nameof(IsHighlighter));
             }
         }
 
         public bool IgnorePreassure
         {
-            get => _penModel.IgnorePressure;
+            get => PenSettings.IgnorePressure;
             set
             {
-                _penModel.IgnorePressure = value;
+                PenSettings.IgnorePressure = value;
                 OnPropertyChanged(nameof(IgnorePreassure));
             }
         }
 
         public bool FitToCurve
         {
-            get => _penModel.FitToCurve;
+            get => PenSettings.FitToCurve;
             set
             {
-                _penModel.FitToCurve = value;
+                PenSettings.FitToCurve = value;
                 OnPropertyChanged(nameof(FitToCurve));
             }
         }
         public DrawingAttributes GetDrawingAttributes()
         {
-            return new DrawingAttributes
-            {
-                Color = PenColor,
-                Width = ThickNess,
-                Height = ThickNess,
-                StylusTip = Tip,
-                IsHighlighter = IsHighlighter,
-                IgnorePressure = IgnorePreassure,
-                FitToCurve = FitToCurve,
-            };
+            return PenSettings.getdrawingattributes();
         }
+
+        public void SavePenSettings()
+        {
+            _settingsServices.SavePenSettings(PenSettings);
+        }   
 
     }
 }

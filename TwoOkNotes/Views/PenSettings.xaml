@@ -3,25 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TwoOkNotes.ViewModels" xmlns:model="clr-namespace:TwoOkNotes.Model" 
-             mc:Ignorable="d" 
-             d:DesignHeight="259.119" d:DesignWidth="258.709">
+             xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
+             xmlns:model="clr-namespace:TwoOkNotes.Model" 
+             mc:Ignorable="d" Height="292" Width="256">
     <Grid Background="Aqua">
-        <StackPanel>
-            <TextBlock Text="Pen Color" Margin="10"/>
-            <ComboBox SelectedValue="{Binding PenColor, Mode=TwoWay}"
-                      SelectedValuePath="Tag"
-                      Margin="10">
-                <ComboBoxItem Content="Red" Tag="{x:Static Colors.Red}"/>
-                <ComboBoxItem Content="Blue" Tag="{x:Static Colors.Blue}"/>
-                <ComboBoxItem Content="Green" Tag="{x:Static Colors.Green}"/>
-            </ComboBox>
+        <StackPanel Margin="0,0,0,0">
+         
+
+            <!-- Individual sliders for RGB -->
+            <TextBlock Text="Red" Margin="10" Height="15"/>
+            <Slider Minimum="0" Maximum="255" Value="{Binding Red, Mode=TwoWay}" Width="240"/>
+
+            <TextBlock Text="Green" Margin="10" Height="15"/>
+            <Slider Minimum="0" Maximum="255" Value="{Binding Green, Mode=TwoWay}" Width="240"/>
+
+            <TextBlock Text="Blue" Margin="10"/>
+            <Slider Minimum="0" Maximum="255" Value="{Binding Blue, Mode=TwoWay}" Width="240"/>
 
             <TextBlock Text="Pen Thickness" Margin="10"/>
-            <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Margin="10"/>
+            <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="240"/>
 
             <TextBlock Text="Pen Opacity" Margin="10"/>
-            <Slider Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}" Margin="10"/>
+            <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
         </StackPanel>
     </Grid>
 </UserControl>
