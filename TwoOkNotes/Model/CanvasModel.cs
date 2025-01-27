@@ -18,6 +18,7 @@ namespace TwoOkNotes.Model
         //The name of the note
         public string CanvasNoteName { get; set; }
         //Redo stack used for the redo button
+        public int NoteID { get; set; }
         public Stack<Stroke> RedoStack { get; set; }
         public PenViewModel PenViewModel { get; set; }
 
@@ -25,8 +26,8 @@ namespace TwoOkNotes.Model
         //Initilizing the canvas
         public CanvasModel(String name, Stack<Stroke> redoStack)
         {
-            CanvasNoteName = name;
             InitilizeCanvas();
+            CanvasNoteName = name;
             RedoStack = redoStack;
             PenViewModel = new PenViewModel();
         }
@@ -57,7 +58,7 @@ namespace TwoOkNotes.Model
         //Clear method for the canvas
         public void ClearCanvas()
         {
-            this.Strokes.Clear();
+            Strokes.Clear();
         }
 
     }

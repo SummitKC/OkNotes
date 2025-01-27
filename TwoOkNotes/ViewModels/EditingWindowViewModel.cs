@@ -18,8 +18,6 @@ namespace TwoOkNotes.ViewModels
     public class EditingWIndowViewModel : ObservableObject
     {
 
-
-        private string _filePath;
         private bool _isPenSettingOpen;
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
@@ -32,61 +30,41 @@ namespace TwoOkNotes.ViewModels
         public ICommand RedoCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
-        public EditingWIndowViewModel()
+        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel CurrentPenModel)
         {
-            CurrentCanvasModel = new CanvasModel("noteName", new Stack<Stroke>());
-            CurrentPenModel = new PenViewModel();
+            CurrentCanvasModel = _currentCanvasModel;
             CurrentCanvasModel.SetPen(CurrentPenModel);
-            SaveNoteCommand = new RelayCommand(SaveNote);
+            //SaveNoteCommand = new RelayCommand(SaveNote);
             ClearInkCommand = new RelayCommand(ClearInk);
-            DeleteNoteCommand = new RelayCommand(DeleteNote);
-            LoadNoteCommand = new RelayCommand(LoadNote);
+            //DeleteNoteCommand = new RelayCommand(DeleteNote);
+            //LoadNoteCommand = new RelayCommand(LoadNote);
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
         }
 
-        public string FilePath
-        {
-            get => _filePath;
-            set => _filePath = value;
-        }
 
-        //Creating a file
-        private void SaveNote(object? obj)
+        ////Creating a file
+        //private void SaveNote(object? obj)
 
-        {
-            Debug.WriteLine("Saving Note");
-            using FileStream fs = new(FilePath, FileMode.Create);
-            CurrentCanvasModel.Strokes.Save(fs);
-        }
+        //{
+        //    Debug.WriteLine("Saving Note");
+        //    using FileStream fs = new(FilePath, FileMode.Create);
+        //    CurrentCanvasModel.Strokes.Save(fs);
+        //}
 
-        //If the given file exists for the filepath, load the note
-        public void LoadNote(object? obj)
-        {
-            Debug.WriteLine("Loading Note");
-            if (File.Exists(FilePath))
-                Debug.WriteLine("L");
+        ////If the given file exists for the filepath, load the note
+        //public void LoadNote(object? obj)
+        //{
+        //    Debug.WriteLine("Loading Note");
+        //    if (File.Exists(FilePath))
+        //        Debug.WriteLine("L");
 
-                using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
-                {
-                    CurrentCanvasModel.Strokes = new StrokeCollection(fs);
-                    // TODO: Implement RedoStack
-                    /*
-                    CurrentCanvasModel.RedoStack = new Stack<Stroke>( Get from db);
-                    */
-
-                    /* foreach (Stroke stroke in CurrentCanvasModel.Strokes)
-                    {
-                        foreach (StylusPoint point in stroke.StylusPoints)
-                        {
-                            Debug.WriteLine(point.X + " " + point.Y);
-                        }
-                    } */
-                }
-        }
-        
-        
+        //        using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
+        //        {
+        //            CurrentCanvasModel.Strokes = new StrokeCollection(fs);
+        //        }
+        //}
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         public void Undo(object? obj)
@@ -116,20 +94,20 @@ namespace TwoOkNotes.ViewModels
         }
 
         //Delete file 
-        private void DeleteNote(object? obj)
-        {
-            Debug.WriteLine("Deleting File");
+        //private void DeleteNote(object? obj)
+        //{
+        //    Debug.WriteLine("Deleting File");
 
-            if (File.Exists(FilePath))
-            {
-                File.Delete(FilePath);
-                Debug.WriteLine("File Deleted");
-            }
-            else
-            {
-                Debug.WriteLine("File does not exist");
-            }
-        }
+        //    if (File.Exists(FilePath))
+        //    {
+        //        File.Delete(FilePath);
+        //        Debug.WriteLine("File Deleted");
+        //    }
+        //    else
+        //    {
+        //        Debug.WriteLine("File does not exist");
+        //    }
+        //}
 
         //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 
         public bool IsPenSettingOpen

@@ -61,7 +61,7 @@ namespace TwoOkNotes.ViewModels
             get => PenSettings.red;
             set
             {
-                PenSettings.red = (byte) value;
+                PenSettings.red = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Red));
             }
@@ -97,7 +97,6 @@ namespace TwoOkNotes.ViewModels
                 OnPropertyChanged(nameof(Opacity));
             }
         }
-
 
         public StylusTip Tip
         {

@@ -1,30 +1,22 @@
-﻿using System;
+﻿using System.Windows;
+using TwoOkNotes.ViewModels;
+using TwoOkNotes.Model;
+using System.Windows.Ink;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Ink; 
-
-
+using TwoOkNotes.ViewModels;
 namespace TwoOkNotes.Views
 {
-    /// <summary>
-    /// Interaction logic for EditingWindow.xaml
-    /// </summary>
     public partial class EditingWindow : Window
     {
-        public EditingWindow()
+        public EditingWindow(CanvasModel canvasModel, PenViewModel penViewModel)
         {
             InitializeComponent();
+            DataContext = new EditingWIndowViewModel(canvasModel, penViewModel);
+        }
+
+        // Optional parameterless constructor
+        public EditingWindow() : this(new CanvasModel("Untitled", new Stack<Stroke>()), new PenViewModel())
+        {
         }
     }
-
 }
