@@ -15,6 +15,9 @@ namespace TwoOkNotes.Model
     public class PenModel : ObservableObject
     {
         public Color PenColor { get; set; } = Colors.Blue;
+        public byte red { get; set; } = 255;
+        public byte green { get; set; } = 255;
+        public byte blue { get; set; } = 255;
         public double Thickness { get; set; } = 20.0;
         public double Opacity { get; set; } = 255.0;
         public StylusTip Tip { get; set; } = StylusTip.Ellipse;
@@ -22,6 +25,7 @@ namespace TwoOkNotes.Model
         public bool IsHighlighter { get; set; } = false;
         public bool IgnorePressure { get; set; } = false;
         public bool FitToCurve { get; set; } = false;
+
 
         //public Color _penColor = Colors.Blue;
         //public double _thickness = 20.0;
@@ -120,6 +124,7 @@ namespace TwoOkNotes.Model
         {
             return new DrawingAttributes
             {
+
                 Color = PenColor,
                 Width = Thickness,
                 Height = Thickness,
