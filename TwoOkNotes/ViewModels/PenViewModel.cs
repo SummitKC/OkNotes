@@ -58,31 +58,31 @@ namespace TwoOkNotes.ViewModels
 
         public byte Red
         {
-            get => _penModel.red;
+            get => PenSettings.red;
             set
             {
-                _penModel.red = (byte) value;
-                _penModel.PenColor = Color.FromArgb(_penModel.Opacity, _penModel.red, _penModel.green, _penModel.blue);
+                PenSettings.red = (byte) value;
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Red));
             }
         }
         public byte Green
         {
-            get => _penModel.green;
+            get => PenSettings.green;
             set
             {
-                _penModel.green = (byte)value;
-                _penModel.PenColor = Color.FromArgb(_penModel.Opacity, _penModel.red, _penModel.green, _penModel.blue);
+                PenSettings.green = (byte)value;
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Green));
             }
         }
         public byte Blue
         {
-            get => _penModel.blue;
+            get => PenSettings.blue;
             set
             {
-                _penModel.blue = (byte)value;
-                _penModel.PenColor = Color.FromArgb(_penModel.Opacity, _penModel.red, _penModel.green, _penModel.blue);
+                PenSettings.blue = (byte)value;
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Blue));
             }
         }
