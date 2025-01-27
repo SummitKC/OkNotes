@@ -17,13 +17,12 @@ namespace TwoOkNotes.ViewModels
 {
     public class HomeViewModel : ObservableObject
     {
+        private readonly string notesDirectory = @"C:\Users\Summit\Source\Repos\OkNotes\TwoOkNotes\TempNoteFolder";
 
         private string iconPath = "pack://application:,,,/Assets/Images/Testingbook.png";
         //Command Opeaning the editing window   
         public ICommand OpenWindow { get; }
         public ICommand LoadCurrentFileCommand { get; }
-
-
 
         public ObservableCollection<PageModel> SavedPages { get; set;  }
 
@@ -55,7 +54,6 @@ namespace TwoOkNotes.ViewModels
         private void LoadSavedPages()
         {
             //Change later 
-            string notesDirectory = @"C:\Users\wajee\Source\Repos\OkNotes\TwoOkNotes\TempNoteFolder";
 
             if (Directory.Exists(notesDirectory))
             {

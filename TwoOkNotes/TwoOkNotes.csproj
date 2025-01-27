@@ -16,7 +16,6 @@
     <Folder Include="Assets\Fonts\" />
     <Folder Include="Assets\Images\" />
     <Folder Include="TempNoteFolder\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
