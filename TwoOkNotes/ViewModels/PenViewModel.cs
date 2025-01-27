@@ -56,7 +56,37 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public double Opacity
+        public byte Red
+        {
+            get => PenSettings.red;
+            set
+            {
+                PenSettings.red = (byte) value;
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
+                OnPropertyChanged(nameof(Red));
+            }
+        }
+        public byte Green
+        {
+            get => PenSettings.green;
+            set
+            {
+                PenSettings.green = (byte)value;
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
+                OnPropertyChanged(nameof(Green));
+            }
+        }
+        public byte Blue
+        {
+            get => PenSettings.blue;
+            set
+            {
+                PenSettings.blue = (byte)value;
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
+                OnPropertyChanged(nameof(Blue));
+            }
+        }
+        public byte Opacity
         {
             get => PenSettings.Opacity;
             set
