@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TwoOkNotes.ViewModels" xmlns:views="clr-namespace:TwoOkNotes.Views"
+        xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
+        xmlns:views="clr-namespace:TwoOkNotes.Views" 
+        d:DataContext="{d:DesignInstance Type=local:EditingWIndowViewModel}"
         mc:Ignorable="d"
         Title="EditingWindow" Height="2560" Width="1440">
     <!--<Window.Resources>

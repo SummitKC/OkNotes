@@ -8,6 +8,7 @@ using TwoOkNotes.Views;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TwoOkNotes.Model;
+using System.Diagnostics;
 namespace TwoOkNotes.Services
 {
     public class SettingsServices
@@ -41,12 +42,14 @@ namespace TwoOkNotes.Services
         {
             if (File.Exists(_settingsFilePath))
             {
+                Debug.WriteLine("gets to loading?");
                 string json = File.ReadAllText(_settingsFilePath);
                 //return the settings if they exist, else return a new instance of the settings
                 return JsonSerializer.Deserialize<PenModel>(json) ?? new PenModel();
             }
             else
             {
+                Debug.WriteLine("gets here?");
                 return new PenModel();
             }
         }

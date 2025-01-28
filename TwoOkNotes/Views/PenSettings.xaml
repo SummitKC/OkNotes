@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
              xmlns:model="clr-namespace:TwoOkNotes.Model" 
              mc:Ignorable="d" Height="292" Width="256">
-    <Grid Background="Aqua">
-        <StackPanel Margin="0,0,0,0">
+    <Grid Background="Aqua" Margin="0,0,0,-23">
+        <StackPanel Margin="0,0,10,-37">
          
 
             <!-- Individual sliders for RGB -->
@@ -25,6 +25,9 @@
 
             <TextBlock Text="Pen Opacity" Margin="10"/>
             <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
+
+            <!-- TODO: Testing for now, remove later to a autosave system on exit -->
+            <Button Content="Save Pen Settings" Command="{Binding SavePenSettingsCommand}" Margin="10"/>
         </StackPanel>
     </Grid>
 </UserControl>

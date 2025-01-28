@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Ink;
@@ -20,6 +21,7 @@ namespace TwoOkNotes.Model
         public byte blue { get; set; } = 255;
         public double Thickness { get; set; } = 20.0;
         public byte Opacity { get; set; } = (byte) 255;
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public StylusTip Tip { get; set; } = StylusTip.Ellipse;
         public bool IsEraser { get; set; } = false;
         public bool IsHighlighter { get; set; } = false;

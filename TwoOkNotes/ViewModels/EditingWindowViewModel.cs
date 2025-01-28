@@ -30,10 +30,11 @@ namespace TwoOkNotes.ViewModels
         public ICommand RedoCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
-        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel CurrentPenModel)
+        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel)
         {
             CurrentCanvasModel = _currentCanvasModel;
-            CurrentCanvasModel.SetPen(CurrentPenModel);
+            CurrentPenModel = currentPenModel;
+            CurrentCanvasModel.SetPen(currentPenModel);
             //SaveNoteCommand = new RelayCommand(SaveNote);
             ClearInkCommand = new RelayCommand(ClearInk);
             //DeleteNoteCommand = new RelayCommand(DeleteNote);

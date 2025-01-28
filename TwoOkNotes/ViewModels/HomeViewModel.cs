@@ -13,16 +13,19 @@ using System.Collections.ObjectModel;
 using TwoOkNotes.Model;
 using System.IO;
 using System.Windows.Ink;
+using TwoOkNotes.Services;
 
 namespace TwoOkNotes.ViewModels
 {
     public class HomeViewModel : ObservableObject
     {
         private readonly string notesDirectory = @"C:\Users\Summit\Source\Repos\OkNotes\TwoOkNotes\TempNoteFolder";
-
         private string iconPath = "pack://application:,,,/Assets/Images/Testingbook.png";
-        //Command Opeaning the editing window
-        private PenViewModel CurrentPenModel { get; set; }
+
+        private CanvasModel canvasModel;
+        public PenViewModel CurrentPenModel { get; set; }
+
+        //
         public ICommand OpenWindow { get; }
         public ICommand LoadCurrentFileCommand { get; }
         public ObservableCollection<PageModel> SavedPages { get; set;  }
@@ -38,7 +41,13 @@ namespace TwoOkNotes.ViewModels
             CurrentPenModel = new PenViewModel();
         }
 
-        private StrokeCollection getCurrentStrokes(PageModel page)
+        private CanvasModel GetCanvasModel()
+        {
+            canvasModel = new("Untitled", new Stack<Stroke>());
+            return canvasModel;
+        }
+
+        private StrokeCollection GetCurrentStrokes(PageModel page)
         {
             if (page != null)
             {
@@ -54,14 +63,13 @@ namespace TwoOkNotes.ViewModels
             if (obj is PageModel page)
             {
                 EditingWindow editingWindow = new();
-                CanvasModel canvasModel = new("Untitled", new Stack<Stroke>());
-                canvasModel.Strokes = getCurrentStrokes(page);
+                GetCanvasModel().Strokes = GetCurrentStrokes(page);
                 EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel);
                 editingWindow.DataContext = editingWindowViewModel;
                 editingWindow.Show();
             }
         }
-        //TODO: look into using db to store name and filepath? should be more efficient
+
         //Get the directory of the notes and load them into the saved pages
         private void LoadSavedPages()
         {
@@ -92,6 +100,8 @@ namespace TwoOkNotes.ViewModels
         private void OpenNewWindow(object? obj)
         {
             EditingWindow newOpenWindow = new();
+            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel);
+            newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();
         }
     }

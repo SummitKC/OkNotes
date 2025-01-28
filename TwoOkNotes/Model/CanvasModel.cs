@@ -10,6 +10,7 @@ using System.Windows.Ink;
 using System.Windows.Media;
 using System.ComponentModel;
 using TwoOkNotes.ViewModels;
+using System.Diagnostics;
 
 namespace TwoOkNotes.Model
 {
@@ -42,6 +43,7 @@ namespace TwoOkNotes.Model
         public void SetPen(PenViewModel penModel)
         {
             PenViewModel = penModel;
+            Debug.WriteLine("gets to here");
             DefaultDrawingAttributes = penModel.GetDrawingAttributes();
             PenViewModel.PropertyChanged += PenModelChanged;
         }

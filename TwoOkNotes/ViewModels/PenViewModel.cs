@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,6 +11,7 @@ using System.Windows;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using TwoOkNotes.Model;
 using TwoOkNotes.Services;
 using TwoOkNotes.Util;
@@ -24,7 +26,7 @@ namespace TwoOkNotes.ViewModels
         private readonly SettingsServices _settingsServices;
         public PenModel PenSettings { get; set; }
 
-
+        public ICommand SavePenSettingsCommand { get; }
 
         //public ICommand ChangePenColorCommand { get; } 
 
@@ -32,6 +34,7 @@ namespace TwoOkNotes.ViewModels
         {
             _settingsServices =  new SettingsServices();
             PenSettings = _settingsServices.LoadPenSettings();
+            SavePenSettingsCommand = new RelayCommand(SavePenSettings);
         }
 
 
@@ -153,10 +156,10 @@ namespace TwoOkNotes.ViewModels
             return PenSettings.getdrawingattributes();
         }
 
-        public void SavePenSettings()
+        public void SavePenSettings(object? obj)
         {
+            Debug.WriteLine("Saving Pen Settings, gets to here?");
             _settingsServices.SavePenSettings(PenSettings);
-        }   
-
+        }
     }
 }
