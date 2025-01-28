@@ -11,13 +11,14 @@ using System.IO;
 using TwoOkNotes.Model;
 using System.Diagnostics;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 
 namespace TwoOkNotes.ViewModels
 {
     public class EditingWIndowViewModel : ObservableObject
     {
-
+        private DispatcherTimer _timer;
         private bool _isPenSettingOpen;
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
