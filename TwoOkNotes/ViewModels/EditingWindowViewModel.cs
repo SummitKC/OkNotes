@@ -12,6 +12,7 @@ using TwoOkNotes.Model;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Threading;
+using TwoOkNotes.Services;
 
 
 namespace TwoOkNotes.ViewModels
@@ -20,6 +21,9 @@ namespace TwoOkNotes.ViewModels
     {
         private DispatcherTimer _timer;
         private bool _isPenSettingOpen;
+        private string currFilePath;
+
+        private FileSavingServices _savingServices { get; set; }
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
         public PenViewModel CurrentPenModel { get; set; }
@@ -31,8 +35,10 @@ namespace TwoOkNotes.ViewModels
         public ICommand RedoCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
-        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel)
+        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
         {
+            _savingServices = new FileSavingServices();
+            currFilePath = filePath;
             CurrentCanvasModel = _currentCanvasModel;
             CurrentPenModel = currentPenModel;
             CurrentCanvasModel.SetPen(currentPenModel);
@@ -43,30 +49,64 @@ namespace TwoOkNotes.ViewModels
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
+            CreateNote();
+            initTimer();
+            SubscribeToStrokeEvents();
         }
 
+        //Tick system for autosaving the note
+        private void initTimer()
+        {
+                _timer = new DispatcherTimer();
+                _timer.Interval = TimeSpan.FromSeconds(20);
+                _timer.Tick += Timer_Tick;
+                _timer.Start();
+        }
 
-        ////Creating a file
-        //private void SaveNote(object? obj)
+        //Calls the save note method when the timer ticks
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            SaveNote();
+        }
 
-        //{
-        //    Debug.WriteLine("Saving Note");
-        //    using FileStream fs = new(FilePath, FileMode.Create);
-        //    CurrentCanvasModel.Strokes.Save(fs);
-        //}
+        //subscribe to the stroke events and call the save note method when the strokes are changed
+        private void SubscribeToStrokeEvents()
+        {
+            CurrentCanvasModel.Strokes.StrokesChanged += Strokes_StrokesChanged;
+        }
 
-        ////If the given file exists for the filepath, load the note
-        //public void LoadNote(object? obj)
-        //{
-        //    Debug.WriteLine("Loading Note");
-        //    if (File.Exists(FilePath))
-        //        Debug.WriteLine("L");
+        // when event is triggered, check if strokes are added or removed, if so, save the note
+        private void Strokes_StrokesChanged(object? sender, StrokeCollectionChangedEventArgs e)
+        {
+            if (e.Added.Count > 0)
+            {
+                Debug.WriteLine("Strokes added");
+                SaveNote();
+            }
 
-        //        using (FileStream fs = new(FilePath, FileMode.Open, FileAccess.Read))
-        //        {
-        //            CurrentCanvasModel.Strokes = new StrokeCollection(fs);
-        //        }
-        //}
+            if (e.Removed.Count > 0)
+            {
+                Debug.WriteLine("Strokes removed");
+                SaveNote();
+            }
+        }
+        //TODO: Move to homeviewmodel, for testing only 
+        private void CreateNote()
+
+        {
+            using FileStream fs = new(currFilePath, FileMode.Create);
+            CurrentCanvasModel.Strokes.Save(fs);
+        }
+
+        private async void SaveNote()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                CurrentCanvasModel.Strokes.Save(ms);
+                byte[] fileContent = ms.ToArray();
+                await _savingServices.SaveFileAsync(currFilePath, fileContent);
+            }
+        }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         public void Undo(object? obj)

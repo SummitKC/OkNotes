@@ -19,7 +19,7 @@ namespace TwoOkNotes.ViewModels
 {
     public class HomeViewModel : ObservableObject
     {
-        private readonly string notesDirectory = @"C:\Users\Summit\Source\Repos\OkNotes\TwoOkNotes\TempNoteFolder";
+        private readonly string notesDirectory = @"";
         private string iconPath = "pack://application:,,,/Assets/Images/Testingbook.png";
 
         private CanvasModel canvasModel;
@@ -41,12 +41,14 @@ namespace TwoOkNotes.ViewModels
             CurrentPenModel = new PenViewModel();
         }
 
+        //just gives a new canvas model
         private CanvasModel GetCanvasModel()
         {
-            canvasModel = new("Untitled", new Stack<Stroke>());
-            return canvasModel;
+            return canvasModel = new("Untitled", new Stack<Stroke>());
+
         }
 
+        //TODO: Change this to get it from the file services 
         private StrokeCollection GetCurrentStrokes(PageModel page)
         {
             if (page != null)
@@ -64,7 +66,7 @@ namespace TwoOkNotes.ViewModels
             {
                 EditingWindow editingWindow = new();
                 GetCanvasModel().Strokes = GetCurrentStrokes(page);
-                EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel);
+                EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel, page.FilePath);
                 editingWindow.DataContext = editingWindowViewModel;
                 editingWindow.Show();
             }
@@ -96,11 +98,11 @@ namespace TwoOkNotes.ViewModels
         }
 
 
-        //Command logic for opening the new window
+        //TODO: Move creating the file here
         private void OpenNewWindow(object? obj)
         {
             EditingWindow newOpenWindow = new();
-            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel);
+            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, @"");
             newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();
         }
