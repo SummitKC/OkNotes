@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TwoOkNotes.Model;
 
 namespace TwoOkNotes.Services
 {
@@ -13,7 +15,7 @@ namespace TwoOkNotes.Services
         private readonly string _metaDataFilePath; 
     
 
-    public FileSavingServices()
+        public FileSavingServices()
         {
             string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string appFolder = Path.Combine(appDataFolder, "TwoOkNotes");
@@ -24,7 +26,7 @@ namespace TwoOkNotes.Services
             _metaDataFilePath = Path.Combine(appFolder, "currFilesMetadata");
         }
 
-    public async Task SaveFileAsync(string filePath, byte[] fileContent)
+        public async Task SaveFileAsync(string filePath, byte[] fileContent)
         {
             await File.WriteAllBytesAsync(filePath, fileContent);
             await UpdateMetadataAsync(filePath);
@@ -38,6 +40,7 @@ namespace TwoOkNotes.Services
             var fileMetadata = new FileMetadata
             {
                 FileName = fileInfo.Name,
+                FilePath = filePath,
                 Id = metadata.Count,
                 CreationDate = fileInfo.CreationTime,
                 LastModifiedDate = fileInfo.LastWriteTime,
@@ -60,6 +63,27 @@ namespace TwoOkNotes.Services
         {
             string json = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(_metaDataFilePath, json);
+        }
+
+        public async Task<Dictionary<string, string>> GetMetadataNameAndFilePathAsync()
+        {
+            if (File.Exists(_metaDataFilePath))
+            {
+                Debug.WriteLine("Here?");
+                var result = new Dictionary<string, string>();
+                var metadata = await LoadMetadataAsync();
+
+                if (metadata != null)
+                {
+                    foreach (var item in metadata)
+                    {
+                        result[item.Key] = item.Value.FilePath;
+                    }
+                }
+
+                return result;
+            }
+            return new Dictionary<string, string>();
         }
 
     }
