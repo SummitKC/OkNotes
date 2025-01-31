@@ -29,8 +29,8 @@ namespace TwoOkNotes.ViewModels
         public PenViewModel CurrentPenModel { get; set; }
         public ICommand SaveNoteCommand { get; }
         public ICommand ClearInkCommand { get; }
-        public ICommand DeleteNoteCommand { get; }
-        public ICommand LoadNoteCommand { get; }
+        //public ICommand DeleteNoteCommand { get; }
+        //public ICommand LoadNoteCommand { get; }
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
@@ -50,12 +50,13 @@ namespace TwoOkNotes.ViewModels
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
             CreateNote();
-            initTimer();
+            SaveNote();
+            InitTimer();
             SubscribeToStrokeEvents();
         }
 
         //Tick system for autosaving the note
-        private void initTimer()
+        private void InitTimer()
         {
                 _timer = new DispatcherTimer();
                 _timer.Interval = TimeSpan.FromSeconds(20);
@@ -104,6 +105,7 @@ namespace TwoOkNotes.ViewModels
             {
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
+                Debug.WriteLine("Does it get here?");
                 await _savingServices.SaveFileAsync(currFilePath, fileContent);
             }
         }

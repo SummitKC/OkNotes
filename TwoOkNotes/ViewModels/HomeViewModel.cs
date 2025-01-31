@@ -22,7 +22,7 @@ namespace TwoOkNotes.ViewModels
     {
         private string iconPath = "pack://application:,,,/Assets/Images/Testingbook.png";
         private FileSavingServices fileSavingServices { get; } = new();
-
+        private double numberOfPagesl;
         private CanvasModel canvasModel;
         public PenViewModel CurrentPenModel { get; set; }
 
@@ -80,6 +80,7 @@ namespace TwoOkNotes.ViewModels
             Debug.WriteLine("gets to here 7");
             //Change later 
             var currFilesTest = await Task.Run(() => fileSavingServices.GetMetadataNameAndFilePathAsync());
+            numberOfPagesl = currFilesTest.Count();
             Debug.WriteLine("gets to here 8", currFilesTest.Keys, currFilesTest.Values);
 
             foreach (var page in currFilesTest)
@@ -101,12 +102,12 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-
         //TODO: Move creating the file here
         private void OpenNewWindow(object? obj)
         {
             EditingWindow newOpenWindow = new();
-            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, @"");
+            Debug.WriteLine(fileSavingServices.GetDefaultFilePath());
+            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.idf");
             newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();
         }

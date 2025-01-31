@@ -29,15 +29,16 @@ namespace TwoOkNotes.ViewModels
         public ICommand SavePenSettingsCommand { get; }
 
         //public ICommand ChangePenColorCommand { get; } 
-
         public PenViewModel()
         {
-            _settingsServices =  new SettingsServices();
-            PenSettings = _settingsServices.LoadPenSettings();
-            SavePenSettingsCommand = new RelayCommand(SavePenSettings);
+            _settingsServices = new SettingsServices();
+            InitializePenSettingsAsync();
         }
 
-
+        private async void InitializePenSettingsAsync()
+        {
+            PenSettings = await _settingsServices.LoadPenSettings();
+        }
         public Color PenColor
 
         {
@@ -46,6 +47,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.PenColor = value;
                 OnPropertyChanged(nameof(PenColor));
+                SavePenSettings();
             }
 
         }
@@ -56,6 +58,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.Thickness = value;
                 OnPropertyChanged(nameof(ThickNess));
+                SavePenSettings();
             }
         }
 
@@ -67,6 +70,7 @@ namespace TwoOkNotes.ViewModels
                 PenSettings.red = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Red));
+                SavePenSettings();
             }
         }
         public byte Green
@@ -77,6 +81,7 @@ namespace TwoOkNotes.ViewModels
                 PenSettings.green = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Green));
+                SavePenSettings();
             }
         }
         public byte Blue
@@ -87,6 +92,7 @@ namespace TwoOkNotes.ViewModels
                 PenSettings.blue = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Blue));
+                SavePenSettings();
             }
         }
         public byte Opacity
@@ -98,6 +104,7 @@ namespace TwoOkNotes.ViewModels
                 PenSettings.Opacity = value;
                 PenSettings.PenColor = Color.FromArgb((byte)PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
                 OnPropertyChanged(nameof(Opacity));
+                SavePenSettings();
             }
         }
 
@@ -108,6 +115,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.Tip = value;
                 OnPropertyChanged(nameof(Tip));
+                SavePenSettings();
             }
         }
 
@@ -118,6 +126,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.IsEraser = value;
                 OnPropertyChanged(nameof(IsEraser));
+                SavePenSettings();
 
             }
         }
@@ -129,6 +138,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.IsHighlighter = value;
                 OnPropertyChanged(nameof(IsHighlighter));
+                SavePenSettings();
             }
         }
 
@@ -139,6 +149,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.IgnorePressure = value;
                 OnPropertyChanged(nameof(IgnorePreassure));
+                SavePenSettings();
             }
         }
 
@@ -149,6 +160,7 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.FitToCurve = value;
                 OnPropertyChanged(nameof(FitToCurve));
+                SavePenSettings();
             }
         }
         public DrawingAttributes GetDrawingAttributes()
@@ -156,10 +168,10 @@ namespace TwoOkNotes.ViewModels
             return PenSettings.getdrawingattributes();
         }
 
-        public void SavePenSettings(object? obj)
+        public async void SavePenSettings()
         {
             Debug.WriteLine("Saving Pen Settings, gets to here?");
-            _settingsServices.SavePenSettings(PenSettings);
+            await _settingsServices.SavePenSettings(PenSettings);
         }
     }
 }

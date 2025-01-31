@@ -12,8 +12,9 @@ namespace TwoOkNotes.Services
 {
     public class FileSavingServices
     {
-        private readonly string _metaDataFilePath; 
-    
+        
+        private readonly string _metaDataFilePath;
+        private readonly string _defaultFileSettings;
 
         public FileSavingServices()
         {
@@ -23,7 +24,21 @@ namespace TwoOkNotes.Services
             {
                 Directory.CreateDirectory(appFolder);
             }
-            _metaDataFilePath = Path.Combine(appFolder, "currFilesMetadata");
+            _metaDataFilePath = Path.Combine(appFolder, "currFilesMetadata.json");
+            _defaultFileSettings = Path.Combine(appFolder, "FileSettings.json");
+        }
+
+        public string GetDefaultFilePath()
+        {
+            if (File.Exists(_defaultFileSettings))
+            {
+                string json = File.ReadAllText(_defaultFileSettings);
+                FileSettings fileSettings = JsonSerializer.Deserialize <FileSettings>(json);
+
+                return fileSettings.DefaultFilePath ?? throw new FileNotFoundException("Change this to something else later"); //Route to
+                                                                                                                               //initilizng the file path
+            }
+            throw new FileNotFoundException("FileSettings.json not found");
         }
 
         public async Task SaveFileAsync(string filePath, byte[] fileContent)
