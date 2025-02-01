@@ -18,17 +18,20 @@
                         <ItemsControl ItemsSource="{Binding AvailableColors}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Rectangle Width="30" Height="30" Fill="{Binding}" Cursor="Hand">
-                                        <Rectangle.InputBindings>
-                                            <MouseBinding Command="{Binding DataContext.SelectColorCommand, 
-                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                  CommandParameter="{Binding}"/>
-                                        </Rectangle.InputBindings>
-                                    </Rectangle>
+                                    <Button Width="30" Height="30"
+                                Background="{Binding}"
+                                Command="{Binding DataContext.SelectColorCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                CommandParameter="{Binding}">
+                                        <!-- Remove default styling -->
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" />
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-
                     </WrapPanel>
                 </Border>
             </Popup>

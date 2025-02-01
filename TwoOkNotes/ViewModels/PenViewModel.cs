@@ -34,15 +34,12 @@ namespace TwoOkNotes.ViewModels
         //public ICommand ChangePenColorCommand { get; } 
         public ICommand OpenColorPickerCommand { get; }
         public ICommand SelectColorCommand { get; }
-        public ObservableCollection<SolidColorBrush> AvailableColors { get; }
+        public ObservableCollection<SolidColorBrush> AvailableColors { get; set; }
         public PenViewModel()
         {
             _settingsServices = new SettingsServices();
 
-            OpenColorPickerCommand = new RelayCommand(_ => OpenColorPicker());
-            SelectColorCommand = new RelayCommand(SelectColor);
-
-            ObservableCollection<SolidColorBrush> AvailableColors = new ObservableCollection<SolidColorBrush>
+            AvailableColors = new ObservableCollection<SolidColorBrush>
             {
                 new SolidColorBrush(Colors.Red),
                 new SolidColorBrush(Colors.Green),
@@ -51,7 +48,8 @@ namespace TwoOkNotes.ViewModels
                 new SolidColorBrush(Colors.Black),
                 new SolidColorBrush(Colors.White)
             };
-
+            OpenColorPickerCommand = new RelayCommand(_ => OpenColorPicker());
+            SelectColorCommand = new RelayCommand(SelectColor);
             InitializePenSettingsAsync();
         }
        
@@ -66,13 +64,6 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public void SetSelectedColor(object? obj)
-        {
-           
-             SelectColor(SelectedColor);
-             OnPropertyChanged(nameof(SelectedColor));
-        }
-
         private void OpenColorPicker()
         {
             IsColorPickerOpen = true;
@@ -80,14 +71,13 @@ namespace TwoOkNotes.ViewModels
 
         private void SelectColor(object selectedColor)
         {
+            Debug.WriteLine("does it get here? 33");
             if (selectedColor is SolidColorBrush brush)
             {
                 PenColor = brush.Color;
             }
             IsColorPickerOpen = false;
         }
-
-
 
 
         private async void InitializePenSettingsAsync()
