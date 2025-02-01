@@ -106,7 +106,6 @@ namespace TwoOkNotes.ViewModels
         private void OpenNewWindow(object? obj)
         {
             EditingWindow newOpenWindow = new();
-            Debug.WriteLine(fileSavingServices.GetDefaultFilePath());
             EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.idf");
             newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();

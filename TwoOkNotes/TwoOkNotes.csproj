@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Assets\Themes\LauncherButtonTheme.xaml" />
   </ItemGroup>
 

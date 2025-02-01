@@ -7,6 +7,10 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TwoOkNotes.Model;
+using Microsoft.Win32;
+using System.Windows;
+using Microsoft.WindowsAPICodePack.Dialogs;
+//using System.Windows.Forms;
 
 namespace TwoOkNotes.Services
 {
@@ -28,18 +32,35 @@ namespace TwoOkNotes.Services
             _defaultFileSettings = Path.Combine(appFolder, "FileSettings.json");
         }
 
+        //TODO: Refactor, just for testing rn 
         public string GetDefaultFilePath()
         {
-            if (File.Exists(_defaultFileSettings))
+            try
             {
-                string json = File.ReadAllText(_defaultFileSettings);
-                FileSettings fileSettings = JsonSerializer.Deserialize <FileSettings>(json);
+                if (File.Exists(_defaultFileSettings))
+                {
+                    string json = File.ReadAllText(_defaultFileSettings);
+                    FileSettings fileSettings = JsonSerializer.Deserialize<FileSettings>(json);
 
-                return fileSettings.DefaultFilePath ?? throw new FileNotFoundException("Change this to something else later"); //Route to
-                                                                                                                               //initilizng the file path
+                    if (fileSettings.DefaultFilePath != null)
+                    {
+                        return fileSettings.DefaultFilePath;
+                    }
+                    else
+                    {
+                        setNoteFilePath(GetDirectoryPathFromUser());
+                        return GetDefaultFilePath();
+                    }               
+                }
+                throw new FileNotFoundException("FileSettings.json not found");
             }
-            throw new FileNotFoundException("FileSettings.json not found");
+            catch (FileNotFoundException e)
+            {
+                Debug.WriteLine(e.Message);
+                return "C:/"; 
+            }
         }
+
 
         public async Task SaveFileAsync(string filePath, byte[] fileContent)
         {
@@ -101,5 +122,36 @@ namespace TwoOkNotes.Services
             return new Dictionary<string, string>();
         }
 
+        public async Task<bool> setNoteFilePath(string filePath)
+        {
+            FileSettings fileSettings = new FileSettings
+            {
+                DefaultFilePath = filePath
+            };
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+       
+            };
+            string json = JsonSerializer.Serialize(fileSettings, options);
+            await File.WriteAllTextAsync(_defaultFileSettings, json);
+            return true;
+        }
+
+        public string GetDirectoryPathFromUser()
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true,
+                Title = "Select a folder"
+            };
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                return dialog.FileName;
+            }
+
+            return null;
+        }
     }
 }
