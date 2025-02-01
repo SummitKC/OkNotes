@@ -27,6 +27,7 @@ namespace TwoOkNotes.Model
         public bool IsHighlighter { get; set; } = false;
         public bool IgnorePressure { get; set; } = false;
         public bool FitToCurve { get; set; } = false;
+        public bool _isColorPickerOpen = false;
 
         public DrawingAttributes getdrawingattributes()
         {

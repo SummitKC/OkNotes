@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TwoOkNotes.ViewModels;
 
 namespace TwoOkNotes.Views
 {
@@ -24,5 +25,16 @@ namespace TwoOkNotes.Views
         {
             InitializeComponent();
         }
+        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Rectangle rectangle && rectangle.Fill is SolidColorBrush brush)
+            {
+                if (DataContext is PenViewModel viewModel)
+                {
+                    viewModel.SelectColorCommand.Execute(brush);
+                }
+            }
+        }
     }
+
 }

@@ -3,22 +3,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
-             xmlns:model="clr-namespace:TwoOkNotes.Model" 
+             xmlns:local="clr-namespace:TwoOkNotes.ViewModels" d:DataContext="{d:DesignInstance Type=local:PenViewModel}"
              mc:Ignorable="d" Height="292" Width="256">
     <Grid Background="Aqua" Margin="0,0,0,-23">
         <StackPanel Margin="0,0,10,-37">
-         
 
-            <!-- Individual sliders for RGB -->
-            <TextBlock Text="Red" Margin="10" Height="15"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Red, Mode=TwoWay}" Width="240"/>
+            <!-- Color Picker -->
+            <TextBlock Text="Select Pen Color" Margin="10" Height="15"/>
+            <Button Content="Pick a Color" Width="240" Command="{Binding OpenColorPickerCommand}"/>
 
-            <TextBlock Text="Green" Margin="10" Height="15"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Green, Mode=TwoWay}" Width="240"/>
+            <Popup IsOpen="{Binding IsColorPickerOpen, Mode=TwoWay}" Placement="Bottom" StaysOpen="False">
+                <Border BorderBrush="Black" BorderThickness="1" Background="White">
+                    <WrapPanel>
+                        <ItemsControl ItemsSource="{Binding AvailableColors}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle Width="30" Height="30" Fill="{Binding}" Cursor="Hand">
+                                        <Rectangle.InputBindings>
+                                            <MouseBinding Command="{Binding DataContext.SelectColorCommand, 
+                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  CommandParameter="{Binding}"/>
+                                        </Rectangle.InputBindings>
+                                    </Rectangle>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-            <TextBlock Text="Blue" Margin="10"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Blue, Mode=TwoWay}" Width="240"/>
+                    </WrapPanel>
+                </Border>
+            </Popup>
 
             <TextBlock Text="Pen Thickness" Margin="10"/>
             <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="240"/>
@@ -26,7 +39,7 @@
             <TextBlock Text="Pen Opacity" Margin="10"/>
             <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
 
-            <!-- TODO: Testing for now, remove later to a autosave system on exit -->
+            <!-- TODO: Testing for now, remove later to an autosave system on exit -->
             <Button Content="Save Pen Settings" Command="{Binding SavePenSettingsCommand}" Margin="10"/>
         </StackPanel>
     </Grid>

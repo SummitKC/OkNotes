@@ -16,29 +16,86 @@ using TwoOkNotes.Model;
 using TwoOkNotes.Services;
 using TwoOkNotes.Util;
 using TwoOkNotes.Views;
+using System.Collections.ObjectModel;
+
 
 namespace TwoOkNotes.ViewModels
 {
     public class PenViewModel : ObservableObject
     {
 
-
+        public SolidColorBrush SelectedColor = new SolidColorBrush(Colors.White);
         private readonly SettingsServices _settingsServices;
+
         public PenModel PenSettings { get; set; }
 
         public ICommand SavePenSettingsCommand { get; }
 
         //public ICommand ChangePenColorCommand { get; } 
+        public ICommand OpenColorPickerCommand { get; }
+        public ICommand SelectColorCommand { get; }
+        public ObservableCollection<SolidColorBrush> AvailableColors { get; }
         public PenViewModel()
         {
             _settingsServices = new SettingsServices();
+
+            OpenColorPickerCommand = new RelayCommand(_ => OpenColorPicker());
+            SelectColorCommand = new RelayCommand(SelectColor);
+
+            ObservableCollection<SolidColorBrush> AvailableColors = new ObservableCollection<SolidColorBrush>
+            {
+                new SolidColorBrush(Colors.Red),
+                new SolidColorBrush(Colors.Green),
+                new SolidColorBrush(Colors.Blue),
+                new SolidColorBrush(Colors.Yellow),
+                new SolidColorBrush(Colors.Black),
+                new SolidColorBrush(Colors.White)
+            };
+
             InitializePenSettingsAsync();
         }
+       
+        public bool IsColorPickerOpen
+        {
+            get => PenSettings._isColorPickerOpen;
+            set
+            {
+                PenSettings._isColorPickerOpen = value;
+                OnPropertyChanged(nameof(IsColorPickerOpen));
+                SavePenSettings();
+            }
+        }
+
+        public void SetSelectedColor(object? obj)
+        {
+           
+             SelectColor(SelectedColor);
+             OnPropertyChanged(nameof(SelectedColor));
+        }
+
+        private void OpenColorPicker()
+        {
+            IsColorPickerOpen = true;
+        }
+
+        private void SelectColor(object selectedColor)
+        {
+            if (selectedColor is SolidColorBrush brush)
+            {
+                PenColor = brush.Color;
+            }
+            IsColorPickerOpen = false;
+        }
+
+
+
 
         private async void InitializePenSettingsAsync()
         {
             PenSettings = await _settingsServices.LoadPenSettings();
         }
+
+        
         public Color PenColor
 
         {
