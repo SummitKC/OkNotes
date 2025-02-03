@@ -153,5 +153,23 @@ namespace TwoOkNotes.Services
 
             return null;
         }
+
+        public string GetFilePathFromUser()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "InkCanvas Files (*.idf)|*.idf|All Files (*.*)|*.*",
+                Title = "Select a File"
+            };
+
+            bool? result = openFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                return openFileDialog.FileName;
+            }
+
+            return string.Empty;
+        }
     }
 }

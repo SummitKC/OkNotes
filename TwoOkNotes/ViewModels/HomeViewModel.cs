@@ -29,6 +29,8 @@ namespace TwoOkNotes.ViewModels
         //
         public ICommand OpenWindow { get; }
         public ICommand LoadCurrentFileCommand { get; }
+
+        public ICommand LoadAFile { get;  }
         public ObservableCollection<PageModel> SavedPages { get; set;  }
         
 
@@ -39,6 +41,7 @@ namespace TwoOkNotes.ViewModels
             LoadSavedPages();
             OpenWindow = new RelayCommand(OpenNewWindow);
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
+            LoadAFile = new RelayCommand(FindAndLoadFile);
             CurrentPenModel = new PenViewModel();
         }
 
@@ -100,6 +103,12 @@ namespace TwoOkNotes.ViewModels
                 iconPath = value;
                 OnPropertyChanged(nameof(ImagePath));
             }
+        }
+
+        private void FindAndLoadFile(object? obj)
+        {
+            string uFilePath = fileSavingServices.GetFilePathFromUser();
+            OpenNewWindow(null); //remove this later 
         }
 
         //TODO: Move creating the file here

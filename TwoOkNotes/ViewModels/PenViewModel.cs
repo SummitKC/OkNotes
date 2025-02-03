@@ -92,7 +92,7 @@ namespace TwoOkNotes.ViewModels
                 PenSettings.blue = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
                 OnPropertyChanged(nameof(Blue));
-                SavePenSettings();
+                SavePenSettings();  
             }
         }
         public byte Opacity

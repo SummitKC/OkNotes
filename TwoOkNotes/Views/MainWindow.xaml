@@ -43,8 +43,9 @@
                              Height="50"
                              Foreground="#ac3dac"
                              FontSize="14"
-                             Style="{StaticResource LauncherButtonTheme}"/>
-
+                             Style="{StaticResource LauncherButtonTheme}"
+                             Command="{Binding LoadAFile}"/>
+                
                 <RadioButton Content="New File"
                              Height="50"
                              Foreground="#ac3dac"
