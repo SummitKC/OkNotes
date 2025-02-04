@@ -107,15 +107,17 @@ namespace TwoOkNotes.ViewModels
 
         private void FindAndLoadFile(object? obj)
         {
-            string uFilePath = fileSavingServices.GetFilePathFromUser();
+            string uFilePath = FileSavingServices.GetFilePathFromUser();
             OpenNewWindow(null); //remove this later 
         }
 
         //TODO: Move creating the file here
         private void OpenNewWindow(object? obj)
         {
+            string filePath = $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.idf";
             EditingWindow newOpenWindow = new();
-            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.idf");
+            fileSavingServices.createFile(filePath);
+            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, filePath);
             newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();
         }

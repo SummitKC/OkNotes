@@ -37,11 +37,6 @@
                 Margin="1"/>
 
             <Button 
-                Content="LoadFile (Remove Later)"
-                Command="{Binding LoadNoteCommand}"
-                Margin="1"/>
-
-            <Button 
                 Content="Undo"
                 Command="{Binding UndoCommand}"
                 Margin="1"/>

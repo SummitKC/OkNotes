@@ -61,6 +61,14 @@ namespace TwoOkNotes.Services
             }
         }
 
+        public async void createFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                await File.WriteAllTextAsync(filePath, null);
+                //await SaveFileAsync(filePath, new byte[0]);
+            }
+        }
 
         public async Task SaveFileAsync(string filePath, byte[] fileContent)
         {
@@ -138,7 +146,7 @@ namespace TwoOkNotes.Services
             return true;
         }
 
-        public string GetDirectoryPathFromUser()
+        public static string GetDirectoryPathFromUser()
         {
             var dialog = new CommonOpenFileDialog
             {
@@ -153,8 +161,7 @@ namespace TwoOkNotes.Services
 
             return null;
         }
-
-        public string GetFilePathFromUser()
+        public static string GetFilePathFromUser()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -170,6 +177,16 @@ namespace TwoOkNotes.Services
             }
 
             return string.Empty;
+        }
+
+        //change it to bool for confirmation later 
+        public void DeleteFile(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+
+            }
         }
     }
 }

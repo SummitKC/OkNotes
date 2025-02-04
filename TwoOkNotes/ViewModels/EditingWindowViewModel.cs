@@ -29,8 +29,7 @@ namespace TwoOkNotes.ViewModels
         public PenViewModel CurrentPenModel { get; set; }
         public ICommand SaveNoteCommand { get; }
         public ICommand ClearInkCommand { get; }
-        //public ICommand DeleteNoteCommand { get; }
-        //public ICommand LoadNoteCommand { get; }
+        public ICommand DeleteNoteCommand { get; }
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
@@ -44,15 +43,20 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel.SetPen(currentPenModel);
             //SaveNoteCommand = new RelayCommand(SaveNote);
             ClearInkCommand = new RelayCommand(ClearInk);
-            //DeleteNoteCommand = new RelayCommand(DeleteNote);
+            DeleteNoteCommand = new RelayCommand(DeleteNote);
             //LoadNoteCommand = new RelayCommand(LoadNote);
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
-            CreateNote();
             SaveNote();
             InitTimer();
             SubscribeToStrokeEvents();
+        }
+
+        //temp only to test move out of this class later 
+        private void DeleteNote(object? obj)
+        {
+            _savingServices.DeleteFile(currFilePath);
         }
 
         //Tick system for autosaving the note
@@ -91,14 +95,6 @@ namespace TwoOkNotes.ViewModels
                 SaveNote();
             }
         }
-        //TODO: Move to homeviewmodel, for testing only 
-        private void CreateNote()
-
-        {
-            using FileStream fs = new(currFilePath, FileMode.Create);
-            CurrentCanvasModel.Strokes.Save(fs);
-        }
-
         private async void SaveNote()
         {
             using (MemoryStream ms = new MemoryStream())
@@ -137,21 +133,6 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel.ClearCanvas();
         }
 
-        //Delete file 
-        //private void DeleteNote(object? obj)
-        //{
-        //    Debug.WriteLine("Deleting File");
-
-        //    if (File.Exists(FilePath))
-        //    {
-        //        File.Delete(FilePath);
-        //        Debug.WriteLine("File Deleted");
-        //    }
-        //    else
-        //    {
-        //        Debug.WriteLine("File does not exist");
-        //    }
-        //}
 
         //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 
         public bool IsPenSettingOpen
