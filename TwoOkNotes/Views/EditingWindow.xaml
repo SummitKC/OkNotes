@@ -41,6 +41,14 @@
                 Command="{Binding UndoCommand}"
                 Margin="1"/>
 
+            <Button Content="Toggle Eraser"
+            Command="{Binding ToggleEraserCommand}"
+            CommandParameter="True" />
+
+            <Button Content="Toggle Ink"
+            Command="{Binding ToggleEraserCommand}"
+            CommandParameter="False" />
+
             <Button 
                 Content="Redo"
                 Command="{Binding RedoCommand}"

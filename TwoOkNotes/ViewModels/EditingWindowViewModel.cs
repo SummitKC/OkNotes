@@ -32,6 +32,7 @@ namespace TwoOkNotes.ViewModels
         public ICommand DeleteNoteCommand { get; }
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
+        public ICommand ToggleEraserCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
@@ -48,6 +49,7 @@ namespace TwoOkNotes.ViewModels
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
+            ToggleEraserCommand = new RelayCommand(ToggleEraser);
             SaveNote();
             InitTimer();
             SubscribeToStrokeEvents();
@@ -118,12 +120,20 @@ namespace TwoOkNotes.ViewModels
         }
 
         //Redo, checks if there is anything in the redo stack, if so, add the last stroke to the canvas
-        public void Redo(object? obj)
+        private void Redo(object? obj)
         {
             //TODO: Add error handling
             if (CurrentCanvasModel.RedoStack.Count > 0)
             {
                 CurrentCanvasModel.Strokes.Add(CurrentCanvasModel.RedoStack.Pop());
+            }
+        }
+
+        private void ToggleEraser(object? obj)
+        {
+            if (obj is string str && bool.TryParse(str, out bool isEraser))
+            {
+                CurrentCanvasModel.SetEraser(isEraser);
             }
         }
 

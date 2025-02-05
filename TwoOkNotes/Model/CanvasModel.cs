@@ -57,6 +57,18 @@ namespace TwoOkNotes.Model
             });
         }
 
+        public void SetEraser(bool isEraser) //add a parameter to erase by point aswell 
+        {
+            if (isEraser)
+            {
+                EditingMode = InkCanvasEditingMode.EraseByStroke;
+            }
+            else
+            {
+                EditingMode = InkCanvasEditingMode.Ink;
+            }
+        }
+
         //Clear method for the canvas
         public void ClearCanvas()
         {
