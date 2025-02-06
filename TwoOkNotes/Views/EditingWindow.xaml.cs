@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Windows.Input;
+using System.Windows;
 using TwoOkNotes.ViewModels;
 using TwoOkNotes.Model;
 using System.Windows.Ink;
@@ -10,12 +11,22 @@ namespace TwoOkNotes.Views
         public EditingWindow()
         {
             InitializeComponent();
-
         }
 
-        // Optional parameterless constructor
-
-        
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (DataContext is EditingWIndowViewModel viewModel)
+            {
+                viewModel.OnKeyDown(e);
+            }
         }
-    
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (DataContext is EditingWIndowViewModel viewModel)
+            {
+                viewModel.OnKeyUp(e);
+            }
+        }
+    }
 }

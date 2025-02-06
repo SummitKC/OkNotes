@@ -29,7 +29,6 @@ namespace TwoOkNotes.ViewModels
         //
         public ICommand OpenWindow { get; }
         public ICommand LoadCurrentFileCommand { get; }
-
         public ICommand LoadAFile { get;  }
         public ObservableCollection<PageModel> SavedPages { get; set;  }
         
@@ -114,7 +113,7 @@ namespace TwoOkNotes.ViewModels
         //TODO: Move creating the file here
         private void OpenNewWindow(object? obj)
         {
-            string filePath = $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.idf";
+            string filePath = $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.isf";
             EditingWindow newOpenWindow = new();
             fileSavingServices.createFile(filePath);
             EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, filePath);

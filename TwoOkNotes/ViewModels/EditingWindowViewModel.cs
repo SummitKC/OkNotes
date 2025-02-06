@@ -54,7 +54,6 @@ namespace TwoOkNotes.ViewModels
             InitTimer();
             SubscribeToStrokeEvents();
         }
-
         //temp only to test move out of this class later 
         private void DeleteNote(object? obj)
         {
@@ -74,6 +73,23 @@ namespace TwoOkNotes.ViewModels
         private void Timer_Tick(object? sender, EventArgs e)
         {
             SaveNote();
+        }
+
+        //
+        public void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.L) //temp for test only 
+            {
+                CurrentCanvasModel.SetEraser(true, 1);
+            }
+        }
+
+        public void OnKeyUp(KeyEventArgs e)
+        {
+            if (e.Key == Key.L) //temp for test only 
+            {
+                CurrentCanvasModel.SetEraser(false, 1);
+            }
         }
 
         //subscribe to the stroke events and call the save note method when the strokes are changed
@@ -133,7 +149,7 @@ namespace TwoOkNotes.ViewModels
         {
             if (obj is string str && bool.TryParse(str, out bool isEraser))
             {
-                CurrentCanvasModel.SetEraser(isEraser);
+                CurrentCanvasModel.SetEraser(isEraser, 0);
             }
         }
 

@@ -165,7 +165,7 @@ namespace TwoOkNotes.Services
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "InkCanvas Files (*.idf)|*.idf|All Files (*.*)|*.*",
+                Filter = "InkCanvas Files (*.isf)|*.isf|All Files (*.*)|*.*",
                 Title = "Select a File"
             };
 
