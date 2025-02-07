@@ -34,6 +34,7 @@ namespace TwoOkNotes.ViewModels
         public ICommand RedoCommand { get; }
         public ICommand ToggleEraserCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
+        public ICommand ToggleHighlighterCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
         {
@@ -50,6 +51,7 @@ namespace TwoOkNotes.ViewModels
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
             ToggleEraserCommand = new RelayCommand(ToggleEraser);
+            ToggleHighlighterCommand = new RelayCommand(ToggelHighlighter);
             SaveNote();
             InitTimer();
             SubscribeToStrokeEvents();
@@ -82,6 +84,10 @@ namespace TwoOkNotes.ViewModels
             {
                 CurrentCanvasModel.SetEraser(true, 1);
             }
+            if (e.Key == Key.H)
+            {
+                CurrentPenModel.IsHighlighter = true;
+            }
         }
 
         public void OnKeyUp(KeyEventArgs e)
@@ -89,6 +95,10 @@ namespace TwoOkNotes.ViewModels
             if (e.Key == Key.L) //temp for test only 
             {
                 CurrentCanvasModel.SetEraser(false, 1);
+            }
+            if (e.Key == Key.H)
+            {
+                CurrentPenModel.IsHighlighter = true;
             }
         }
 
@@ -150,6 +160,14 @@ namespace TwoOkNotes.ViewModels
             if (obj is string str && bool.TryParse(str, out bool isEraser))
             {
                 CurrentCanvasModel.SetEraser(isEraser, 0);
+            }
+        }
+
+        private void ToggelHighlighter(object? obj)
+        {
+            if (obj is string str && bool.TryParse(str, out bool isHighlighter))
+            {
+                CurrentPenModel.IsHighlighter = isHighlighter;
             }
         }
 

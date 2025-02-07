@@ -49,6 +49,14 @@
             Command="{Binding ToggleEraserCommand}"
             CommandParameter="False" />
 
+            <Button Content="Toggle Highlighter"
+            Command="{Binding ToggleHighlighterCommand}"
+            CommandParameter="True" />
+
+            <Button Content="Toggle Ink "
+            Command="{Binding ToggleHighlighterCommand}"
+            CommandParameter="False" />
+
             <Button 
                 Content="Redo"
                 Command="{Binding RedoCommand}"

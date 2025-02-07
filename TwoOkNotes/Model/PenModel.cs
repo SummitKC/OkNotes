@@ -23,7 +23,7 @@ namespace TwoOkNotes.Model
         public byte Opacity { get; set; } = (byte) 255;
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public StylusTip Tip { get; set; } = StylusTip.Ellipse;
-        public bool IsEraser { get; set; } = false;
+        //public bool IsEraser { get; set; } = false;
         public bool IsHighlighter { get; set; } = false;
         public bool IgnorePressure { get; set; } = false;
         public bool FitToCurve { get; set; } = false;
