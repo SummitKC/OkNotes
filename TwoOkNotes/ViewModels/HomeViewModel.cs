@@ -69,6 +69,7 @@ namespace TwoOkNotes.ViewModels
             if (obj is PageModel page)
             {
                 EditingWindow editingWindow = new();
+                editingWindow.Title = "Untitled";
                 GetCanvasModel().Strokes = GetCurrentStrokes(page);
                 EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel, page.FilePath);
                 editingWindow.DataContext = editingWindowViewModel;
@@ -103,7 +104,6 @@ namespace TwoOkNotes.ViewModels
                 OnPropertyChanged(nameof(ImagePath));
             }
         }
-
         private void FindAndLoadFile(object? obj)
         {
             string uFilePath = FileSavingServices.GetFilePathFromUser();

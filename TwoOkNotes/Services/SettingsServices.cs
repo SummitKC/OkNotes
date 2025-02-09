@@ -14,6 +14,7 @@ namespace TwoOkNotes.Services
     public class SettingsServices
     {
         private readonly string _settingsFilePath;
+        private readonly string _windowSettingsPath;
         public SettingsServices()
         {
             //initilize file paths
@@ -25,6 +26,7 @@ namespace TwoOkNotes.Services
                 Directory.CreateDirectory(appFolder);
             }
             _settingsFilePath = Path.Combine(appFolder, "PenSettings.json");
+            _windowSettingsPath = Path.Combine(appFolder, "WindowSettings.json");
         }
 
         public async Task SavePenSettings(PenModel settings)
@@ -54,20 +56,38 @@ namespace TwoOkNotes.Services
             }
         }
 
-        public async Task SaveEditingWindowSettings(CanvasModel settings)
+        public async Task SaveEditingWindowSettings(WindowSettings settings)
         {
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Converters = { new JsonStringEnumConverter() }
             };
             string json = JsonSerializer.Serialize(settings, options);
-            await File.WriteAllTextAsync(_settingsFilePath, json);
+            try
+            {
+                await File.WriteAllTextAsync(_windowSettingsPath, json);
+                Debug.WriteLine("Window settings saved successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to save window settings: {ex.Message}");
+            }
         }
 
-        public CanvasModel LoadCanvasSettings()
+        public async Task<WindowSettings> LoadEditingWindowSettings()
         {
-            return null;
+            if (File.Exists(_windowSettingsPath))
+            {
+                Debug.WriteLine("gets to loading?");
+                string json = await File.ReadAllTextAsync(_windowSettingsPath);
+                //return the settings if they exist, else return a new instance of the settings
+                return JsonSerializer.Deserialize<WindowSettings>(json) ?? new WindowSettings();
+            }
+            else
+            {
+                Debug.WriteLine("gets here?");
+                return new WindowSettings();
+            }
         }
     }
 }

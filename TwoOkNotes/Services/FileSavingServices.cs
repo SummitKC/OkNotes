@@ -103,6 +103,7 @@ namespace TwoOkNotes.Services
             return new Dictionary<string, FileMetadata>();
         }
 
+        //TODO: Looks like this save and the 5 second timer are clashing 
         private async Task SaveMetadataAsync(Dictionary<string, FileMetadata> metadata)
         {
             string json = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true });

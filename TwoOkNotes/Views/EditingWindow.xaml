@@ -9,7 +9,9 @@
         mc:Ignorable="d"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp"
-        Title="EditingWindow" Height="2560" Width="1440">
+        Title="{Binding WindowTitle}" 
+        Height="{Binding WindowHeight, Mode=TwoWay}" 
+        Width="{Binding WindowTitle, Mode=TwoWay}" >
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

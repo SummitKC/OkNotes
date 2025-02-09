@@ -21,8 +21,6 @@ namespace TwoOkNotes.ViewModels
 {
     public class PenViewModel : ObservableObject
     {
-
-
         private readonly SettingsServices _settingsServices;
         public PenModel PenSettings { get; set; }
 

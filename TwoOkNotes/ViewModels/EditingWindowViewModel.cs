@@ -19,11 +19,14 @@ namespace TwoOkNotes.ViewModels
 {
     public class EditingWIndowViewModel : ObservableObject
     {
-        private DispatcherTimer _timer;
         private bool _isPenSettingOpen;
         private string currFilePath;
-
+        private KeyHandler _keyHandler;
+        private TimerHandler _autoSaveTimer;
+        public WindowSettings _windowSettings { get; set; }
         private FileSavingServices _savingServices { get; set; }
+        private SettingsServices _settingsSercices { get; set; }
+
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
         public PenViewModel CurrentPenModel { get; set; }
@@ -39,23 +42,56 @@ namespace TwoOkNotes.ViewModels
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
         {
             _savingServices = new FileSavingServices();
+            _settingsSercices = new SettingsServices();
+            _windowSettings = new WindowSettings();
+
             currFilePath = filePath;
             CurrentCanvasModel = _currentCanvasModel;
             CurrentPenModel = currentPenModel;
             CurrentCanvasModel.SetPen(currentPenModel);
-            //SaveNoteCommand = new RelayCommand(SaveNote);
+            _keyHandler = new KeyHandler(CurrentCanvasModel, CurrentPenModel);
+
             ClearInkCommand = new RelayCommand(ClearInk);
             DeleteNoteCommand = new RelayCommand(DeleteNote);
-            //LoadNoteCommand = new RelayCommand(LoadNote);
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
             ToggleEraserCommand = new RelayCommand(ToggleEraser);
-            ToggleHighlighterCommand = new RelayCommand(ToggelHighlighter);
+            ToggleHighlighterCommand = new RelayCommand(ToggleHighlighter);
+
             SaveNote();
-            InitTimer();
+            InitAutoSaveTimer();
             SubscribeToStrokeEvents();
+            InitilizeWindowDimentions();
         }
+
+        private async void InitilizeWindowDimentions()
+        {
+            _windowSettings = await _settingsSercices.LoadEditingWindowSettings();
+        }
+
+        public double WindowWidth
+        {
+            get => _windowSettings._windowWidth;
+            set
+            {
+                _windowSettings._windowWidth = value;
+                OnPropertyChanged(nameof(WindowWidth));
+                SaveWindowSettings();
+            }
+        }
+
+        public double WindowHeight
+        {
+            get => _windowSettings._windowHeight;
+            set
+            {
+                _windowSettings._windowHeight = value;
+                OnPropertyChanged(nameof(WindowHeight));
+                SaveWindowSettings();
+            }
+        }
+
         //temp only to test move out of this class later 
         private void DeleteNote(object? obj)
         {
@@ -63,12 +99,10 @@ namespace TwoOkNotes.ViewModels
         }
 
         //Tick system for autosaving the note
-        private void InitTimer()
+        private void InitAutoSaveTimer()
         {
-                _timer = new DispatcherTimer();
-                _timer.Interval = TimeSpan.FromSeconds(20);
-                _timer.Tick += Timer_Tick;
-                _timer.Start();
+            _autoSaveTimer = new TimerHandler(TimeSpan.FromSeconds(5), Timer_Tick);
+            _autoSaveTimer.Start();
         }
 
         //Calls the save note method when the timer ticks
@@ -80,26 +114,12 @@ namespace TwoOkNotes.ViewModels
         //
         public void OnKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.L) //temp for test only 
-            {
-                CurrentCanvasModel.SetEraser(true, 1);
-            }
-            if (e.Key == Key.H)
-            {
-                CurrentPenModel.IsHighlighter = true;
-            }
+            _keyHandler.OnKeyDown(e);
         }
 
         public void OnKeyUp(KeyEventArgs e)
         {
-            if (e.Key == Key.L) //temp for test only 
-            {
-                CurrentCanvasModel.SetEraser(false, 1);
-            }
-            if (e.Key == Key.H)
-            {
-                CurrentPenModel.IsHighlighter = true;
-            }
+            _keyHandler.OnKeyUp(e);
         }
 
         //subscribe to the stroke events and call the save note method when the strokes are changed
@@ -113,7 +133,6 @@ namespace TwoOkNotes.ViewModels
         {
             if (e.Added.Count > 0)
             {
-                Debug.WriteLine("Strokes added");
                 SaveNote();
             }
 
@@ -163,7 +182,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        private void ToggelHighlighter(object? obj)
+        private void ToggleHighlighter(object? obj)
         {
             if (obj is string str && bool.TryParse(str, out bool isHighlighter))
             {
@@ -193,6 +212,11 @@ namespace TwoOkNotes.ViewModels
         public void TogglePenSettings(object? obj)
         {
             IsPenSettingOpen = !IsPenSettingOpen;
+        }
+
+        public async void SaveWindowSettings()
+        {
+            await _settingsSercices.SaveEditingWindowSettings(_windowSettings);
         }
     }
 }
