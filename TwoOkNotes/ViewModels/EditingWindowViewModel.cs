@@ -149,7 +149,6 @@ namespace TwoOkNotes.ViewModels
             {
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
-                Debug.WriteLine("Does it get here?");
                 await _savingServices.SaveFileAsync(currFilePath, fileContent);
             }
         }
@@ -175,11 +174,11 @@ namespace TwoOkNotes.ViewModels
                 }
                 CurrentCanvasModel.RedoStack.Push(action);
 
-                // Resubscribe to the event
-                SubscribeToStrokeEvents();
+            // Resubscribe to the event
+            SubscribeToStrokeEvents();
 
-                // Save the note state after undo since the event arg is not being called 
-                SaveNote();
+            // Save the note state after undo since the event arg is not being called 
+            SaveNote();
             }
         }
 
@@ -204,11 +203,11 @@ namespace TwoOkNotes.ViewModels
                 }
                 CurrentCanvasModel.UndoStack.Push(action);
 
-                // Resubscribe to the event
-                SubscribeToStrokeEvents();
+            // Resubscribe to the event
+            SubscribeToStrokeEvents();
 
-                // Save the note state after undo since the event arg is not being called 
-                SaveNote();
+            // Save the note state after undo since the event arg is not being called 
+            SaveNote();
             }
         }
 
@@ -222,6 +221,7 @@ namespace TwoOkNotes.ViewModels
 
         private void ToggleHighlighter(object? obj)
         {
+            //I don't think this is needed look into it later 
             if (obj is string str && bool.TryParse(str, out bool isHighlighter))
             {
                 CurrentPenModel.IsHighlighter = isHighlighter;

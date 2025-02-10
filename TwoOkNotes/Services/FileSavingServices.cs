@@ -107,7 +107,25 @@ namespace TwoOkNotes.Services
         private async Task SaveMetadataAsync(Dictionary<string, FileMetadata> metadata)
         {
             string json = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(_metaDataFilePath, json);
+            int retryCount = 3;
+
+            //Not sure why but when reasing the program crashes 
+            //added a retry count to try and fix it 
+            //TODO: It's working for now, Look into this further
+            while (retryCount > 0)
+            {
+                try
+                {
+                    await File.WriteAllTextAsync(_metaDataFilePath, json);
+                    break;
+                }
+                catch (IOException)
+                {
+                    retryCount--;
+                    if (retryCount == 0) throw;
+                    await Task.Delay(100); // Wait before retrying
+                }
+            }
         }
 
         public async Task<Dictionary<string, string>> GetMetadataNameAndFilePathAsync()
