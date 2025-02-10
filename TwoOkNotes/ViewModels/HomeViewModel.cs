@@ -48,7 +48,7 @@ namespace TwoOkNotes.ViewModels
         //just gives a new canvas model
         private CanvasModel GetCanvasModel()
         {
-            return canvasModel = new("Untitled", new Stack<Stroke>());
+            return canvasModel = new("Untitled");
 
         }
 

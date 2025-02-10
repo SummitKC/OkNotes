@@ -133,12 +133,13 @@ namespace TwoOkNotes.ViewModels
         {
             if (e.Added.Count > 0)
             {
+                CurrentCanvasModel.UndoStack.Push(new StrokeTypeAction(e.Added[0], true));
                 SaveNote();
             }
 
             if (e.Removed.Count > 0)
             {
-                Debug.WriteLine("Strokes removed");
+                CurrentCanvasModel.UndoStack.Push(new StrokeTypeAction(e.Removed[0], false));
                 SaveNote();
             }
         }
@@ -156,21 +157,58 @@ namespace TwoOkNotes.ViewModels
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         public void Undo(object? obj)
         {
-            //TODO: Add error handling
-            if (CurrentCanvasModel.Strokes.Count > 0)
+            //Need to unsubscribe from the event so this this stroke does not get pushed to the stack from the Removed event 
+            CurrentCanvasModel.Strokes.StrokesChanged -= Strokes_StrokesChanged;
+
+            if (CurrentCanvasModel.UndoStack.Count > 0)
             {
-                CurrentCanvasModel.RedoStack.Push(CurrentCanvasModel.Strokes[CurrentCanvasModel.Strokes.Count - 1]);
-                CurrentCanvasModel.Strokes.RemoveAt(CurrentCanvasModel.Strokes.Count - 1);
+                var action = CurrentCanvasModel.UndoStack.Pop();
+                if (action.TypeOfStroke)
+                {
+                    // If it was an addition, remove the stroke
+                    CurrentCanvasModel.Strokes.Remove(action.Stroke);
+                }
+                else
+                {
+                    // If it was a removal, add the stroke back
+                    CurrentCanvasModel.Strokes.Add(action.Stroke);
+                }
+                CurrentCanvasModel.RedoStack.Push(action);
+
+                // Resubscribe to the event
+                SubscribeToStrokeEvents();
+
+                // Save the note state after undo since the event arg is not being called 
+                SaveNote();
             }
         }
 
         //Redo, checks if there is anything in the redo stack, if so, add the last stroke to the canvas
         private void Redo(object? obj)
         {
-            //TODO: Add error handling
+            //Need to unsubscribe from the event so this this stroke does not get pushed to the stack from the Removed event 
+            CurrentCanvasModel.Strokes.StrokesChanged -= Strokes_StrokesChanged;
+
             if (CurrentCanvasModel.RedoStack.Count > 0)
             {
-                CurrentCanvasModel.Strokes.Add(CurrentCanvasModel.RedoStack.Pop());
+                var action = CurrentCanvasModel.RedoStack.Pop();
+                if (action.TypeOfStroke)
+                {
+                    // If it was an addition, add the stroke back
+                    CurrentCanvasModel.Strokes.Add(action.Stroke);
+                }
+                else
+                {
+                    // If it was a removal, remove the stroke
+                    CurrentCanvasModel.Strokes.Remove(action.Stroke);
+                }
+                CurrentCanvasModel.UndoStack.Push(action);
+
+                // Resubscribe to the event
+                SubscribeToStrokeEvents();
+
+                // Save the note state after undo since the event arg is not being called 
+                SaveNote();
             }
         }
 
