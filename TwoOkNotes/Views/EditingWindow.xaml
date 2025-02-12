@@ -44,20 +44,23 @@
                 Margin="1"/>
 
             <Button Content="Toggle Eraser"
-            Command="{Binding ToggleEraserCommand}"
-            CommandParameter="True" />
+                Command="{Binding ToggleEraserCommand}"
+                CommandParameter="True"
+                Margin="1"/>
 
-            <Button Content="Toggle Ink"
-            Command="{Binding ToggleEraserCommand}"
-            CommandParameter="False" />
+            <Button Content="Toggle Pen"
+                Command="{Binding ToggleInkCommand}"
+                Margin="1"/>
 
             <Button Content="Toggle Highlighter"
-            Command="{Binding ToggleHighlighterCommand}"
-            CommandParameter="True" />
+                Command="{Binding ToggleHighlighterCommand}"
+                CommandParameter="True"
+                Margin="1"/>
 
-            <Button Content="Toggle Ink "
-            Command="{Binding ToggleHighlighterCommand}"
-            CommandParameter="False" />
+            <Button Content="Toggle Select Tool"
+                Command="{Binding ToggleSelectionToolCommand}"
+                CommandParameter="True"
+                Margin="1"/>
 
             <Button 
                 Content="Redo"

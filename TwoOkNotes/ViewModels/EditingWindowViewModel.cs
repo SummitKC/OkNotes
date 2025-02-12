@@ -38,9 +38,14 @@ namespace TwoOkNotes.ViewModels
         public ICommand ToggleEraserCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
         public ICommand ToggleHighlighterCommand { get; }
+        public ICommand ToggleSelectionToolCommand { get; }
+        public ICommand ToggleInkCommand { get; }
+
+
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
         {
+            //Metadata 
             _savingServices = new FileSavingServices();
             _settingsSercices = new SettingsServices();
             _windowSettings = new WindowSettings();
@@ -58,6 +63,8 @@ namespace TwoOkNotes.ViewModels
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
             ToggleEraserCommand = new RelayCommand(ToggleEraser);
             ToggleHighlighterCommand = new RelayCommand(ToggleHighlighter);
+            ToggleSelectionToolCommand = new RelayCommand(ToggleSelectionTool);
+            ToggleInkCommand = new RelayCommand(ToggleInk);
 
             SaveNote();
             InitAutoSaveTimer();
@@ -221,19 +228,30 @@ namespace TwoOkNotes.ViewModels
 
         private void ToggleHighlighter(object? obj)
         {
-            //I don't think this is needed look into it later 
+            //TODO: I don't think this is needed look into it later 
             if (obj is string str && bool.TryParse(str, out bool isHighlighter))
             {
                 CurrentPenModel.IsHighlighter = isHighlighter;
             }
         }
 
+        private void ToggleSelectionTool(object? obj)
+        {
+            //TODO: Don't think the true or false arguements are needed here 
+            CurrentCanvasModel.SetSelectionTool(true);
+        }
+
+        private void ToggleInk(object? obj)
+        {
+            CurrentCanvasModel.SetInk();
+        }
+
+
         //Clear the ink from the canvas
         private void ClearInk(object? obj)
         {
             CurrentCanvasModel.ClearCanvas();
         }
-
 
         //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 
         public bool IsPenSettingOpen

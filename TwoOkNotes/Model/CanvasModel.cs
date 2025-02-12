@@ -45,7 +45,6 @@ namespace TwoOkNotes.Model
         public void SetPen(PenViewModel penModel)
         {
             PenViewModel = penModel;
-            Debug.WriteLine("gets to here");
             DefaultDrawingAttributes = penModel.GetDrawingAttributes();
             PenViewModel.PropertyChanged += PenModelChanged;
         }
@@ -72,10 +71,23 @@ namespace TwoOkNotes.Model
                 //SaveCurrentStrokes();
                 EditingMode = InkCanvasEditingMode.EraseByPoint;
             }
+        }
+        //Selection Tool 
+        public void SetSelectionTool(bool IsSelection)
+        {
+            if (IsSelection)
+            {
+                EditingMode = InkCanvasEditingMode.Select;
+            }
             else
             {
                 EditingMode = InkCanvasEditingMode.Ink;
             }
+        }
+        //Set the ink mode
+        public void SetInk()
+        {
+            EditingMode = InkCanvasEditingMode.Ink;
         }
 
         //Clear method for the canvas
