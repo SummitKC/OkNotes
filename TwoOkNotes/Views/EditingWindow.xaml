@@ -72,6 +72,16 @@
                 Content="Pen"
                 Command="{Binding TogglePenSettingsCommand}" 
                 Margin="1"/>
+            
+            <Button 
+                Content="Zoom In" 
+                Command="{Binding ZoomInCommand}"
+                Margin="1"/>
+
+            <Button 
+                Content="Zoom In" 
+                Command="{Binding ZoomOutCommand}"
+                Margin="1"/>
 
         </StackPanel>
         <Grid>

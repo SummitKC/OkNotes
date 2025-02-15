@@ -40,7 +40,8 @@ namespace TwoOkNotes.ViewModels
         public ICommand ToggleHighlighterCommand { get; }
         public ICommand ToggleSelectionToolCommand { get; }
         public ICommand ToggleInkCommand { get; }
-
+        public ICommand ZoomInCommand { get; }
+        public ICommand ZoomOutCommand { get; }
 
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
@@ -65,6 +66,8 @@ namespace TwoOkNotes.ViewModels
             ToggleHighlighterCommand = new RelayCommand(ToggleHighlighter);
             ToggleSelectionToolCommand = new RelayCommand(ToggleSelectionTool);
             ToggleInkCommand = new RelayCommand(ToggleInk);
+            ZoomInCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomIn());
+            ZoomOutCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomOut());
 
             SaveNote();
             InitAutoSaveTimer();

@@ -17,13 +17,25 @@ namespace TwoOkNotes.Model
     public class CanvasModel : InkCanvas
     {
         //The name of the note
+
+        private double _zoomLevel = 1.0;
+        private MatrixTransform _transform = new MatrixTransform();
+
         public string CanvasNoteName { get; set; }
         //Redo stack used for the redo button
         public int NoteID { get; set; }
         public Stack<StrokeTypeAction> RedoStack { get; set; }
         public Stack<StrokeTypeAction> UndoStack { get; set; }
         public PenViewModel PenViewModel { get; set; }
-
+        private double ZoomLevel
+        {
+            get => _zoomLevel;
+            set
+            {
+                _zoomLevel = value;
+                ApplyZoom();
+            }
+        }
 
         //Initilizing the canvas
         public CanvasModel(String name)
@@ -33,6 +45,7 @@ namespace TwoOkNotes.Model
             RedoStack = new Stack<StrokeTypeAction>();
             UndoStack = new Stack<StrokeTypeAction>();
             PenViewModel = new PenViewModel();
+            this.RenderTransform = _transform;
         }
 
         //default settings for the canvas
@@ -95,6 +108,23 @@ namespace TwoOkNotes.Model
         {
             //SaveCurrentStrokes();
             Strokes.Clear();
+        }
+
+        private void ApplyZoom()
+        {
+            var matrix = new Matrix();
+            matrix.Scale(_zoomLevel, _zoomLevel);
+            _transform.Matrix = matrix;
+        }
+
+        public void ZoomIn()
+        {
+            ZoomLevel += 0.1;
+        }
+
+        public void ZoomOut()
+        {
+            ZoomLevel -= 0.1;
         }
 
         //private void SaveCurrentStrokes()
