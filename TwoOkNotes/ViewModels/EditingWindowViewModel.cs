@@ -55,7 +55,7 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel = _currentCanvasModel;
             CurrentPenModel = currentPenModel;
             CurrentCanvasModel.SetPen(currentPenModel);
-            _keyHandler = new KeyHandler(CurrentCanvasModel, CurrentPenModel);
+            _keyHandler = new KeyHandler(CurrentCanvasModel, CurrentPenModel, this);
 
             ClearInkCommand = new RelayCommand(ClearInk);
             DeleteNoteCommand = new RelayCommand(DeleteNote);
@@ -68,6 +68,7 @@ namespace TwoOkNotes.ViewModels
             ToggleInkCommand = new RelayCommand(ToggleInk);
             ZoomInCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomIn());
             ZoomOutCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomOut());
+            SaveNoteCommand = new RelayCommand(_ => SaveNote());
 
             SaveNote();
             InitAutoSaveTimer();
@@ -137,6 +138,7 @@ namespace TwoOkNotes.ViewModels
             _keyHandler.onMouseWheal(e);
         }
 
+
         //subscribe to the stroke events and call the save note method when the strokes are changed
         private void SubscribeToStrokeEvents()
         {
@@ -162,6 +164,7 @@ namespace TwoOkNotes.ViewModels
         {
             using (MemoryStream ms = new MemoryStream())
             {
+                Debug.WriteLine("Keyboard save?");
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
                 await _savingServices.SaveFileAsync(currFilePath, fileContent);
@@ -169,7 +172,7 @@ namespace TwoOkNotes.ViewModels
         }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
-        public void Undo(object? obj)
+        private void Undo(object? obj)
         {
             //Need to unsubscribe from the event so this this stroke does not get pushed to the stack from the Removed event 
             CurrentCanvasModel.Strokes.StrokesChanged -= Strokes_StrokesChanged;
