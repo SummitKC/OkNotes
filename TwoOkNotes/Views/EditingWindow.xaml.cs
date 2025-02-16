@@ -28,5 +28,15 @@ namespace TwoOkNotes.Views
                 viewModel.OnKeyUp(e);
             }
         }
+
+        private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (DataContext is EditingWIndowViewModel viewModel)
+            {
+                viewModel.OnMouseWheel(e);
+            }
+        }
+
+
     }
 }

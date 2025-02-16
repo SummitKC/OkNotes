@@ -9,6 +9,7 @@
         mc:Ignorable="d"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp"
+        MouseWheel="Window_MouseWheel"
         Title="{Binding WindowTitle}" 
         Height="{Binding WindowHeight, Mode=TwoWay}" 
         Width="{Binding WindowTitle, Mode=TwoWay}" >

@@ -14,6 +14,8 @@ namespace TwoOkNotes.Services
         private readonly CanvasModel _canvasModel;
         private readonly PenViewModel _penViewModel;
 
+        private double _zoomLevel = 1.0;
+
         public KeyHandler(CanvasModel canvasModel, PenViewModel penViewModel)
         {
             _canvasModel = canvasModel;
@@ -30,6 +32,11 @@ namespace TwoOkNotes.Services
             {
                 _penViewModel.IsHighlighter = true;
             }
+
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+            {
+                _canvasModel.ZoomLevel = _zoomLevel;
+            }
         }
 
         public void OnKeyUp(KeyEventArgs e)
@@ -41,6 +48,18 @@ namespace TwoOkNotes.Services
             if (e.Key == Key.H)
             {
                 _penViewModel.IsHighlighter = true;
+            }
+        }
+
+        public void onMouseWheal(MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                _zoomLevel += 0.1;
+            }
+            else
+            {
+                _zoomLevel -= 0.1;
             }
         }
     }

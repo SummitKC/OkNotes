@@ -27,7 +27,7 @@ namespace TwoOkNotes.Model
         public Stack<StrokeTypeAction> RedoStack { get; set; }
         public Stack<StrokeTypeAction> UndoStack { get; set; }
         public PenViewModel PenViewModel { get; set; }
-        private double ZoomLevel
+        public double ZoomLevel
         {
             get => _zoomLevel;
             set
@@ -127,6 +127,8 @@ namespace TwoOkNotes.Model
             ZoomLevel -= 0.1;
         }
 
+        
+
         //private void SaveCurrentStrokes()
         //{
         //    StrokeCollection currentStrokes = new StrokeCollection(Strokes);
@@ -135,3 +137,4 @@ namespace TwoOkNotes.Model
 
     }
 }
+

@@ -132,6 +132,11 @@ namespace TwoOkNotes.ViewModels
             _keyHandler.OnKeyUp(e);
         }
 
+        public void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            _keyHandler.onMouseWheal(e);
+        }
+
         //subscribe to the stroke events and call the save note method when the strokes are changed
         private void SubscribeToStrokeEvents()
         {
