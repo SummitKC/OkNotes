@@ -10,6 +10,7 @@ using TwoOkNotes.Model;
 using Microsoft.Win32;
 using System.Windows;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Windows.Documents;
 //using System.Windows.Forms;
 
 namespace TwoOkNotes.Services
@@ -128,25 +129,25 @@ namespace TwoOkNotes.Services
             }
         }
 
-        public async Task<Dictionary<string, string>> GetMetadataNameAndFilePathAsync()
+        public async Task<Dictionary<string, (string FilePath, DateTime LastModifiedDate)>> GetMetadataNameAndFilePathAsync()
         {
             if (File.Exists(_metaDataFilePath))
             {
                 Debug.WriteLine("Here?");
-                var result = new Dictionary<string, string>();
+                var result = new Dictionary<string, (string FilePath, DateTime LastModifiedDate)>();
                 var metadata = await LoadMetadataAsync();
 
                 if (metadata != null)
                 {
                     foreach (var item in metadata)
                     {
-                        result[item.Key] = item.Value.FilePath;
+                        result[item.Key] = (item.Value.FilePath, item.Value.LastModifiedDate);
                     }
                 }
 
                 return result;
             }
-            return new Dictionary<string, string>();
+            return new Dictionary<string, (string FilePath, DateTime LastModifiedDate)>();
         }
 
         public async Task<bool> setNoteFilePath(string filePath)

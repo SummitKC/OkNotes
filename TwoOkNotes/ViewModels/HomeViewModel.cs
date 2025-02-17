@@ -26,13 +26,37 @@ namespace TwoOkNotes.ViewModels
         private CanvasModel canvasModel;
         public PenViewModel CurrentPenModel { get; set; }
 
+
+        private string _selectedSort; 
+        public List<string> SortOptions { get; set; }
+
+        public string SelectedSort
+        {
+            get => _selectedSort;
+            set
+            {
+                _selectedSort = value;
+                OnPropertyChanged(nameof(SelectedSort));
+                sortSavedPages(_selectedSort);
+            }
+        }
+
         //
         public ICommand OpenWindow { get; }
         public ICommand LoadCurrentFileCommand { get; }
         public ICommand LoadAFile { get;  }
-        public ICommand SearchCommand { get; }
-        public ObservableCollection<PageModel> SavedPages { get; set;  }
-        
+
+        private ObservableCollection<PageModel> _savedPages;
+        public ObservableCollection<PageModel> SavedPages
+        {
+            get => _savedPages;
+            set
+            {
+                _savedPages = value;
+                OnPropertyChanged(nameof(SavedPages));
+            }
+        }
+
 
         //Initilizing the command
         public HomeViewModel()
@@ -43,9 +67,8 @@ namespace TwoOkNotes.ViewModels
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
             LoadAFile = new RelayCommand(FindAndLoadFile);
             CurrentPenModel = new PenViewModel();
-            SearchCommand = new RelayCommand(searchForFiles);
+            SortOptions = new List<string> { "Name", "Date",  };
         }
-
 
         //just gives a new canvas model
         private CanvasModel GetCanvasModel()
@@ -82,23 +105,34 @@ namespace TwoOkNotes.ViewModels
         //Get the directory of the notes and load them into the saved pages
         private async void LoadSavedPages()
         {
-            Debug.WriteLine("gets to here 7");
-            //Change later 
             var currFilesTest = await Task.Run(() => fileSavingServices.GetMetadataNameAndFilePathAsync());
             numberOfPagesl = currFilesTest.Count();
-            Debug.WriteLine("gets to here 8", currFilesTest.Keys, currFilesTest.Values);
 
             foreach (var page in currFilesTest)
             {
                 Debug.WriteLine(page.Key + page.Value);
-                SavedPages.Add(new PageModel { Name = page.Key, FilePath = page.Value });
+                SavedPages.Add(new PageModel { Name = page.Key, FilePath = page.Value.FilePath, LastUpdatedDate = page.Value.LastModifiedDate });
             }
 
         }
 
-        private void searchForFiles(object? obj)
+        private void sortSavedPages(string sortBy)
         {
-            SavedPages.ToLookup(x => x.Name);
+            if (sortBy is string sortOption)
+            {
+                switch (sortOption)
+                {
+                    case "Name":
+                        SavedPages = new ObservableCollection<PageModel>(SavedPages.OrderBy(x => x.Name));
+                        break;
+                    case "Date":
+                        SavedPages = new ObservableCollection<PageModel>(SavedPages.OrderBy(x => x.LastUpdatedDate));
+                        break;
+                    default:
+                        SavedPages = new ObservableCollection<PageModel>(SavedPages.OrderBy(x => x.LastUpdatedDate));
+                        break;
+                }
+            }
         }
 
         //Icon's Getter and Setter

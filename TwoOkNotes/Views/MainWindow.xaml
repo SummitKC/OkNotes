@@ -50,7 +50,7 @@
                              FontSize="14"
                              Style="{StaticResource LauncherButtonTheme}"/>
 
-                <RadioButton Content="New Folder"
+                <RadioButton Content="Open File"
                              Height="50"
                              Foreground="#ac3dac"
                              FontSize="14"
@@ -61,15 +61,22 @@
                              Height="50"
                              Foreground="#ac3dac"
                              FontSize="14"
+                             
                              Style="{StaticResource LauncherButtonTheme}"
                              Command="{Binding OpenWindow}"/>
 
-                <RadioButton Content="Search 🔍"
-                             Height="50"
+                <ComboBox ItemsSource="{Binding SortOptions}"
+                          SelectedItem="{Binding SelectedSort, Mode=TwoWay}"
+                          Style="{StaticResource LauncherComboBoxTheme}"/>
+
+
+
+                <RadioButton Content="Exit"
+                             Height="48"
                              Foreground="#ac3dac"
                              FontSize="14"
                              Style="{StaticResource LauncherButtonTheme}"
-                             Command="{Binding SearchCommand}"/>
+                             />
 
             </StackPanel>
 
@@ -77,7 +84,7 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                     
-                    <ItemsControl ItemsSource="{Binding SavedPages}" 
+                    <ItemsControl ItemsSource="{Binding SavedPages, Mode=TwoWay}" 
                                   Background="#E6F7FA" 
                                   Grid.ColumnSpan="2">
                         
@@ -124,7 +131,8 @@
                     </ItemsControl>
                 </ScrollViewer>
             </Grid>
-
+         
+            
         </Grid>
     </Border>
 </Window>

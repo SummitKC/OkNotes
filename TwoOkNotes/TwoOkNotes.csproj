@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Page Remove="Assets\Themes\LauncherButtonTheme.xaml" />
+    <Page Remove="Assets\Themes\LauncherComboBoxTheme.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Themes\LauncherComboBoxTheme.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Resource>
     <Resource Include="Assets\Themes\LauncherButtonTheme.xaml" />
   </ItemGroup>
 
