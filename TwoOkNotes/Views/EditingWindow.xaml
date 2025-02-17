@@ -11,8 +11,8 @@
         KeyUp="Window_KeyUp"
         MouseWheel="Window_MouseWheel"
         Title="{Binding WindowTitle}" 
-        Height="{Binding WindowHeight, Mode=TwoWay}" 
-        Width="{Binding WindowTitle, Mode=TwoWay}" >
+        Height="1440" 
+        Width="2460" >
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -73,7 +73,7 @@
                 Content="Pen"
                 Command="{Binding TogglePenSettingsCommand}" 
                 Margin="1"/>
-            
+
             <Button 
                 Content="Zoom In" 
                 Command="{Binding ZoomInCommand}"
@@ -85,18 +85,40 @@
                 Margin="1"/>
 
         </StackPanel>
+        
+        
+        
         <Grid>
-            <ContentControl Content="{Binding CurrentCanvasModel}" />
-            <views:PenSettings 
-               DataContext="{Binding CurrentPenModel}"
-               Visibility="{Binding DataContext.IsPenSettingOpen, 
-                       RelativeSource={RelativeSource AncestorType=Window}, 
-                       Converter={StaticResource BooleanToVisibilityConverter}}"
-                 HorizontalAlignment="Right" 
-               VerticalAlignment="Top" 
-               Width="272" 
-               Height="290" Margin="0,0,862,0"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1080"/>
+            </Grid.RowDefinitions>
         </Grid>
+
+        <views:PenSettings Grid.Row="1" Grid.Column="1" 
+           DataContext="{Binding CurrentPenModel}"
+           Visibility="{Binding DataContext.IsPenSettingOpen, 
+                   RelativeSource={RelativeSource AncestorType=Window}, 
+                   Converter={StaticResource BooleanToVisibilityConverter}}"
+             HorizontalAlignment="Right" 
+           VerticalAlignment="Top" 
+           Width="272" 
+           Height="290" Margin="0,0,862,0"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto"
+                      Grid.Column="1"
+                      Grid.Row="1">
+            <ContentControl Content="{Binding CurrentCanvasModel}" RenderTransformOrigin="0.497,0.478"         
+                Height="1080" 
+                Width="1920"  
+                VerticalAlignment="Top" />
+        </ScrollViewer>
+
+
     </DockPanel>
- 
+
+
 </Window>
