@@ -30,6 +30,7 @@ namespace TwoOkNotes.ViewModels
         public ICommand OpenWindow { get; }
         public ICommand LoadCurrentFileCommand { get; }
         public ICommand LoadAFile { get;  }
+        public ICommand SearchCommand { get; }
         public ObservableCollection<PageModel> SavedPages { get; set;  }
         
 
@@ -42,6 +43,7 @@ namespace TwoOkNotes.ViewModels
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
             LoadAFile = new RelayCommand(FindAndLoadFile);
             CurrentPenModel = new PenViewModel();
+            SearchCommand = new RelayCommand(searchForFiles);
         }
 
 
@@ -92,6 +94,11 @@ namespace TwoOkNotes.ViewModels
                 SavedPages.Add(new PageModel { Name = page.Key, FilePath = page.Value });
             }
 
+        }
+
+        private void searchForFiles(object? obj)
+        {
+            SavedPages.ToLookup(x => x.Name);
         }
 
         //Icon's Getter and Setter

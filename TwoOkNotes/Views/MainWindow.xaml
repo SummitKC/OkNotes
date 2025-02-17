@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
+        xmlns:services="clr-namespace:TwoOkNotes.Services"
         mc:Ignorable="d"
         Height="600" Width="900"
         WindowStyle="None"
@@ -13,9 +14,13 @@
         <local:HomeViewModel />
     </Window.DataContext>
 
-    <Border Background="#98dbe1"
+    <Window.Resources>
+        <services:FileNameConverter x:Key="FileNameConverter" />
+    </Window.Resources>
+
+    <Border Background="#D0F0F7"
             CornerRadius="10">
-        <Grid RenderTransformOrigin="0.567,0.537">
+        <Grid RenderTransformOrigin="0.567,0.537" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="114.754"/>
                 <ColumnDefinition Width="*"/>
@@ -27,15 +32,21 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="TwoOkNotes"
-                       VerticalAlignment="Center"
+                       VerticalAlignment="Top"
                        HorizontalAlignment="Center"
                        Foreground="#ac3dac"
-                       FontSize="20"/>
+                       FontSize="20" 
+                       Grid.Column="1" 
+                       Height="34" 
+                       Width="115" 
+                       Margin="0,10,0,0" 
+                       Grid.RowSpan="2" 
+                       RenderTransformOrigin="0.505,0.5"/>
 
-            <StackPanel Grid.Row="1">
+            <StackPanel Grid.Row="1" Background="#A0DDE0" Margin="1,31,785,10" Grid.ColumnSpan="2">
                 <RadioButton Content="Home"
-                             Height="50"
-                             Foreground="#ac3dac"
+                             Height="54"
+                             Foreground="#7A0D7C"
                              FontSize="14"
                              Style="{StaticResource LauncherButtonTheme}"/>
 
@@ -45,28 +56,73 @@
                              FontSize="14"
                              Style="{StaticResource LauncherButtonTheme}"
                              Command="{Binding LoadAFile}"/>
-                
+
                 <RadioButton Content="New File"
                              Height="50"
                              Foreground="#ac3dac"
                              FontSize="14"
                              Style="{StaticResource LauncherButtonTheme}"
                              Command="{Binding OpenWindow}"/>
+
+                <RadioButton Content="Search 🔍"
+                             Height="50"
+                             Foreground="#ac3dac"
+                             FontSize="14"
+                             Style="{StaticResource LauncherButtonTheme}"
+                             Command="{Binding SearchCommand}"/>
+
             </StackPanel>
 
-            <Grid Grid.Column="1" Margin="10,10,10,10" Grid.Row="1">
-                <ListView ItemsSource="{Binding SavedPages}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <TextBlock Text="{Binding Name}" FontSize="16" Margin="0,0,10,0" />
-                                <Button Content="Open"
-                           Command="{Binding DataContext.LoadCurrentFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                           CommandParameter="{Binding}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+            <Grid Grid.Column="1" Margin="10,30,10,10" Grid.Row="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    
+                    <ItemsControl ItemsSource="{Binding SavedPages}" 
+                                  Background="#E6F7FA" 
+                                  Grid.ColumnSpan="2">
+                        
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel HorizontalAlignment="Center"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center" Margin="10">
+                                    
+                                    <Button Command="{Binding DataContext.LoadCurrentFileCommand, 
+                                        RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Width="100" 
+                                        Height="141" 
+                                        Background="#E6F7FA" 
+                                        BorderThickness="2" 
+                                        BorderBrush="#E6F7FA">
+                                        
+                                            <StackPanel>
+                                                <TextBlock Text="📄" 
+                                                       FontSize="100" 
+                                                       HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                    </Button>
+
+                                    <TextBlock Text="{Binding Name, Converter={StaticResource FileNameConverter}}"
+                                               
+                                               FontSize="16" 
+                                               HorizontalAlignment="Center" 
+                                               TextAlignment="Center"
+                                               Margin="5" 
+                                               Height="50"
+                                               Width="100"
+                                               TextWrapping="Wrap"
+                                               TextTrimming="CharacterEllipsis">
+                                        
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Grid>
 
         </Grid>

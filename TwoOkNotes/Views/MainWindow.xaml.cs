@@ -18,7 +18,7 @@ namespace TwoOkNotes.Views
     {
         public MainWindow()
         {
-            InitializeComponent();   
+            InitializeComponent();
         }
     }
 }

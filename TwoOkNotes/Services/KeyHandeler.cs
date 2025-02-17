@@ -87,7 +87,6 @@ namespace TwoOkNotes.Services
             {
                 ctlrKey = false;
             }
-
         }
         public void onMouseWheal(MouseWheelEventArgs e)
         {
@@ -102,8 +101,6 @@ namespace TwoOkNotes.Services
                     _canvasModel.ZoomLevel -= 0.1;
                 }
             }
-
         }
-
     }
 }
