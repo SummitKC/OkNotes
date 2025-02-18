@@ -22,7 +22,7 @@
         <StackPanel 
             DockPanel.Dock="Top"
             Orientation="Horizontal"
-            Background="Gray">
+            Background="#1E1E1E">
 
             <Button 
                 Content="Save"
@@ -80,45 +80,49 @@
                 Margin="1"/>
 
             <Button 
-                Content="Zoom In" 
+                Content="Zoom Out" 
                 Command="{Binding ZoomOutCommand}"
                 Margin="1"/>
 
         </StackPanel>
         
-        
-        
         <Grid>
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1080"/>
-            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Column="0" Background="#1E1E1E">
+                
+                
+                
+            </StackPanel>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto"
+                          Grid.Column="1" 
+                          Background="#2C2C2C">
+
+                <ContentControl Content="{Binding CurrentCanvasModel}"        
+                    Height="10000" 
+                    Width="10000"  
+                    VerticalAlignment="Top"/>
+
+            </ScrollViewer>
+
+            <views:PenSettings 
+               DataContext="{Binding CurrentPenModel}"
+               Visibility="{Binding DataContext.IsPenSettingOpen, 
+                       RelativeSource={RelativeSource AncestorType=Window}, 
+                       Converter={StaticResource BooleanToVisibilityConverter}}"
+                 HorizontalAlignment="Right" 
+               VerticalAlignment="Top" 
+               Width="272" 
+               Height="312" 
+               Margin="0,0,1978,0"  Grid.Column="1" />
         </Grid>
-
-        <views:PenSettings Grid.Row="1" Grid.Column="1" 
-           DataContext="{Binding CurrentPenModel}"
-           Visibility="{Binding DataContext.IsPenSettingOpen, 
-                   RelativeSource={RelativeSource AncestorType=Window}, 
-                   Converter={StaticResource BooleanToVisibilityConverter}}"
-             HorizontalAlignment="Right" 
-           VerticalAlignment="Top" 
-           Width="272" 
-           Height="290" Margin="0,0,862,0"/>
-
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Auto"
-                      Grid.Column="1"
-                      Grid.Row="1">
-            <ContentControl Content="{Binding CurrentCanvasModel}" RenderTransformOrigin="0.497,0.478"         
-                Height="1080" 
-                Width="1920"  
-                VerticalAlignment="Top" />
-        </ScrollViewer>
-
-
+        
     </DockPanel>
-
-
+    
 </Window>

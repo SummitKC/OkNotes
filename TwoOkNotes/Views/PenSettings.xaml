@@ -5,29 +5,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
              xmlns:model="clr-namespace:TwoOkNotes.Model" 
-             mc:Ignorable="d" Height="292" Width="256">
-    <Grid Background="Aqua" Margin="0,0,0,-23">
-        <StackPanel Margin="0,0,10,-37">
-         
+             mc:Ignorable="d" Height="306" Width="256">
+    
+    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="10" Background="White">
 
-            <!-- Individual sliders for RGB -->
-            <TextBlock Text="Red" Margin="10" Height="15"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Red, Mode=TwoWay}" Width="240"/>
+        <Grid Background="#2C2C2C" Margin="0,0,0,-23">
 
-            <TextBlock Text="Green" Margin="10" Height="15"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Green, Mode=TwoWay}" Width="240"/>
+            <StackPanel Margin="0,0,10,-37">
 
-            <TextBlock Text="Blue" Margin="10"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Blue, Mode=TwoWay}" Width="240"/>
+                <TextBlock Text="Red" Margin="10" Height="15" Foreground="#BB86FC"/>
+                <Slider Minimum="0" Maximum="255" Value="{Binding Red, Mode=TwoWay}" Width="240"/>
 
-            <TextBlock Text="Pen Thickness" Margin="10"/>
-            <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="240"/>
+                <TextBlock Text="Green" Margin="10" Height="15" Foreground="#BB86FC"/>
+                <Slider Minimum="0" Maximum="255" Value="{Binding Green, Mode=TwoWay}" Width="240"/>
 
-            <TextBlock Text="Pen Opacity" Margin="10"/>
-            <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
+                <TextBlock Text="Blue" Margin="10" Height="15" Foreground="#BB86FC"/>
+                <Slider Minimum="0" Maximum="255" Value="{Binding Blue, Mode=TwoWay}" Width="240"/>
 
-            <!-- TODO: Testing for now, remove later to a autosave system on exit -->
-            <Button Content="Save Pen Settings" Command="{Binding SavePenSettingsCommand}" Margin="10"/>
-        </StackPanel>
-    </Grid>
+                <TextBlock Text="Pen Thickness" Margin="10" Height="15" Foreground="#BB86FC"/>
+                <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="240"/>
+
+                <TextBlock Text="Pen Opacity" Margin="10" Height="15" Foreground="#BB86FC"/>
+                <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
+
+                <Button Content="Save Pen Settings" Command="{Binding SavePenSettingsCommand}" Margin="10"/>
+            </StackPanel>
+        </Grid>
+
+    </Border>
 </UserControl>

@@ -36,7 +36,5 @@ namespace TwoOkNotes.Views
                 viewModel.OnMouseWheel(e);
             }
         }
-
-
     }
 }
