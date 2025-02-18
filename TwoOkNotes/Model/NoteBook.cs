@@ -8,5 +8,6 @@ namespace TwoOkNotes.Model
 {
     public class NoteBook
     {
+        public required List<NoteBookSection> Setctions { get; set; }
     }
 }

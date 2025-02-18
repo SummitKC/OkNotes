@@ -51,7 +51,7 @@ namespace TwoOkNotes.Model
         //default settings for the canvas
         private void InitilizeCanvas()
         {
-            Background = Brushes.Black;
+            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2C2C2C"));
         }
 
         //Set pen with the current, and update on when any aspect of the pen changes
