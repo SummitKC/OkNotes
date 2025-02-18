@@ -11,7 +11,6 @@ namespace TwoOkNotes.Model
         public required string FileName { get; set; }
         public required string FilePath { get; set; }
         public int Id { get; set; }
-        public DateTime CreationDate { get; set; }
         public DateTime LastModifiedDate { get; set; }
     }
 }

@@ -94,9 +94,9 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Background="#1E1E1E">
-                
-                
-                
+
+
+                 
             </StackPanel>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"

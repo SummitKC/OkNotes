@@ -8,6 +8,11 @@ namespace TwoOkNotes.Model
 {
     public class NoteBookSection
     {
-        public required FileMetadata FileMetadata { get; set; }
+        public required string Name { get; set; }
+        public required double ID { get; set; }
+        public required string FolderPath { get; set; }
+        public required List<FileMetadata> FileMetadata { get; set; }
+        public required DateTime LastUpdated { get; set; }
+
     }
 }

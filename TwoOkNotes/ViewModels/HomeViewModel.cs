@@ -67,7 +67,7 @@ namespace TwoOkNotes.ViewModels
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
             LoadAFile = new RelayCommand(FindAndLoadFile);
             CurrentPenModel = new PenViewModel();
-            SortOptions = new List<string> { "Name", "Date",  };
+            SortOptions = new List<string> { "Name", "Date"  };
         }
 
         //just gives a new canvas model
@@ -154,7 +154,7 @@ namespace TwoOkNotes.ViewModels
         //TODO: Move creating the file here
         private void OpenNewWindow(object? obj)
         {
-            string filePath = $"{fileSavingServices.GetDefaultFilePath()}Untitled{numberOfPagesl}.isf";
+            string filePath = $"Untitled{numberOfPagesl}.isf";
             EditingWindow newOpenWindow = new();
             fileSavingServices.createFile(filePath);
             EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, filePath);

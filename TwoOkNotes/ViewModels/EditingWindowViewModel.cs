@@ -22,7 +22,7 @@ namespace TwoOkNotes.ViewModels
         private bool _isPenSettingOpen;
         private string currFilePath;
         private KeyHandler _keyHandler;
-        private TimerHandler _autoSaveTimer;
+        private TimerHandler? _autoSaveTimer;
         public WindowSettings _windowSettings { get; set; }
         private FileSavingServices _savingServices { get; set; }
         private SettingsServices _settingsSercices { get; set; }
@@ -148,6 +148,7 @@ namespace TwoOkNotes.ViewModels
         // when event is triggered, check if strokes are added or removed, if so, save the note
         private void Strokes_StrokesChanged(object? sender, StrokeCollectionChangedEventArgs e)
         {
+            Debug.WriteLine(e.Added.Count + "     " + e.Removed.Count);
             if (e.Added.Count > 0)
             {
                 CurrentCanvasModel.UndoStack.Push(new StrokeTypeAction(e.Added[0], true));
@@ -164,16 +165,19 @@ namespace TwoOkNotes.ViewModels
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                Debug.WriteLine("Keyboard save?");
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
-                await _savingServices.SaveFileAsync(currFilePath, fileContent);
+                if (await _savingServices.SaveFileAsync(currFilePath, fileContent))
+                {
+                    Debug.WriteLine("Saved"); //Change this to a toast message later
+                }
             }
         }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         private void Undo(object? obj)
         {
+            Debug.WriteLine("Is it called?");
             //Need to unsubscribe from the event so this this stroke does not get pushed to the stack from the Removed event 
             CurrentCanvasModel.Strokes.StrokesChanged -= Strokes_StrokesChanged;
 
@@ -191,13 +195,12 @@ namespace TwoOkNotes.ViewModels
                     CurrentCanvasModel.Strokes.Add(action.Stroke);
                 }
                 CurrentCanvasModel.RedoStack.Push(action);
-
+            }
             // Resubscribe to the event
             SubscribeToStrokeEvents();
 
             // Save the note state after undo since the event arg is not being called 
             SaveNote();
-            }
         }
 
         //Redo, checks if there is anything in the redo stack, if so, add the last stroke to the canvas
@@ -220,13 +223,12 @@ namespace TwoOkNotes.ViewModels
                     CurrentCanvasModel.Strokes.Remove(action.Stroke);
                 }
                 CurrentCanvasModel.UndoStack.Push(action);
-
+            }
             // Resubscribe to the event
             SubscribeToStrokeEvents();
 
             // Save the note state after undo since the event arg is not being called 
             SaveNote();
-            }
         }
 
         private void ToggleEraser(object? obj)
