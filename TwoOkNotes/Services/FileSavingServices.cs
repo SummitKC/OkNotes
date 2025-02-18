@@ -17,7 +17,8 @@ namespace TwoOkNotes.Services
 {
     public class FileSavingServices
     {
-        
+        private readonly string _notebookFilePath;
+        private readonly string _sectionFilePath;
         private readonly string _metaDataFilePath;
         private readonly string _defaultFileSettings;
 
@@ -25,74 +26,144 @@ namespace TwoOkNotes.Services
         {
             string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string appFolder = Path.Combine(appDataFolder, "TwoOkNotes");
-            if (!Directory.Exists(appFolder))
-            {
-                Directory.CreateDirectory(appFolder);
-            }
-            _metaDataFilePath = Path.Combine(appFolder, "currFilesMetadata.json");
+
+            ValidateDirectory(appFolder);
+
             _defaultFileSettings = Path.Combine(appFolder, "FileSettings.json");
+            _notebookFilePath = Path.Combine(appFolder, "notebookFilePath.json");
+            _sectionFilePath = Path.Combine(appFolder, "sectionFilePath.json");
+            _metaDataFilePath = Path.Combine(appFolder, "currFilesMetadata.json");
+
+            ValidateFilePaths();
+        }
+
+        private void ValidateDirectory(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+        }
+
+        private void ValidateFilePaths()
+        {
+            var filePaths = new Dictionary<string, string>
+            {{ nameof(_defaultFileSettings), _defaultFileSettings },
+            { nameof(_notebookFilePath), _notebookFilePath },
+            { nameof(_sectionFilePath), _sectionFilePath },
+            { nameof(_metaDataFilePath), _metaDataFilePath }};
+
+            foreach (var filePath in filePaths)
+            {
+                if (!File.Exists(filePath.Value))
+                {
+                    Debug.WriteLine($"File not found: {filePath.Key} - {filePath.Value}");
+                    CreateMetaDataFiles(filePath.Value);
+                }
+            }
         }
 
         //TODO: Refactor, just for testing rn 
-        public string GetDefaultFilePath()
+        public async Task<string> GetDefaultFilePath()
         {
             try
             {
                 if (File.Exists(_defaultFileSettings))
                 {
-                    string json = File.ReadAllText(_defaultFileSettings);
-                    FileSettings fileSettings = JsonSerializer.Deserialize<FileSettings>(json);
-
-                    if (fileSettings.DefaultFilePath != null)
+                    string json = await File.ReadAllTextAsync(_defaultFileSettings);
+                    FileSettings? fileSettings = JsonSerializer.Deserialize<FileSettings>(json);
+                    //Empty check for Json 
+                    if (fileSettings != null && !JsonHelper.isAttributeEmtpy(fileSettings.DefaultFilePath))
                     {
-                        return fileSettings.DefaultFilePath;
+                        return fileSettings.DefaultFilePath; // Could return an invalid filepath 
                     }
-                    else
-                    {
-                        setNoteFilePath(GetDirectoryPathFromUser());
-                        return GetDefaultFilePath();
-                    }               
+
+                    await setNoteFilePath(GetDirectoryPathFromUser());
+                    return await GetDefaultFilePath();
                 }
-                throw new FileNotFoundException("FileSettings.json not found");
+                throw new FileNotFoundException(_defaultFileSettings);
             }
             catch (FileNotFoundException e)
             {
-                Debug.WriteLine(e.Message);
-                return "C:/"; 
+                createFile(e.Message);
+                await setNoteFilePath(GetDirectoryPathFromUser());
+                return await GetDefaultFilePath();
             }
         }
 
-        public async void createFile(string filePath)
+        private async void CreateMetaDataFiles(string filePath)
         {
-            if (!File.Exists(filePath))
+            try
             {
                 await File.WriteAllTextAsync(filePath, null);
-                //await SaveFileAsync(filePath, new byte[0]);
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("here?");
             }
         }
 
-        public async Task SaveFileAsync(string filePath, byte[] fileContent)
+        //TODO: when maning is implemented change return type to bool for name repete check 
+        public async void createFile(string fileName)
         {
-            await File.WriteAllBytesAsync(filePath, fileContent);
-            await UpdateMetadataAsync(filePath);
+            try
+            {
+                string filePath = await GetDefaultFilePath() + fileName;
+                if (!File.Exists(filePath))
+                {
+                    await File.WriteAllTextAsync(filePath, null);
+                    //return true;
+                }
+                else
+                {
+                    //TODO: Add a message box to ask to overwrite the file when file naming is implemented 
+                    //return false; 
+                }
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("here?");
+                //return false; 
+            }
+        }
+        public async Task<bool> SaveFileAsync(string filePath, byte[] fileContent)
+        {
+            try
+            {
+                await File.WriteAllBytesAsync(filePath, fileContent);
+                await UpdateMetadataAsync(filePath);
+                return true;
+            }
+            catch (FileNotFoundException ) 
+            {
+                
+                return false;
+            }
         }
 
         private async Task UpdateMetadataAsync(string filePath)
         {
-            var metadata = await LoadMetadataAsync();
-            var fileInfo = new FileInfo(filePath);
-
-            var fileMetadata = new FileMetadata
+            try
             {
-                FileName = fileInfo.Name,
-                FilePath = filePath,
-                Id = metadata.Count,
-                CreationDate = fileInfo.CreationTime,
-                LastModifiedDate = fileInfo.LastWriteTime,
-            };
+                var metadata = await LoadMetadataAsync();
+                var fileInfo = new FileInfo(filePath);
 
-            metadata[fileInfo.Name] = fileMetadata;
-            await SaveMetadataAsync(metadata);
+                var fileMetadata = new FileMetadata
+                {
+                    FileName = fileInfo.Name,
+                    FilePath = filePath,
+                    Id = metadata.Count,
+                    LastModifiedDate = fileInfo.LastWriteTime,
+                };
+
+                metadata[fileInfo.Name] = fileMetadata;
+                await SaveMetadataAsync(metadata);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"An error occurred while updating metadata: {ex.Message}");
+                throw;
+            }
         }
         private async Task<Dictionary<string, FileMetadata>> LoadMetadataAsync()
         {
