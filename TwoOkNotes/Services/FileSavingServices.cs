@@ -167,12 +167,21 @@ namespace TwoOkNotes.Services
         }
         private async Task<Dictionary<string, FileMetadata>> LoadMetadataAsync()
         {
-            if (File.Exists(_metaDataFilePath))
+            if (File.Exists(_metaDataFilePath) && !JsonHelper.IsJsonEmpty(_metaDataFilePath))
             {
                 string json = await File.ReadAllTextAsync(_metaDataFilePath);
-                return JsonSerializer.Deserialize<Dictionary<string, FileMetadata>>(json) ?? new Dictionary<string, FileMetadata>();
+                return JsonSerializer.Deserialize<Dictionary<string, FileMetadata>>(json);
             }
-            return new Dictionary<string, FileMetadata>();
+
+            var dict = new Dictionary<string, FileMetadata>();
+            var fileMetadata = new FileMetadata
+            {
+                FilePath = _metaDataFilePath,
+            };
+
+            dict[fileMetadata.FileName] = fileMetadata;
+            await SaveMetadataAsync(dict);
+            return dict;
         }
 
         //TODO: Looks like this save and the 5 second timer are clashing 
