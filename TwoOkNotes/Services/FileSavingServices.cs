@@ -167,6 +167,7 @@ namespace TwoOkNotes.Services
         }
         private async Task<Dictionary<string, FileMetadata>> LoadMetadataAsync()
         {
+
             if (File.Exists(_metaDataFilePath) && !JsonHelper.IsJsonEmpty(_metaDataFilePath))
             {
                 string json = await File.ReadAllTextAsync(_metaDataFilePath);
@@ -176,7 +177,7 @@ namespace TwoOkNotes.Services
             var dict = new Dictionary<string, FileMetadata>();
             var fileMetadata = new FileMetadata
             {
-                FilePath = _metaDataFilePath,
+                FilePath = _defaultFileSettings,
             };
 
             dict[fileMetadata.FileName] = fileMetadata;
