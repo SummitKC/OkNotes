@@ -70,6 +70,8 @@ namespace TwoOkNotes.ViewModels
             ZoomOutCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomOut());
             SaveNoteCommand = new RelayCommand(_ => SaveNote());
 
+            Debug.WriteLine(_savingServices._currFilePath + "123123123123123123123312");
+
             SaveNote();
             InitAutoSaveTimer();
             SubscribeToStrokeEvents();

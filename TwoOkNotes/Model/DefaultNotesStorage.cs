@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TwoOkNotes.Model
 {
-    public class FileSettings
+    public class DefaultNotesStorage
     {
         public required string DefaultFilePath { get; set; }
     }

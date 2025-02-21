@@ -17,27 +17,31 @@ namespace TwoOkNotes.Services
 {
     public class FileSavingServices
     {
-        private readonly string _notebookFilePath;
-        private readonly string _sectionFilePath;
-        private readonly string _metaDataFilePath;
-        private readonly string _defaultFileSettings;
+        private readonly string _defaultNotesDirectoryLocation; //Path of the JSON that points to the default notes directory
+        private readonly string _globalMetaDataLocation;
+        private readonly string _notesDirectory;
+        public string _currFilePath;
 
         public FileSavingServices()
         {
             string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string appFolder = Path.Combine(appDataFolder, "TwoOkNotes");
 
-            ValidateDirectory(appFolder);
+            createDir(appFolder);
 
-            _defaultFileSettings = Path.Combine(appFolder, "FileSettings.json");
-            _notebookFilePath = Path.Combine(appFolder, "notebookFilePath.json");
-            _sectionFilePath = Path.Combine(appFolder, "sectionFilePath.json");
-            _metaDataFilePath = Path.Combine(appFolder, "currFilesMetadata.json");
+            _defaultNotesDirectoryLocation = Path.Combine(appFolder, "DefaultNotesStorage.json");
+            ValidateDirLocationExists(_defaultNotesDirectoryLocation);
 
-            ValidateFilePaths();
+            DefaultNotesStorage noteDir = JsonSerializer.Deserialize<DefaultNotesStorage>(File.ReadAllText(_defaultNotesDirectoryLocation));
+            _notesDirectory = noteDir.DefaultFilePath;
+            
+
+
+            _globalMetaDataLocation = Path.Combine(_notesDirectory, "GlobalMetaData.json");
+            ValidateFilePaths(_globalMetaDataLocation);
         }
 
-        private void ValidateDirectory(string directoryPath)
+        private void createDir(string directoryPath)
         {
             if (!Directory.Exists(directoryPath))
             {
@@ -45,85 +49,156 @@ namespace TwoOkNotes.Services
             }
         }
 
-        private void ValidateFilePaths()
+        private async void ValidateDirLocationExists(string filePath)
         {
-            var filePaths = new Dictionary<string, string>
-            {{ nameof(_defaultFileSettings), _defaultFileSettings },
-            { nameof(_notebookFilePath), _notebookFilePath },
-            { nameof(_sectionFilePath), _sectionFilePath },
-            { nameof(_metaDataFilePath), _metaDataFilePath }};
-
-            foreach (var filePath in filePaths)
+            if (!File.Exists(filePath))
             {
-                if (!File.Exists(filePath.Value))
+                DefaultNotesStorage defDirectoryPath = new()
                 {
-                    Debug.WriteLine($"File not found: {filePath.Key} - {filePath.Value}");
-                    CreateMetaDataFiles(filePath.Value);
-                }
+                    DefaultFilePath = GetDirectoryPathFromUser() 
+                };
+                await SaveMetadataAsync(defDirectoryPath, filePath);
             }
         }
 
-        //TODO: Refactor, just for testing rn 
-        public async Task<string> GetDefaultFilePath()
+        private void ValidateFilePaths(string filePath)
         {
-            try
-            {
-                if (File.Exists(_defaultFileSettings))
+            //var filePaths = new Dictionary<string, string>
+            //{{ nameof(_defaultFileSettings), _defaultFileSettings },
+            //{ nameof(_notebookFilePath), _notebookFilePath },
+            //{ nameof(_sectionFilePath), _sectionFilePath },
+            //{ nameof(_metaDataFilePath), _metaDataFilePath }};
+
+            //foreach (var filePath in filePaths)
+            //{
+                if (!File.Exists(filePath))
                 {
-                    string json = await File.ReadAllTextAsync(_defaultFileSettings);
-                    FileSettings? fileSettings = JsonSerializer.Deserialize<FileSettings>(json);
-                    //Empty check for Json 
-                    if (fileSettings != null && !JsonHelper.isAttributeEmtpy(fileSettings.DefaultFilePath))
+                    Debug.WriteLine($"File not found: {filePath}");
+                    CreateFile(filePath).Wait();
+                }
+            }
+        //}
+
+
+        public async Task<bool> CreateNotebook(string directoryName)
+        {
+            string notebookPath = Path.Combine(_notesDirectory, directoryName);
+            if (!Directory.Exists(notebookPath))
+            {
+                Directory.CreateDirectory(notebookPath);
+                // Load global metadata
+                var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
+                // Add new notebook
+                if (!metadata.NoteBooks.Contains(directoryName))
+                {
+                    metadata.NoteBooks.Add(directoryName);
+                }
+                // Save updated metadata
+                await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                // Create initial section
+                bool sectionCreated = await CreateSection("Section1", directoryName);
+                return sectionCreated;
+            }
+            return false;
+        }
+
+
+        public async Task<bool> CreateSection(string sectionName, string notebookName)
+        {
+            string sectionPath = Path.Combine(_notesDirectory, notebookName, sectionName);
+            if (!Directory.Exists(sectionPath))
+            {
+                Directory.CreateDirectory(sectionPath);
+                string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
+                var metadata = await LoadMetadataAsync<NoteBookMetaData>(metadataFilePath);
+                if (!metadata.Sections.Contains(sectionName))
+                {
+                    metadata.Sections.Add(sectionName);
+                }
+                // Save updated metadata
+                await SaveMetadataAsync(metadata, metadataFilePath);
+                bool pageCreated = await CreatePage(notebookName, sectionName, "Page1.isf");
+                return pageCreated;
+            }
+            return false; // Section already exists
+        }
+
+        public async Task<bool> CreatePage(string? notebookName, string? sectionName, string pageName)
+        {
+            string pagePath = Path.Combine(_notesDirectory, notebookName ?? "", sectionName ?? "", pageName);
+            if (!File.Exists(pagePath))
+            {
+                await CreateFile(pagePath);
+                if (notebookName != null && sectionName != null)
+                {
+                    string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
+                    // Load or initialize metadata
+                    var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
+                    // Add new page
+                    if (!metadata.Pages.Contains(pageName))
                     {
-                        return fileSettings.DefaultFilePath; // Could return an invalid filepath 
+                        metadata.Pages.Add(pageName);
                     }
-
-                    await setNoteFilePath(GetDirectoryPathFromUser());
-                    return await GetDefaultFilePath();
+                    await SaveMetadataAsync(metadata, metadataFilePath);
                 }
-                throw new FileNotFoundException(_defaultFileSettings);
+                else
+                {
+                    Debug.WriteLine("WHY??????????????????????");
+                    // Update global metadata for orphan pages
+                    var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
+                    Debug.WriteLine("7723");
+                    if (!metadata.OrphanPages.Contains(pageName))
+                    {
+                        metadata.OrphanPages.Add(pageName);
+                    }
+                    Debug.WriteLine(metadata);
+                    await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                }
+                return true; // Page created successfully
             }
-            catch (FileNotFoundException e)
-            {
-                createFile(e.Message);
-                await setNoteFilePath(GetDirectoryPathFromUser());
-                return await GetDefaultFilePath();
-            }
+            Debug.WriteLine("False");
+            return false; // Page already exists
         }
 
-        private async void CreateMetaDataFiles(string filePath)
+        public async Task<List<string>> GetNotebookMetadata(string notebookName)
         {
-            try
-            {
-                await File.WriteAllTextAsync(filePath, null);
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("here?");
-            }
+            string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
+            var metadata = await LoadMetadataAsync<NoteBookMetaData>(metadataFilePath);
+            return metadata.Sections;
+        }
+
+        public async Task<List<string>> GetSectionMetadata(string notebookName, string sectionName)
+        {
+            string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
+            var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
+            return metadata.Pages;
+        }
+
+        public string GetCurrFilePath(string? noteBookName, string? sectionName, string pageName)
+        {
+            return Path.Combine(_notesDirectory, noteBookName ?? "", sectionName ?? "", pageName);
         }
 
         //TODO: when maning is implemented change return type to bool for name repete check 
-        public async void createFile(string fileName)
+        public static async Task<bool> CreateFile(string filePath)
         {
             try
             {
-                string filePath = await GetDefaultFilePath() + fileName;
                 if (!File.Exists(filePath))
                 {
                     await File.WriteAllTextAsync(filePath, null);
-                    //return true;
+                    return true;
                 }
                 else
                 {
                     //TODO: Add a message box to ask to overwrite the file when file naming is implemented 
-                    //return false; 
+                    return false;
                 }
             }
             catch (Exception)
             {
                 Debug.WriteLine("here?");
-                //return false; 
+                return false;
             }
         }
         public async Task<bool> SaveFileAsync(string filePath, byte[] fileContent)
@@ -131,7 +206,6 @@ namespace TwoOkNotes.Services
             try
             {
                 await File.WriteAllBytesAsync(filePath, fileContent);
-                await UpdateMetadataAsync(filePath);
                 return true;
             }
             catch (FileNotFoundException ) 
@@ -140,111 +214,71 @@ namespace TwoOkNotes.Services
                 return false;
             }
         }
-
-        private async Task UpdateMetadataAsync(string filePath)
+        private static async Task<T> LoadMetadataAsync<T>(string filePath) where T : new()
         {
-            try
+            Debug.WriteLine(filePath);
+            if (File.Exists(filePath))
             {
-                var metadata = await LoadMetadataAsync();
-                var fileInfo = new FileInfo(filePath);
-
-                var fileMetadata = new FileMetadata
+                string json = await File.ReadAllTextAsync(filePath);
+                Debug.WriteLine(json);
+                if (!string.IsNullOrEmpty(json))
                 {
-                    FileName = fileInfo.Name,
-                    FilePath = filePath,
-                    Id = metadata.Count,
-                    LastModifiedDate = fileInfo.LastWriteTime,
-                };
-
-                metadata[fileInfo.Name] = fileMetadata;
-                await SaveMetadataAsync(metadata);
+                    Debug.WriteLine("423");
+                    return JsonSerializer.Deserialize<T>(json) ?? new T();
+                }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"An error occurred while updating metadata: {ex.Message}");
-                throw;
-            }
-        }
-        private async Task<Dictionary<string, FileMetadata>> LoadMetadataAsync()
-        {
-
-            if (File.Exists(_metaDataFilePath) && !JsonHelper.IsJsonEmpty(_metaDataFilePath))
-            {
-                string json = await File.ReadAllTextAsync(_metaDataFilePath);
-                return JsonSerializer.Deserialize<Dictionary<string, FileMetadata>>(json);
-            }
-
-            var dict = new Dictionary<string, FileMetadata>();
-            var fileMetadata = new FileMetadata
-            {
-                FilePath = _defaultFileSettings,
-            };
-
-            dict[fileMetadata.FileName] = fileMetadata;
-            await SaveMetadataAsync(dict);
-            return dict;
+            Debug.WriteLine("Test");
+            return new T();
         }
 
         //TODO: Looks like this save and the 5 second timer are clashing 
-        private async Task SaveMetadataAsync(Dictionary<string, FileMetadata> metadata)
+        private async Task SaveMetadataAsync<T>(T metaData, string filePath)
         {
-            string json = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true });
+            string json = JsonSerializer.Serialize(metaData, new JsonSerializerOptions { WriteIndented = true });
             int retryCount = 3;
 
-            //Not sure why but when reasing the program crashes 
-            //added a retry count to try and fix it 
-            //TODO: It's working for now, Look into this further
             while (retryCount > 0)
             {
                 try
                 {
-                    await File.WriteAllTextAsync(_metaDataFilePath, json);
+                    await File.WriteAllTextAsync(filePath, json);
                     break;
                 }
                 catch (IOException)
                 {
                     retryCount--;
                     if (retryCount == 0) throw;
-                    await Task.Delay(100); // Wait before retrying
+                    await Task.Delay(100);
                 }
             }
         }
 
-        public async Task<Dictionary<string, (string FilePath, DateTime LastModifiedDate)>> GetMetadataNameAndFilePathAsync()
+        public async Task<Dictionary<string, (string type, string Fileapth, DateTime LastAccessTime)>> GetMetadataNameAndFilePathAsync()
         {
-            if (File.Exists(_metaDataFilePath))
+            if (File.Exists(_globalMetaDataLocation))
             {
                 Debug.WriteLine("Here?");
-                var result = new Dictionary<string, (string FilePath, DateTime LastModifiedDate)>();
-                var metadata = await LoadMetadataAsync();
+                Dictionary<string, (string Name, string FilePath, DateTime LastAccessTime)> result = new();
+                GlobalMetaData metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
 
                 if (metadata != null)
                 {
-                    foreach (var item in metadata)
+                    foreach (var item in metadata.NoteBooks)
                     {
-                        result[item.Key] = (item.Value.FilePath, item.Value.LastModifiedDate);
+                        string itemFilePath = Path.Combine(_notesDirectory, item);
+                        result[item] = ("NoteBook", itemFilePath, File.GetLastAccessTime(itemFilePath));
+                    }
+
+                    foreach (var item in metadata.OrphanPages)
+                    {
+                        string itemFilePath = Path.Combine(_notesDirectory, item);
+                        result[item] = ("OrphanPage", itemFilePath, File.GetLastAccessTime(itemFilePath));
                     }
                 }
 
                 return result;
             }
-            return new Dictionary<string, (string FilePath, DateTime LastModifiedDate)>();
-        }
-
-        public async Task<bool> setNoteFilePath(string filePath)
-        {
-            FileSettings fileSettings = new FileSettings
-            {
-                DefaultFilePath = filePath
-            };
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-       
-            };
-            string json = JsonSerializer.Serialize(fileSettings, options);
-            await File.WriteAllTextAsync(_defaultFileSettings, json);
-            return true;
+            return new Dictionary<string, (string Name, string FilePath, DateTime LastAccessTime)>();
         }
 
         public static string GetDirectoryPathFromUser()
@@ -260,7 +294,8 @@ namespace TwoOkNotes.Services
                 return dialog.FileName;
             }
 
-            return null;
+            MessageBox.Show("No folder selected, please select a folder");
+            return GetDirectoryPathFromUser(); //Unsure the best way to handle this 
         }
         public static string GetFilePathFromUser()
         {

@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace TwoOkNotes.Model
 {
-    public class NoteBook
+    public class GlobalMetaData
     {
-        public required string Name { get; set; }
-        public required double ID { get; set; }
-        public required string FolderPath { get; set; }
-        public required List<NoteBookSection> Setctions { get; set; }
-        public required DateTime LastUpdated { get; set; }
+        public List<string> NoteBooks { get; set; } = new();
+        public List<string> OrphanPages { get; set; } = new();
     }
+
+    public class NoteBookMetaData
+    {
+        public List<string> Sections { get; set; } = new();
+    }
+
+    public class SectionMetaData 
+    {
+        public List<string> Pages { get; set; } = new();
+    }
+
 }

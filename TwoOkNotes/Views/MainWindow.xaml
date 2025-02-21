@@ -16,11 +16,12 @@
 
     <Window.Resources>
         <services:FileNameConverter x:Key="FileNameConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
     <Border Background="#D0F0F7"
             CornerRadius="10">
-        <Grid RenderTransformOrigin="0.567,0.537" Margin="0,0,0,10">
+        <Grid Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="114.754"/>
                 <ColumnDefinition Width="*"/>
@@ -55,15 +56,57 @@
                              Foreground="#ac3dac"
                              FontSize="14"
                              Style="{StaticResource LauncherButtonTheme}"
-                             Command="{Binding LoadAFile}"/>
+                             Command="{Binding LoadAFileCommand}"/>
 
-                <RadioButton Content="New File"
+                <RadioButton Content="New NoteBook"
                              Height="50"
                              Foreground="#ac3dac"
                              FontSize="14"
                              
                              Style="{StaticResource LauncherButtonTheme}"
-                             Command="{Binding OpenWindow}"/>
+                             Command="{Binding ToggleNotebookInputCommand }"/>
+
+                <Grid Visibility="{Binding IsNotebookInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="10">
+                    <StackPanel>
+                        <TextBox Text="{Binding NewNotebookName, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="200"
+                                 services:PlaceholderService.Placeholder="Enter notebook name" />
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                            <RadioButton  Content="Create"
+                                    Command="{Binding CreateNotebookCommand}"
+                                    Style="{StaticResource LauncherButtonTheme}" />
+                            <RadioButton  Content="Cancel"
+                                    Command="{Binding CancelNotebookCreationCommand}"
+                                    Style="{StaticResource LauncherButtonTheme}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+
+                <RadioButton Content="New Page"
+                             Height="50"
+                             Foreground="#ac3dac"
+                             FontSize="14"
+                             
+                             Style="{StaticResource LauncherButtonTheme}"
+                             Command="{Binding TogglePageInputCommand}"/>
+
+                <Grid Visibility="{Binding IsPageInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="10">
+                    <StackPanel>
+                        <TextBox Text="{Binding NewPageName, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="200"
+                                 services:PlaceholderService.Placeholder="Enter notebook name" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                            <RadioButton  Content="Create"
+                                    Command="{Binding CreatePageCommand}"
+                                    Style="{StaticResource LauncherButtonTheme}" />
+                            <RadioButton  Content="Cancel"
+                                    Command="{Binding CancelPageCreationCommand}"
+                                    Style="{StaticResource LauncherButtonTheme}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
 
                 <ComboBox ItemsSource="{Binding SortOptions}"
                           SelectedItem="{Binding SelectedSort, Mode=TwoWay}"
