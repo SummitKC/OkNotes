@@ -168,12 +168,23 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
-                    <ScrollViewer VerticalScrollBarVisibility="Visible"
-                              Grid.Row="0">
+                    <Button Command="{Binding DataContext.NewSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Width="200"
+                    Height="20"
+                     VerticalAlignment="Top">
+                        <TextBlock Text="New Section" />
+                    </Button>
+                </Grid>
+
+
+                <Grid Grid.Row="1">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Grid.Row="0"
+                                  MaxHeight="1360">
                         <ItemsControl ItemsSource="{Binding Sections, Mode = TwoWay}"
                                   Grid.ColumnSpan="2">
 
@@ -211,14 +222,6 @@
 
                     </ScrollViewer>
                 </Grid>
-                <Grid Grid.Row="1">
-                    <Button Command="{Binding DataContext.NewSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Width="200"
-                    Height="20"
-                     VerticalAlignment="Top">
-                        <TextBlock Text="New Section" />
-                    </Button>
-                </Grid>
             </Grid>
 
             <StackPanel Grid.Column="1" Background="#1E1E1E"                   
@@ -233,6 +236,17 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
+                        <Button Command="{Binding DataContext.NewPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Width="200"
+                    Height="20"
+                     VerticalAlignment="Top">
+                            <TextBlock Text="New Page" />
+                        </Button>
+                    </Grid>
+
+
+                    <Grid Grid.Row="1">
+
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                             <ItemsControl ItemsSource="{Binding Pages, Mode = TwoWay}"
@@ -270,14 +284,6 @@
 
                         </ScrollViewer>
                     </Grid>
-                    <Grid Grid.Row="1">
-                        <Button Command="{Binding DataContext.NewPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Width="200"
-                    Height="20"
-                     VerticalAlignment="Top">
-                            <TextBlock Text="New Page" />
-                        </Button>
-                    </Grid>
                 </Grid>
             </StackPanel>
 
@@ -302,7 +308,7 @@
                VerticalAlignment="Top" 
                Width="272" 
                Height="312" 
-               Margin="0,0,1978,0"  Grid.Column="1" Grid.ColumnSpan="3" />
+               Margin="0,0,1788,0"  Grid.Column="2" />
         </Grid>
 
     </Grid>
