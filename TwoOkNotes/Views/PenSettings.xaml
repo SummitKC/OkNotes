@@ -5,13 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
              xmlns:model="clr-namespace:TwoOkNotes.Model" 
-             mc:Ignorable="d" Height="306" Width="256">
+             mc:Ignorable="d" Height="1070" Width="256">
 
     <Border BorderBrush="Black" BorderThickness="1" CornerRadius="10" Background="White">
 
-        <Grid Background="#2C2C2C" Margin="0,0,0,-23">
+        <Grid Background="#2C2C2C" >
 
-            <StackPanel Margin="0,0,10,-37">
+            <StackPanel>
+
+                <InkCanvas x:Name="PreviewCanvas" 
+                    Width="200" 
+                    Height="70" 
+                    Background="#2C2C2C"
+                    Strokes="{Binding PreviewStrokes}"
+                    IsEnabled="False"
+                    Margin="10"/>
+
+                <WrapPanel>
+                    <RadioButton></RadioButton>
+                    
+                    
+                </WrapPanel>
+
 
                 <TextBlock Text="Red" Margin="10" Height="15" Foreground="#BB86FC"/>
                 <Slider Minimum="0" Maximum="255" Value="{Binding Red, Mode=TwoWay}" Width="240"/>

@@ -26,16 +26,25 @@ namespace TwoOkNotes.ViewModels
 
         public ICommand SavePenSettingsCommand { get; }
 
+        private StrokeCollection _previewStrokes;
+
         //public ICommand ChangePenColorCommand { get; } 
         public PenViewModel()
         {
             _settingsServices = new SettingsServices();
+            PenSettings = new PenModel();
             InitializePenSettingsAsync();
         }
 
         private async void InitializePenSettingsAsync()
         {
-            PenSettings = await _settingsServices.LoadPenSettings();
+            var loadedSettings = await _settingsServices.LoadPenSettings();
+            if (loadedSettings != null)
+            {
+                PenSettings = loadedSettings;
+                CreatePreviewStroke();
+
+            }
         }
         public Color PenColor
 
@@ -44,8 +53,11 @@ namespace TwoOkNotes.ViewModels
             set
             {
                 PenSettings.PenColor = value;
-                OnPropertyChanged(nameof(PenColor));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(PenColor));
+
+
             }
 
         }
@@ -55,8 +67,11 @@ namespace TwoOkNotes.ViewModels
             set
             {
                 PenSettings.Thickness = value;
-                OnPropertyChanged(nameof(ThickNess));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(ThickNess));
+
+
             }
         }
 
@@ -67,8 +82,11 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.red = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
-                OnPropertyChanged(nameof(Red));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(Red));
+
+
             }
         }
         public byte Green
@@ -78,8 +96,11 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.green = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
-                OnPropertyChanged(nameof(Green));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(Green));
+
+
             }
         }
         public byte Blue
@@ -89,8 +110,11 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.blue = (byte)value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
+                SavePenSettings();
+                CreatePreviewStroke();
                 OnPropertyChanged(nameof(Blue));
-                SavePenSettings();  
+
+
             }
         }
         public byte Opacity
@@ -101,8 +125,11 @@ namespace TwoOkNotes.ViewModels
 
                 PenSettings.Opacity = value;
                 PenSettings.PenColor = Color.FromArgb((byte)PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
-                OnPropertyChanged(nameof(Opacity));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(Opacity));
+
+
             }
         }
 
@@ -112,8 +139,11 @@ namespace TwoOkNotes.ViewModels
             set
             {
                 PenSettings.Tip = value;
-                OnPropertyChanged(nameof(Tip));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(Tip));
+
+
             }
         }
 
@@ -124,8 +154,11 @@ namespace TwoOkNotes.ViewModels
             {
                 PenSettings.IsHighlighter = value;
                 PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, 253, 255, 50);
-                OnPropertyChanged(nameof(IsHighlighter));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(IsHighlighter));
+
+
             }
         }
 
@@ -135,8 +168,11 @@ namespace TwoOkNotes.ViewModels
             set
             {
                 PenSettings.IgnorePressure = value;
-                OnPropertyChanged(nameof(IgnorePreassure));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(IgnorePreassure));
+
+
             }
         }
 
@@ -146,10 +182,58 @@ namespace TwoOkNotes.ViewModels
             set
             {
                 PenSettings.FitToCurve = value;
-                OnPropertyChanged(nameof(FitToCurve));
                 SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(FitToCurve));
+
+
             }
         }
+
+        public StrokeCollection PreviewStrokes
+        {
+            get => _previewStrokes;
+            set
+            {
+                _previewStrokes = value;
+                OnPropertyChanged(nameof(PreviewStrokes));
+
+            }
+        }
+
+        private void CreatePreviewStroke()
+        {
+            _previewStrokes = new StrokeCollection();
+
+            double startX = 20;
+            double endX = 180;
+            double centerY = 35;
+
+            StylusPointCollection points = new StylusPointCollection();
+
+            for (int i = 0; i <= 100; i++)
+            {
+                double t = i / 100.0;
+                double x = startX + (endX - startX) * t;
+                double y = centerY + Math.Sin(t * Math.PI) * 30;
+                float pressure = 1.0f - ((float)t * 0.8f);
+
+                points.Add(new StylusPoint(x, y, pressure));
+            }
+
+            var previewStroke = new Stroke(points)
+            {
+                DrawingAttributes = GetDrawingAttributes()
+            };
+
+            _previewStrokes.Add(previewStroke);
+
+            // Notify that PreviewStrokes has changed
+            OnPropertyChanged(nameof(PreviewStrokes));
+        }
+
+
+
         public DrawingAttributes GetDrawingAttributes()
         {
             return PenSettings.getdrawingattributes();
