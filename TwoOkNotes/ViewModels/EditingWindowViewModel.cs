@@ -13,6 +13,8 @@ using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Threading;
 using TwoOkNotes.Services;
+using System.Collections.ObjectModel;
+
 
 
 namespace TwoOkNotes.ViewModels
@@ -20,9 +22,15 @@ namespace TwoOkNotes.ViewModels
     public class EditingWIndowViewModel : ObservableObject
     {
         private bool _isPenSettingOpen;
+        private string _fileName;
         private string currFilePath;
-        private KeyHandler _keyHandler;
+        private string? currSection;
+        private string? currPage;
+        private readonly KeyHandler _keyHandler;
         private TimerHandler? _autoSaveTimer;
+        private ObservableCollection<string> _sections;
+        private ObservableCollection<string> _pages;
+
         public WindowSettings _windowSettings { get; set; }
         private FileSavingServices _savingServices { get; set; }
         private SettingsServices _settingsSercices { get; set; }
@@ -42,9 +50,14 @@ namespace TwoOkNotes.ViewModels
         public ICommand ToggleInkCommand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
-
+        public ICommand NewPageCommand { get; }
+        public ICommand NewSectionCommand { get; }
+        public ICommand SwitchSectionCommand { get; }
+        public ICommand SwitchPagesCommand { get; }
+        public ICommand ToggleSectionsGridCommand { get; }
+        public ICommand TogglePagesCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
-        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath)
+        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath, string fileName)
         {
             //Metadata 
             _savingServices = new FileSavingServices();
@@ -52,6 +65,7 @@ namespace TwoOkNotes.ViewModels
             _windowSettings = new WindowSettings();
 
             currFilePath = filePath;
+            _fileName = fileName;
             CurrentCanvasModel = _currentCanvasModel;
             CurrentPenModel = currentPenModel;
             CurrentCanvasModel.SetPen(currentPenModel);
@@ -69,18 +83,42 @@ namespace TwoOkNotes.ViewModels
             ZoomInCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomIn());
             ZoomOutCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomOut());
             SaveNoteCommand = new RelayCommand(_ => SaveNote());
-
-            Debug.WriteLine(_savingServices._currFilePath + "123123123123123123123312");
+            NewPageCommand = new RelayCommand(CreateNewPage);
+            NewSectionCommand = new RelayCommand(CreateNewSection);
+            SwitchSectionCommand = new RelayCommand(SwitchSections);
+            SwitchPagesCommand = new RelayCommand(SwitchPages);
 
             SaveNote();
             InitAutoSaveTimer();
             SubscribeToStrokeEvents();
             InitilizeWindowDimentions();
+            InitilizeSectionsAndPages();
+          
         }
 
         private async void InitilizeWindowDimentions()
         {
             _windowSettings = await _settingsSercices.LoadEditingWindowSettings();
+        }
+
+        private async void InitilizeSectionsAndPages()
+        {
+            var sectionsList = await _savingServices.GetNotebookMetadata(_fileName);
+
+            if (sectionsList.Count > 0) 
+            {
+                Sections = new ObservableCollection<string>(sectionsList);
+                currSection = currSection ?? _sections[0];
+                string sectionToLoad = currSection;
+                var pagesList = await _savingServices.GetSectionMetadata(_fileName, sectionToLoad);
+                Pages = new ObservableCollection<string>(pagesList);
+            }
+            else {
+                Pages = new ObservableCollection<string>();
+                Pages.Add(_fileName);
+                //TODO: Change this to toggle the visiability of the section grid to false
+                //      Also lock the toggle button for the section grid to false 
+            }
         }
 
         public double WindowWidth
@@ -102,6 +140,36 @@ namespace TwoOkNotes.ViewModels
                 _windowSettings._windowHeight = value;
                 OnPropertyChanged(nameof(WindowHeight));
                 SaveWindowSettings();
+            }
+        }
+
+        public string WindowTitle
+        {
+            get => _fileName;
+            set
+            {
+                _fileName = value;
+                OnPropertyChanged(nameof(WindowTitle));
+            }
+        }
+
+        public ObservableCollection<string> Sections
+        {
+            get => _sections;
+            set
+            {
+                _sections = value;
+                OnPropertyChanged(nameof(Sections));
+            }
+        }
+
+        public ObservableCollection<string> Pages
+        {
+            get => _pages;
+            set
+            {
+                _pages = value;
+                OnPropertyChanged(nameof(Pages));
             }
         }
 
@@ -150,7 +218,6 @@ namespace TwoOkNotes.ViewModels
         // when event is triggered, check if strokes are added or removed, if so, save the note
         private void Strokes_StrokesChanged(object? sender, StrokeCollectionChangedEventArgs e)
         {
-            Debug.WriteLine(e.Added.Count + "     " + e.Removed.Count);
             if (e.Added.Count > 0)
             {
                 CurrentCanvasModel.UndoStack.Push(new StrokeTypeAction(e.Added[0], true));
@@ -165,22 +232,19 @@ namespace TwoOkNotes.ViewModels
         }
         private async void SaveNote()
         {
+
+            Debug.WriteLine("Saving Note" + currFilePath);
             using (MemoryStream ms = new MemoryStream())
             {
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
-                if (await _savingServices.SaveFileAsync(currFilePath, fileContent))
-                {
-                    Debug.WriteLine("Saved"); //Change this to a toast message later
-                }
+                await FileSavingServices.SaveFileAsync(currFilePath, fileContent);
             }
         }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         private void Undo(object? obj)
         {
-            Debug.WriteLine("Is it called?");
-            //Need to unsubscribe from the event so this this stroke does not get pushed to the stack from the Removed event 
             CurrentCanvasModel.Strokes.StrokesChanged -= Strokes_StrokesChanged;
 
             if (CurrentCanvasModel.UndoStack.Count > 0)
@@ -188,20 +252,15 @@ namespace TwoOkNotes.ViewModels
                 var action = CurrentCanvasModel.UndoStack.Pop();
                 if (action.TypeOfStroke)
                 {
-                    // If it was an addition, remove the stroke
                     CurrentCanvasModel.Strokes.Remove(action.Stroke);
                 }
                 else
                 {
-                    // If it was a removal, add the stroke back
                     CurrentCanvasModel.Strokes.Add(action.Stroke);
                 }
                 CurrentCanvasModel.RedoStack.Push(action);
             }
-            // Resubscribe to the event
             SubscribeToStrokeEvents();
-
-            // Save the note state after undo since the event arg is not being called 
             SaveNote();
         }
 
@@ -266,6 +325,49 @@ namespace TwoOkNotes.ViewModels
         private void ClearInk(object? obj)
         {
             CurrentCanvasModel.ClearCanvas();
+        }
+
+        private async void CreateNewPage(object? obj)
+        {
+            int numPages = Pages.Count;
+            if (await _savingServices.CreatePage(_fileName, currSection, $"NewPage{numPages+1}.isf"))
+            {
+                InitilizeSectionsAndPages();
+
+            }
+            else Debug.WriteLine("Creating New Page");
+        }
+
+        private async void CreateNewSection(object? obj)
+        {
+            int numSections = Sections.Count;
+            await _savingServices.CreateSection($"NewSection{numSections}", _fileName);
+            InitilizeSectionsAndPages();
+            SwitchSections($"NewSection{numSections}");
+
+        }
+
+        private void SwitchSections(object? obj)
+        {
+            if (obj is string section && section != currSection)
+            {
+                currSection = section;
+                InitilizeSectionsAndPages();
+                SwitchPages(Pages[0]);
+            }
+        }
+
+        private async void SwitchPages(object? obj)
+        {
+            if (obj is string page)
+            {
+                currPage = page;
+                string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection, currPage);
+                currFilePath = updateFP;
+                var pageContent = await FileSavingServices.GetFileContents(updateFP);
+                CurrentCanvasModel.Strokes = pageContent;
+                SubscribeToStrokeEvents();
+            }
         }
 
         //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 

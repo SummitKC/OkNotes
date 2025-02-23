@@ -117,18 +117,6 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        //public bool IsEraser
-        //{
-        //    get => PenSettings.IsEraser;
-        //    set
-        //    {
-        //        PenSettings.IsEraser = value;
-        //        OnPropertyChanged(nameof(IsEraser));
-        //        SavePenSettings();
-
-        //    }
-        //}
-
         public bool IsHighlighter
         {
             get => PenSettings.IsHighlighter;
@@ -169,7 +157,6 @@ namespace TwoOkNotes.ViewModels
 
         public async void SavePenSettings()
         {
-            Debug.WriteLine("Saving Pen Settings, gets to here?");
             await _settingsServices.SavePenSettings(PenSettings);
         }
     }

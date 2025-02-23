@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
              xmlns:model="clr-namespace:TwoOkNotes.Model" 
              mc:Ignorable="d" Height="306" Width="256">
-    
+
     <Border BorderBrush="Black" BorderThickness="1" CornerRadius="10" Background="White">
 
         <Grid Background="#2C2C2C" Margin="0,0,0,-23">
@@ -27,8 +27,6 @@
 
                 <TextBlock Text="Pen Opacity" Margin="10" Height="15" Foreground="#BB86FC"/>
                 <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
-
-                <Button Content="Save Pen Settings" Command="{Binding SavePenSettingsCommand}" Margin="10"/>
             </StackPanel>
         </Grid>
 

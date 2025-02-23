@@ -18,9 +18,14 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions> 
+        
         <StackPanel 
-            DockPanel.Dock="Top"
+            Grid.Row ="0"
             Orientation="Horizontal"
             Background="#1E1E1E">
 
@@ -85,23 +90,133 @@
                 Margin="1"/>
 
         </StackPanel>
-        
-        <Grid>
+
+        <Grid Grid.Row="1">
 
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Background="#1E1E1E">
+            <Grid Grid.Column="0" Background="#29182f">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
 
-                 
+                
+
+                <Grid Grid.Row="1">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Grid.Row="0">
+                    <ItemsControl ItemsSource="{Binding Sections, Mode = TwoWay}"
+                                  Grid.ColumnSpan="2">
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center" Margin="10">
+                                    <Button Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                   CommandParameter="{Binding}"
+                   Width="100" 
+                   Height="20" 
+                   Background="#E6F7FA" 
+                   BorderThickness="2" 
+                   BorderBrush="#E6F7FA">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding}" 
+                              FontSize="10" 
+                              HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        
+                    </ItemsControl>
+
+                </ScrollViewer>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Button Command="{Binding DataContext.NewSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Width="200"
+                    Height="20"
+                     VerticalAlignment="Top">
+                    <TextBlock Text="New Section" />
+                </Button>
+                </Grid>
+            </Grid>
+
+            <StackPanel Grid.Column="1" Background="#1E1E1E">
+
+                <Grid Grid.Column="1" Background="#29182f">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="1">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding Pages, Mode = TwoWay}"
+                                  Grid.ColumnSpan="2">
+
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel HorizontalAlignment="Center" Margin="10">
+                                            <Button Command="{Binding DataContext.SwitchPagesCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                   CommandParameter="{Binding}"
+                                     Width="100" 
+                                     Height="20" 
+                                     Background="#E6F7FA" 
+                                     BorderThickness="2" 
+                                     BorderBrush="#E6F7FA">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding}" 
+                                                    FontSize="10" 
+                                                    HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                        </ScrollViewer>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Button Command="{Binding DataContext.NewPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Width="200"
+                    Height="20"
+                     VerticalAlignment="Top">
+                            <TextBlock Text="New Page" />
+                        </Button>
+                    </Grid>
+                </Grid>
             </StackPanel>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Auto"
-                          Grid.Column="1" 
+                          Grid.Column="2" 
                           Background="#2C2C2C">
 
                 <ContentControl Content="{Binding CurrentCanvasModel}"        
@@ -120,9 +235,8 @@
                VerticalAlignment="Top" 
                Width="272" 
                Height="312" 
-               Margin="0,0,1978,0"  Grid.Column="1" />
+               Margin="0,0,1978,0"  Grid.Column="1" Grid.ColumnSpan="3" />
         </Grid>
-        
-    </DockPanel>
-    
+
+    </Grid>
 </Window>

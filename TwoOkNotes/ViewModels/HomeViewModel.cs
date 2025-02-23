@@ -149,25 +149,17 @@ namespace TwoOkNotes.ViewModels
         }
 
         //TODO: Change this to get it from the file services 
-        private StrokeCollection GetCurrentStrokes(PageModel page)
-        {
-            if (page != null)
-            {
-                    using FileStream fs = new(page.FilePath, FileMode.Open);
-                    return new StrokeCollection(fs);
-            }
-            else return new StrokeCollection();
-        }
+
 
         //Create a new editingWindow and it's viewmodel, set it's data context to the viewmodel, so the window is binded to that instance of the viewmodel and loads it in the window
-        private void LoadCurrentFile(object? obj)
+        private async void LoadCurrentFile(object? obj)
         {
             if (obj is PageModel page)
             {
                 EditingWindow editingWindow = new();
                 editingWindow.Title = "Untitled";
-                GetCanvasModel().Strokes = GetCurrentStrokes(page);
-                EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel, page.FilePath);
+                GetCanvasModel().Strokes = await FileSavingServices.GetFileContents(page.FilePath);
+                EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel, page.FilePath, page.Name);
                 editingWindow.DataContext = editingWindowViewModel;
                 editingWindow.Show();
             }
@@ -242,7 +234,7 @@ namespace TwoOkNotes.ViewModels
         {
             EditingWindow newOpenWindow = new();
             newOpenWindow.Title = name;
-            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, filePath);
+            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, filePath, name);
             newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();
         }
@@ -308,7 +300,7 @@ namespace TwoOkNotes.ViewModels
             {
                 if (await fileSavingServices.CreatePage(null, null, pageName))
                 {
-                    string filePath = fileSavingServices.GetCurrFilePath(null, null, pageName);
+                    string filePath = fileSavingServices.GetCurrFilePath(null, null, $"{pageName}");
                     OpenNewWindow(pageName, filePath);
                     NewPageName = string.Empty;
                     IsPageInputVisible = false;

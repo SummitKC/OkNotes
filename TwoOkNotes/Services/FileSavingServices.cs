@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using System.Windows;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Documents;
+using System.Windows.Ink;
 //using System.Windows.Forms;
 
 namespace TwoOkNotes.Services
@@ -63,22 +64,11 @@ namespace TwoOkNotes.Services
 
         private void ValidateFilePaths(string filePath)
         {
-            //var filePaths = new Dictionary<string, string>
-            //{{ nameof(_defaultFileSettings), _defaultFileSettings },
-            //{ nameof(_notebookFilePath), _notebookFilePath },
-            //{ nameof(_sectionFilePath), _sectionFilePath },
-            //{ nameof(_metaDataFilePath), _metaDataFilePath }};
-
-            //foreach (var filePath in filePaths)
-            //{
-                if (!File.Exists(filePath))
-                {
-                    Debug.WriteLine($"File not found: {filePath}");
-                    CreateFile(filePath).Wait();
-                }
+            if (!File.Exists(filePath))
+            {
+                CreateFile(filePath).Wait();
             }
-        //}
-
+        }
 
         public async Task<bool> CreateNotebook(string directoryName)
         {
@@ -86,16 +76,12 @@ namespace TwoOkNotes.Services
             if (!Directory.Exists(notebookPath))
             {
                 Directory.CreateDirectory(notebookPath);
-                // Load global metadata
                 var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
-                // Add new notebook
                 if (!metadata.NoteBooks.Contains(directoryName))
                 {
                     metadata.NoteBooks.Add(directoryName);
                 }
-                // Save updated metadata
                 await SaveMetadataAsync(metadata, _globalMetaDataLocation);
-                // Create initial section
                 bool sectionCreated = await CreateSection("Section1", directoryName);
                 return sectionCreated;
             }
@@ -115,7 +101,6 @@ namespace TwoOkNotes.Services
                 {
                     metadata.Sections.Add(sectionName);
                 }
-                // Save updated metadata
                 await SaveMetadataAsync(metadata, metadataFilePath);
                 bool pageCreated = await CreatePage(notebookName, sectionName, "Page1.isf");
                 return pageCreated;
@@ -132,32 +117,26 @@ namespace TwoOkNotes.Services
                 if (notebookName != null && sectionName != null)
                 {
                     string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
-                    // Load or initialize metadata
                     var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
-                    // Add new page
                     if (!metadata.Pages.Contains(pageName))
                     {
                         metadata.Pages.Add(pageName);
                     }
                     await SaveMetadataAsync(metadata, metadataFilePath);
+                    return true;
                 }
                 else
                 {
-                    Debug.WriteLine("WHY??????????????????????");
-                    // Update global metadata for orphan pages
                     var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
-                    Debug.WriteLine("7723");
                     if (!metadata.OrphanPages.Contains(pageName))
                     {
                         metadata.OrphanPages.Add(pageName);
                     }
-                    Debug.WriteLine(metadata);
                     await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                    return true; 
                 }
-                return true; // Page created successfully
             }
-            Debug.WriteLine("False");
-            return false; // Page already exists
+            return false;
         }
 
         public async Task<List<string>> GetNotebookMetadata(string notebookName)
@@ -186,7 +165,7 @@ namespace TwoOkNotes.Services
             {
                 if (!File.Exists(filePath))
                 {
-                    await File.WriteAllTextAsync(filePath, null);
+                    await File.WriteAllTextAsync(filePath, string.Empty);
                     return true;
                 }
                 else
@@ -197,11 +176,10 @@ namespace TwoOkNotes.Services
             }
             catch (Exception)
             {
-                Debug.WriteLine("here?");
                 return false;
             }
         }
-        public async Task<bool> SaveFileAsync(string filePath, byte[] fileContent)
+        public static async Task<bool> SaveFileAsync(string filePath, byte[] fileContent)
         {
             try
             {
@@ -216,18 +194,14 @@ namespace TwoOkNotes.Services
         }
         private static async Task<T> LoadMetadataAsync<T>(string filePath) where T : new()
         {
-            Debug.WriteLine(filePath);
             if (File.Exists(filePath))
             {
                 string json = await File.ReadAllTextAsync(filePath);
-                Debug.WriteLine(json);
                 if (!string.IsNullOrEmpty(json))
                 {
-                    Debug.WriteLine("423");
                     return JsonSerializer.Deserialize<T>(json) ?? new T();
                 }
             }
-            Debug.WriteLine("Test");
             return new T();
         }
 
@@ -257,7 +231,6 @@ namespace TwoOkNotes.Services
         {
             if (File.Exists(_globalMetaDataLocation))
             {
-                Debug.WriteLine("Here?");
                 Dictionary<string, (string Name, string FilePath, DateTime LastAccessTime)> result = new();
                 GlobalMetaData metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
 
@@ -279,6 +252,23 @@ namespace TwoOkNotes.Services
                 return result;
             }
             return new Dictionary<string, (string Name, string FilePath, DateTime LastAccessTime)>();
+        }
+
+        public static async Task<StrokeCollection> GetFileContents(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                byte[] fileContent = await File.ReadAllBytesAsync(filePath);
+
+                if (fileContent.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream(fileContent))
+                    {
+                        return new StrokeCollection(memoryStream);
+                    }
+                }
+            }
+            return new StrokeCollection();
         }
 
         public static string GetDirectoryPathFromUser()

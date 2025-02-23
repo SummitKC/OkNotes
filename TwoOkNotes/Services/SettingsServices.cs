@@ -44,14 +44,11 @@ namespace TwoOkNotes.Services
         {
             if (File.Exists(_settingsFilePath))
             {
-                Debug.WriteLine("gets to loading?");
                 string json = await File.ReadAllTextAsync(_settingsFilePath);
-                //return the settings if they exist, else return a new instance of the settings
                 return JsonSerializer.Deserialize<PenModel>(json) ?? new PenModel();
             }
             else
             {
-                Debug.WriteLine("gets here?");
                 return new PenModel();
             }
         }
@@ -78,14 +75,11 @@ namespace TwoOkNotes.Services
         {
             if (File.Exists(_windowSettingsPath))
             {
-                Debug.WriteLine("gets to loading?");
                 string json = await File.ReadAllTextAsync(_windowSettingsPath);
-                //return the settings if they exist, else return a new instance of the settings
                 return JsonSerializer.Deserialize<WindowSettings>(json) ?? new WindowSettings();
             }
             else
             {
-                Debug.WriteLine("gets here?");
                 return new WindowSettings();
             }
         }
