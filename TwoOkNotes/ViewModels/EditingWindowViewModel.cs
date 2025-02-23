@@ -30,7 +30,8 @@ namespace TwoOkNotes.ViewModels
         private TimerHandler? _autoSaveTimer;
         private ObservableCollection<string> _sections;
         private ObservableCollection<string> _pages;
-
+        private bool isPageGridVisible;
+        private bool isSectionGridVisible;
         public WindowSettings _windowSettings { get; set; }
         private FileSavingServices _savingServices { get; set; }
         private SettingsServices _settingsSercices { get; set; }
@@ -54,8 +55,6 @@ namespace TwoOkNotes.ViewModels
         public ICommand NewSectionCommand { get; }
         public ICommand SwitchSectionCommand { get; }
         public ICommand SwitchPagesCommand { get; }
-        public ICommand ToggleSectionsGridCommand { get; }
-        public ICommand TogglePagesCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath, string fileName)
         {
@@ -107,18 +106,18 @@ namespace TwoOkNotes.ViewModels
 
             if (sectionsList.Count > 0) 
             {
-                Sections = new ObservableCollection<string>(sectionsList);
+            Sections = new ObservableCollection<string>(sectionsList);
                 currSection = currSection ?? _sections[0];
                 string sectionToLoad = currSection;
                 var pagesList = await _savingServices.GetSectionMetadata(_fileName, sectionToLoad);
-                Pages = new ObservableCollection<string>(pagesList);
-            }
+            Pages = new ObservableCollection<string>(pagesList);
+                    }
             else {
                 Pages = new ObservableCollection<string>();
                 Pages.Add(_fileName);
                 //TODO: Change this to toggle the visiability of the section grid to false
                 //      Also lock the toggle button for the section grid to false 
-            }
+        }
         }
 
         public double WindowWidth
@@ -150,6 +149,27 @@ namespace TwoOkNotes.ViewModels
             {
                 _fileName = value;
                 OnPropertyChanged(nameof(WindowTitle));
+            }
+        }
+
+        public bool IsPagesGridVisible
+        {
+            get => isPageGridVisible;
+            set
+            {
+                isPageGridVisible = value;
+                OnPropertyChanged(nameof(IsPagesGridVisible));
+            }
+        }
+
+        public bool IsSectionsGridVisible
+        {
+            get => isSectionGridVisible;
+            set
+            {
+                isSectionGridVisible = value;
+                IsPagesGridVisible = value;
+                OnPropertyChanged(nameof(IsSectionsGridVisible));
             }
         }
 
@@ -232,15 +252,13 @@ namespace TwoOkNotes.ViewModels
         }
         private async void SaveNote()
         {
-
-            Debug.WriteLine("Saving Note" + currFilePath);
             using (MemoryStream ms = new MemoryStream())
             {
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
                 await FileSavingServices.SaveFileAsync(currFilePath, fileContent);
+                }
             }
-        }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         private void Undo(object? obj)
@@ -256,11 +274,15 @@ namespace TwoOkNotes.ViewModels
                 }
                 else
                 {
+                    // If it was a removal, add the stroke back
                     CurrentCanvasModel.Strokes.Add(action.Stroke);
                 }
                 CurrentCanvasModel.RedoStack.Push(action);
             }
+            // Resubscribe to the event
             SubscribeToStrokeEvents();
+
+            // Save the note state after undo since the event arg is not being called 
             SaveNote();
         }
 
@@ -333,7 +355,7 @@ namespace TwoOkNotes.ViewModels
             if (await _savingServices.CreatePage(_fileName, currSection, $"NewPage{numPages+1}.isf"))
             {
                 InitilizeSectionsAndPages();
-
+                SwitchPages($"NewPage{numPages+1}.isf");
             }
             else Debug.WriteLine("Creating New Page");
         }

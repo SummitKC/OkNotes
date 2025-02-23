@@ -133,7 +133,7 @@ namespace TwoOkNotes.Services
                         metadata.OrphanPages.Add(pageName);
                     }
                     await SaveMetadataAsync(metadata, _globalMetaDataLocation);
-                    return true; 
+                    return true;
                 }
             }
             return false;
@@ -262,11 +262,11 @@ namespace TwoOkNotes.Services
 
                 if (fileContent.Length > 0)
                 {
-                    using (var memoryStream = new MemoryStream(fileContent))
-                    {
-                        return new StrokeCollection(memoryStream);
-                    }
+                using (var memoryStream = new MemoryStream(fileContent))
+                {
+                    return new StrokeCollection(memoryStream);
                 }
+            }
             }
             return new StrokeCollection();
         }

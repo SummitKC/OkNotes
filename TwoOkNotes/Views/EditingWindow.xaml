@@ -21,9 +21,10 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-        </Grid.RowDefinitions> 
-        
+        </Grid.RowDefinitions>
+
         <StackPanel 
             Grid.Row ="0"
             Orientation="Horizontal"
@@ -91,84 +92,147 @@
 
         </StackPanel>
 
-        <Grid Grid.Row="1">
+        <Grid             
+            Grid.Row="1"
+            Background="Beige"
+            >
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="200" MaxWidth="200"/>
+                <ColumnDefinition Width="Auto" MaxWidth="200"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" Background="#29182f">
+            <ToggleButton 
+             Grid.Column="0"
+             Content="☰"
+             IsChecked="{Binding IsSectionsGridVisible}"
+             Width="26"
+             Height="30"
+             Background="#2196F3"
+             Foreground="White"
+             FontSize="24"
+             HorizontalAlignment="Left"
+             VerticalAlignment="Top"
+             Panel.ZIndex="100"
+             BorderThickness="0"
+             Cursor="Hand">
+                <ToggleButton.Effect>
+                    <DropShadowEffect Color="Black" 
+                         BlurRadius="10" 
+                         ShadowDepth="4" 
+                         Direction="320" 
+                         Opacity="0.5"/>
+                </ToggleButton.Effect>
+            </ToggleButton>
+
+            <ToggleButton 
+             Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
+             Grid.Column="1"
+             Content="☰"
+             IsChecked="{Binding IsPagesGridVisible}"
+             Width="26"
+             Height="30"
+             Background="#2196F3"
+             Foreground="White"
+             FontSize="24"
+             HorizontalAlignment="Left"
+             VerticalAlignment="Top"
+             Panel.ZIndex="100"
+             BorderThickness="0"
+             Cursor="Hand">
+                <ToggleButton.Effect>
+                    <DropShadowEffect Color="Black" 
+                         BlurRadius="10" 
+                         ShadowDepth="4" 
+                         Direction="320" 
+                         Opacity="0.5"/>
+                </ToggleButton.Effect>
+            </ToggleButton>
+
+
+        </Grid>
+
+        <Grid Grid.Row="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" 
+                  Background="#29182f"
+                  Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
+                  >
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="30" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-
-                
-
-                <Grid Grid.Row="1">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled"
+                <Grid Grid.Row="0">
+                    <ScrollViewer VerticalScrollBarVisibility="Visible"
                               Grid.Row="0">
-                    <ItemsControl ItemsSource="{Binding Sections, Mode = TwoWay}"
+                        <ItemsControl ItemsSource="{Binding Sections, Mode = TwoWay}"
                                   Grid.ColumnSpan="2">
 
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
 
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel HorizontalAlignment="Center" Margin="10">
-                                    <Button Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel 
+                                            Orientation="Vertical"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top" Margin="10">
+                                        <Button Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                    CommandParameter="{Binding}"
                    Width="100" 
                    Height="20" 
                    Background="#E6F7FA" 
                    BorderThickness="2" 
                    BorderBrush="#E6F7FA">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding}" 
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding}" 
                               FontSize="10" 
                               HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                                
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        
-                    </ItemsControl>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
 
-                </ScrollViewer>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                        </ItemsControl>
+
+                    </ScrollViewer>
                 </Grid>
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="1">
                     <Button Command="{Binding DataContext.NewSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     Width="200"
                     Height="20"
                      VerticalAlignment="Top">
-                    <TextBlock Text="New Section" />
-                </Button>
+                        <TextBlock Text="New Section" />
+                    </Button>
                 </Grid>
             </Grid>
 
-            <StackPanel Grid.Column="1" Background="#1E1E1E">
+            <StackPanel Grid.Column="1" Background="#1E1E1E"                   
+                     Visibility="{Binding IsPagesGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
+>
 
                 <Grid Grid.Column="1" Background="#29182f">
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="0">
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                             <ItemsControl ItemsSource="{Binding Pages, Mode = TwoWay}"
@@ -176,13 +240,16 @@
 
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <WrapPanel />
+                                        <StackPanel Orientation="Vertical" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel HorizontalAlignment="Center" Margin="10">
+                                        <StackPanel 
+                                            Orientation="Vertical"
+                                            HorizontalAlignment="Center"
+                                            Margin="10">
                                             <Button Command="{Binding DataContext.SwitchPagesCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                    CommandParameter="{Binding}"
                                      Width="100" 
@@ -203,7 +270,7 @@
 
                         </ScrollViewer>
                     </Grid>
-                    <Grid Grid.Row="2">
+                    <Grid Grid.Row="1">
                         <Button Command="{Binding DataContext.NewPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     Width="200"
                     Height="20"
