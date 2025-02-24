@@ -21,10 +21,62 @@
                     IsEnabled="False"
                     Margin="10"/>
 
-                <WrapPanel>
-                    <RadioButton></RadioButton>
-                    
-                    
+                <WrapPanel Margin="0,0,1,0" Width="226">
+                    <RadioButton Height="52" Width="75" Background="Red"
+                                 Command="{Binding PenColor}"
+                                 CommandParameter="{x:Static Colors.Red}">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
+
+                    <RadioButton Height="52" Width="75">
+                        <RadioButton.Style>
+                            <StaticResource ResourceKey="CustomRadioButton"/>
+                        </RadioButton.Style>
+                    </RadioButton>
                 </WrapPanel>
 
 
