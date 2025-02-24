@@ -59,8 +59,8 @@
                 Command="{Binding ToggleInkCommand}"
                 Margin="1"/>
 
-            <Button Content="Toggle Highlighter"
-                Command="{Binding ToggleHighlighterCommand}"
+            <ToggleButton Content="Toggle Highlighter"
+                IsChecked="{Binding CurrentPenModel.IsHighlighter, Mode=TwoWay}"
                 CommandParameter="True"
                 Margin="1"/>
 

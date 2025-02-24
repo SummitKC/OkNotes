@@ -46,7 +46,6 @@ namespace TwoOkNotes.ViewModels
         public ICommand RedoCommand { get; }
         public ICommand ToggleEraserCommand { get; }
         public ICommand TogglePenSettingsCommand { get; }
-        public ICommand ToggleHighlighterCommand { get; }
         public ICommand ToggleSelectionToolCommand { get; }
         public ICommand ToggleInkCommand { get; }
         public ICommand ZoomInCommand { get; }
@@ -76,7 +75,6 @@ namespace TwoOkNotes.ViewModels
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
             ToggleEraserCommand = new RelayCommand(ToggleEraser);
-            ToggleHighlighterCommand = new RelayCommand(ToggleHighlighter);
             ToggleSelectionToolCommand = new RelayCommand(ToggleSelectionTool);
             ToggleInkCommand = new RelayCommand(ToggleInk);
             ZoomInCommand = new RelayCommand(_ => CurrentCanvasModel.ZoomIn());
@@ -319,15 +317,6 @@ namespace TwoOkNotes.ViewModels
             if (obj is string str && bool.TryParse(str, out bool isEraser))
             {
                 CurrentCanvasModel.SetEraser(isEraser, 0);
-            }
-        }
-
-        private void ToggleHighlighter(object? obj)
-        {
-            //TODO: I don't think this is needed look into it later 
-            if (obj is string str && bool.TryParse(str, out bool isHighlighter))
-            {
-                CurrentPenModel.IsHighlighter = isHighlighter;
             }
         }
 

@@ -81,9 +81,7 @@ namespace TwoOkNotes.ViewModels
             {
 
                 PenSettings.Opacity = value;
-                Debug.WriteLine(PenSettings.Opacity + "AASDLASDHLASKHD");
-                PenSettings.PenColor = Color.FromArgb((byte)PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
-                Debug.WriteLine(PenColor.A);
+                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(Opacity));
@@ -112,12 +110,13 @@ namespace TwoOkNotes.ViewModels
             set
             {
                 PenSettings.IsHighlighter = value;
-                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, 253, 255, 50);
+                if (value)
+                {
+                    PenSettings.PenColor = Color.FromArgb(128, 255, 255, 0);
+                }
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(IsHighlighter));
-
-
             }
         }
 
@@ -197,7 +196,7 @@ namespace TwoOkNotes.ViewModels
                 double t = i / 100.0;
                 double x = startX + (endX - startX) * t;
                 double y = centerY + Math.Sin(t * Math.PI) * 30;
-                float pressure = 1.0f - ((float)t * 0.8f);
+                float pressure = 0.7f - ((float)t * 0.7f);
 
                 points.Add(new StylusPoint(x, y, pressure));
             }
@@ -212,8 +211,6 @@ namespace TwoOkNotes.ViewModels
             // Notify that PreviewStrokes has changed
             OnPropertyChanged(nameof(PreviewStrokes));
         }
-
-
 
         public DrawingAttributes GetDrawingAttributes()
         {

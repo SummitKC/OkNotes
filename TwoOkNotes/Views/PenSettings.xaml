@@ -121,12 +121,12 @@
                 </StackPanel>
 
 
-                <RadioButton Background="#2C2C2C" IsChecked="{Binding PickColorVisiability}">
+                <ToggleButton Background="#2C2C2C" IsChecked="{Binding PickColorVisiability}">
                     <TextBlock Foreground="AliceBlue" FontSize="20" FontFamily="Segoe UI">Pick A Color 🎨</TextBlock>
-                    <RadioButton.Style>
-                        <StaticResource ResourceKey="CustomRadioButton"/>
-                    </RadioButton.Style>
-                </RadioButton>
+                    <ToggleButton.Style>
+                        <StaticResource ResourceKey="CustomToggleButton"/>
+                    </ToggleButton.Style>
+                </ToggleButton>
 
                 <Line X1="0" Y1="0" X2="300" Y2="0" Stroke="#808080" StrokeThickness="4"></Line>
 
