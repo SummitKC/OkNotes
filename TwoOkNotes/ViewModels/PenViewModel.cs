@@ -11,7 +11,6 @@ using System.Windows;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 using TwoOkNotes.Model;
 using TwoOkNotes.Services;
 using TwoOkNotes.Util;
@@ -24,7 +23,7 @@ namespace TwoOkNotes.ViewModels
         private readonly SettingsServices _settingsServices;
         public PenModel PenSettings { get; set; }
 
-        public ICommand SavePenSettingsCommand { get; }
+        public ICommand SwitchColorCommand { get; }
 
         private StrokeCollection _previewStrokes;
 
@@ -33,6 +32,7 @@ namespace TwoOkNotes.ViewModels
         {
             _settingsServices = new SettingsServices();
             PenSettings = new PenModel();
+            SwitchColorCommand = new RelayCommand(SwitchColor);
             InitializePenSettingsAsync();
         }
 
@@ -74,49 +74,6 @@ namespace TwoOkNotes.ViewModels
 
             }
         }
-
-        public byte Red
-        {
-            get => PenSettings.red;
-            set
-            {
-                PenSettings.red = (byte)value;
-                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
-                SavePenSettings();
-                CreatePreviewStroke();
-                OnPropertyChanged(nameof(Red));
-
-
-            }
-        }
-        public byte Green
-        {
-            get => PenSettings.green;
-            set
-            {
-                PenSettings.green = (byte)value;
-                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
-                SavePenSettings();
-                CreatePreviewStroke();
-                OnPropertyChanged(nameof(Green));
-
-
-            }
-        }
-        public byte Blue
-        {
-            get => PenSettings.blue;
-            set
-            {
-                PenSettings.blue = (byte)value;
-                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.red, PenSettings.green, PenSettings.blue);
-                SavePenSettings();
-                CreatePreviewStroke();
-                OnPropertyChanged(nameof(Blue));
-
-
-            }
-        }
         public byte Opacity
         {
             get => PenSettings.Opacity;
@@ -124,7 +81,9 @@ namespace TwoOkNotes.ViewModels
             {
 
                 PenSettings.Opacity = value;
+                Debug.WriteLine(PenSettings.Opacity + "AASDLASDHLASKHD");
                 PenSettings.PenColor = Color.FromArgb((byte)PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
+                Debug.WriteLine(PenColor.A);
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(Opacity));
@@ -201,13 +160,35 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        private bool _pickColorVisiability;
+        public bool PickColorVisiability
+        {
+            get => _pickColorVisiability;
+            set
+            {
+                _pickColorVisiability = value;
+                OnPropertyChanged(nameof(PickColorVisiability));
+            }
+        }
+
+
+        public void SwitchColor(object? obj)
+        {
+            if (obj is Color color)
+            {
+                PenSettings.PenColor = color;
+                SavePenSettings();
+                CreatePreviewStroke();
+            }
+        }
+
         private void CreatePreviewStroke()
         {
             _previewStrokes = new StrokeCollection();
 
             double startX = 20;
-            double endX = 180;
-            double centerY = 35;
+            double endX = 314;
+            double centerY = 50;
 
             StylusPointCollection points = new StylusPointCollection();
 

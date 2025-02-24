@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TwoOkNotes" 
              xmlns:converters="clr-namespace:TwoOkNotes.Util"
+             xmlns:metro="clr-namespace:MahApps.Metro;assembly=MahApps.Metro"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>

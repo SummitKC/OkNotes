@@ -16,14 +16,10 @@ namespace TwoOkNotes.Model
     public class PenModel : ObservableObject
     {
         public Color PenColor { get; set; } = Colors.White;
-        public byte red { get; set; } = 255;
-        public byte green { get; set; } = 255;
-        public byte blue { get; set; } = 255;
         public double Thickness { get; set; } = 20.0;
         public byte Opacity { get; set; } = (byte) 255;
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public StylusTip Tip { get; set; } = StylusTip.Ellipse;
-        //public bool IsEraser { get; set; } = false;
         public bool IsHighlighter { get; set; } = false;
         public bool IgnorePressure { get; set; } = false;
         public bool FitToCurve { get; set; } = false;

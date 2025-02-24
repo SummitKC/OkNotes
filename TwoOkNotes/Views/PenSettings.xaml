@@ -4,90 +4,131 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
-             xmlns:model="clr-namespace:TwoOkNotes.Model" 
-             mc:Ignorable="d" Height="1070" Width="256">
+             xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:model="clr-namespace:TwoOkNotes.Model" d:DataContext="{d:DesignInstance Type=local:PenViewModel}"
+             mc:Ignorable="d" Height="1070" Width="403">
+
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Blue.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
 
     <Border BorderBrush="Black" BorderThickness="1" CornerRadius="10" Background="White">
 
-        <Grid Background="#2C2C2C" >
+        <Grid Background="#2C2C2C" Margin="0,0,0,0" >
 
             <StackPanel>
 
                 <InkCanvas x:Name="PreviewCanvas" 
-                    Width="200" 
-                    Height="70" 
+                    Width="334" 
+                    Height="100" 
                     Background="#2C2C2C"
                     Strokes="{Binding PreviewStrokes}"
                     IsEnabled="False"
                     Margin="10"/>
 
-                <WrapPanel Margin="0,0,1,0" Width="226">
+                <WrapPanel Margin="0,0,1,0" Width="375">
                     <RadioButton Height="52" Width="75" Background="Red"
-                                 Command="{Binding PenColor}"
+                                 Command="{Binding SwitchColorCommand}"
                                  CommandParameter="{x:Static Colors.Red}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75" Background="Green"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Green}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75" Background="Blue"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Blue}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75"  Background="Yellow"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Yellow}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75"  Background="Orange"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Orange}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75" Background="Purple"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Purple}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75" Background="Pink"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Pink}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75" Background="White"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.White}">
+                        
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
 
-                    <RadioButton Height="52" Width="75">
+                    <RadioButton Height="52" Width="75" Background="Black"
+                                 Command="{Binding SwitchColorCommand}"
+                                 CommandParameter="{x:Static Colors.Black}">
                         <RadioButton.Style>
                             <StaticResource ResourceKey="CustomRadioButton"/>
                         </RadioButton.Style>
                     </RadioButton>
                 </WrapPanel>
 
+                <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="#808080" StrokeThickness="4"></Line>
 
-                <TextBlock Text="Red" Margin="10" Height="15" Foreground="#BB86FC"/>
-                <Slider Minimum="0" Maximum="255" Value="{Binding Red, Mode=TwoWay}" Width="240"/>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding PickColorVisiability, Converter={StaticResource BooleanToCollapsedConverter}}">
+                    <mah:ColorCanvas x:Name="MyColorPicker"
+                      SelectedColor="{Binding PenColor, Mode=TwoWay}"
+                      Width="391"
+                      Height="334"
+                      Visibility="{Binding PickColorVisiability, Converter={StaticResource BooleanToCollapsedConverter}}"/>
+                </StackPanel>
 
-                <TextBlock Text="Green" Margin="10" Height="15" Foreground="#BB86FC"/>
-                <Slider Minimum="0" Maximum="255" Value="{Binding Green, Mode=TwoWay}" Width="240"/>
 
-                <TextBlock Text="Blue" Margin="10" Height="15" Foreground="#BB86FC"/>
-                <Slider Minimum="0" Maximum="255" Value="{Binding Blue, Mode=TwoWay}" Width="240"/>
+                <RadioButton Background="#2C2C2C" IsChecked="{Binding PickColorVisiability}">
+                    <TextBlock Foreground="AliceBlue" FontSize="20" FontFamily="Segoe UI">Pick A Color 🎨</TextBlock>
+                    <RadioButton.Style>
+                        <StaticResource ResourceKey="CustomRadioButton"/>
+                    </RadioButton.Style>
+                </RadioButton>
+
+                <Line X1="0" Y1="0" X2="300" Y2="0" Stroke="#808080" StrokeThickness="4"></Line>
 
                 <TextBlock Text="Pen Thickness" Margin="10" Height="15" Foreground="#BB86FC"/>
                 <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="240"/>

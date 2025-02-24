@@ -23,6 +23,7 @@
                             <Setter TargetName="RadioBorder" Property="BorderBrush" Value="DarkGray"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
+                    
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
