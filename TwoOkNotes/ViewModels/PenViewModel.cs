@@ -37,6 +37,7 @@ namespace TwoOkNotes.ViewModels
             SwitchColorCommand = new RelayCommand(SwitchColor);
             InitializePenSettingsAsync();
             CreatePreviewStroke();
+            InitializeColorOptions();
 
         }
 
@@ -46,8 +47,6 @@ namespace TwoOkNotes.ViewModels
             if (loadedSettings != null)
             {
                 PenSettings = loadedSettings;
-                InitializeColorOptions();
-
             }
         }
 
