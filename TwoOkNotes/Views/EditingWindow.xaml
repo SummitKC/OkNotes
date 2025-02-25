@@ -306,9 +306,10 @@
                        Converter={StaticResource BooleanToVisibilityConverter}}"
                  HorizontalAlignment="Right" 
                VerticalAlignment="Top" 
-               Width="413" 
-               Height="719" 
-               Margin="0,0,1647,0"  Grid.Column="2" />
+               Width="400" 
+               Height="Auto" 
+               Margin="0,0,1642,0"  
+               Grid.Column="2" />
         </Grid>
 
     </Grid>

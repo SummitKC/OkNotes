@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace TwoOkNotes.ViewModels
     {
         private readonly SettingsServices _settingsServices;
         public PenModel PenSettings { get; set; }
+        public ObservableCollection<Color> ColorOptions { get; set; }
 
         public ICommand SwitchColorCommand { get; }
 
@@ -34,6 +36,7 @@ namespace TwoOkNotes.ViewModels
             PenSettings = new PenModel();
             SwitchColorCommand = new RelayCommand(SwitchColor);
             InitializePenSettingsAsync();
+            InitializeColorOptions();
         }
 
         private async void InitializePenSettingsAsync()
@@ -45,6 +48,23 @@ namespace TwoOkNotes.ViewModels
                 CreatePreviewStroke();
 
             }
+        }
+
+        public void InitializeColorOptions()
+        {
+            ColorOptions = new ObservableCollection<Color>
+            {
+                Colors.Black,
+                Colors.Red,
+                Colors.Blue,
+                Colors.Green,
+                Colors.Yellow,
+                Colors.Purple,
+                Colors.Orange,
+                Colors.Pink,
+                Colors.Brown,
+                Colors.Gray
+            };
         }
         public Color PenColor
 
@@ -185,8 +205,8 @@ namespace TwoOkNotes.ViewModels
         {
             _previewStrokes = new StrokeCollection();
 
-            double startX = 20;
-            double endX = 314;
+            double startX = 40;
+            double endX = 334;
             double centerY = 50;
 
             StylusPointCollection points = new StylusPointCollection();

@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoOkNotes.ViewModels" 
+             xmlns:converter="clr-namespace:TwoOkNotes.Util"
              xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:model="clr-namespace:TwoOkNotes.Model" d:DataContext="{d:DesignInstance Type=local:PenViewModel}"
-             mc:Ignorable="d" Height="1070" Width="403">
-
+             mc:Ignorable="d" Height="Auto" Width="400">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -21,122 +21,74 @@
     </UserControl.Resources>
 
 
-    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="10" Background="White">
-
-        <Grid Background="#2C2C2C" Margin="0,0,0,0" >
-
+    <Border BorderBrush="#3C3C3C" BorderThickness="2" CornerRadius="15" Background="#1E1E1E" Padding="10" Margin="0,0,0,4">
+        <Grid Background="#1E1E1E" VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <StackPanel>
+                <!-- Preview Area -->
+                <InkCanvas x:Name="PreviewCanvas" Width="379" Height="134" Background="#2C2C2C" Margin="10"
+                           Strokes="{Binding PreviewStrokes}" IsEnabled="False"/>
 
-                <InkCanvas x:Name="PreviewCanvas" 
-                    Width="334" 
-                    Height="100" 
-                    Background="#2C2C2C"
-                    Strokes="{Binding PreviewStrokes}"
-                    IsEnabled="False"
-                    Margin="10"/>
+                <!-- Color Selection Buttons -->
+                <ItemsControl ItemsSource="{Binding ColorOptions}" Margin="0,10,0,10">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton Width="60" 
+                                         Height="60" 
+                                         Background="{Binding Converter={StaticResource ColorToBrushConverter}}" 
+                                         Command="{Binding DataContext.SwitchColorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                         CommandParameter="{Binding}">
+                                <RadioButton.Style>
+                                    <StaticResource ResourceKey="CustomRadioButton"/>
+                                </RadioButton.Style>
+                            </RadioButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-                <WrapPanel Margin="0,0,1,0" Width="375">
-                    <RadioButton Height="52" Width="75" Background="Red"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Red}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
+                <!-- Divider -->
+                <Separator Margin="10" Background="#404040" Height="2"/>
 
-                    <RadioButton Height="52" Width="75" Background="Green"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Green}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
+                <!-- Color Picker -->
+                <mah:ColorCanvas x:Name="MyColorPicker" 
+                                 SelectedColor="{Binding PenColor, Mode=TwoWay}"
+                                 Width="380" 
+                                 Height="300" 
+                                 Foreground="White"
+                                 Visibility="{Binding PickColorVisiability, Converter={StaticResource BooleanToCollapsedConverter}}"/>
 
-                    <RadioButton Height="52" Width="75" Background="Blue"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Blue}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-
-                    <RadioButton Height="52" Width="75"  Background="Yellow"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Yellow}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-
-                    <RadioButton Height="52" Width="75"  Background="Orange"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Orange}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-
-                    <RadioButton Height="52" Width="75" Background="Purple"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Purple}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-
-                    <RadioButton Height="52" Width="75" Background="Pink"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Pink}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-
-                    <RadioButton Height="52" Width="75" Background="White"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.White}">
-                        
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-
-                    <RadioButton Height="52" Width="75" Background="Black"
-                                 Command="{Binding SwitchColorCommand}"
-                                 CommandParameter="{x:Static Colors.Black}">
-                        <RadioButton.Style>
-                            <StaticResource ResourceKey="CustomRadioButton"/>
-                        </RadioButton.Style>
-                    </RadioButton>
-                </WrapPanel>
-
-                <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="#808080" StrokeThickness="4"></Line>
-
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding PickColorVisiability, Converter={StaticResource BooleanToCollapsedConverter}}">
-                    <mah:ColorCanvas x:Name="MyColorPicker"
-                      SelectedColor="{Binding PenColor, Mode=TwoWay}"
-                      Width="391"
-                      Height="334"
-                      Visibility="{Binding PickColorVisiability, Converter={StaticResource BooleanToCollapsedConverter}}"/>
-                </StackPanel>
-
-
-                <ToggleButton Background="#2C2C2C" IsChecked="{Binding PickColorVisiability}">
-                    <TextBlock Foreground="AliceBlue" FontSize="20" FontFamily="Segoe UI">Pick A Color 🎨</TextBlock>
-                    <ToggleButton.Style>
-                        <StaticResource ResourceKey="CustomToggleButton"/>
-                    </ToggleButton.Style>
+                <!-- Toggle for Color Picker -->
+                <ToggleButton Background="#333" 
+                              Foreground="White" 
+                              IsChecked="{Binding PickColorVisiability}" 
+                              Padding="10" 
+                              Margin="5">
+                    <TextBlock Text="Pick A Color 🎨" 
+                               FontSize="18" 
+                               HorizontalAlignment="Center"/>
                 </ToggleButton>
 
-                <Line X1="0" Y1="0" X2="300" Y2="0" Stroke="#808080" StrokeThickness="4"></Line>
+                <Separator Margin="10" Background="#404040" Height="2"/>
 
-                <TextBlock Text="Pen Thickness" Margin="10" Height="15" Foreground="#BB86FC"/>
-                <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="240"/>
+                <!-- Thickness Slider -->
+                <TextBlock Text="Pen Thickness" Foreground="White" FontSize="18" HorizontalAlignment="Center" Margin="5"/>
+                <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="340" Style="{StaticResource CustomSliderStyle}"/>
 
-                <TextBlock Text="Pen Opacity" Margin="10" Height="15" Foreground="#BB86FC"/>
-                <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="240"/>
+                <Separator Margin="10" Background="#404040" Height="2"/>
+
+                <!-- Opacity Slider -->
+                <TextBlock Text="Opacity" Foreground="White" FontSize="16" HorizontalAlignment="Center" Margin="5"/>
+                <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="340" Style="{StaticResource CustomSliderStyle}"/>
             </StackPanel>
         </Grid>
-
     </Border>
 </UserControl>

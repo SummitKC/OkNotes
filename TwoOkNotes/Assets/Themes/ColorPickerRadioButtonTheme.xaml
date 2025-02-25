@@ -17,13 +17,18 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="RadioBorder" Property="BorderBrush" Value="LightGreen"/>
+                            <Setter TargetName="RadioBorder" Property="BorderBrush" Value="#09f"/>
                         </Trigger>
+
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="RadioBorder" Property="BorderBrush" Value="Black"/>
+                        </Trigger>
+
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="RadioBorder" Property="BorderBrush" Value="DarkGray"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
-                    
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
