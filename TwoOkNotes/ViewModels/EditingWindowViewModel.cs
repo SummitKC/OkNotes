@@ -55,7 +55,7 @@ namespace TwoOkNotes.ViewModels
         public ICommand SwitchSectionCommand { get; }
         public ICommand SwitchPagesCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
-        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, PenViewModel currentPenModel, string filePath, string fileName)
+        public EditingWIndowViewModel(CanvasModel _currentCanvasModel, string filePath, string fileName)
         {
             //Metadata 
             _savingServices = new FileSavingServices();
@@ -65,8 +65,8 @@ namespace TwoOkNotes.ViewModels
             currFilePath = filePath;
             _fileName = fileName;
             CurrentCanvasModel = _currentCanvasModel;
-            CurrentPenModel = currentPenModel;
-            CurrentCanvasModel.SetPen(currentPenModel);
+            CurrentPenModel = new PenViewModel();
+            CurrentCanvasModel.SetPen(CurrentPenModel);
             _keyHandler = new KeyHandler(CurrentCanvasModel, CurrentPenModel, this);
 
             ClearInkCommand = new RelayCommand(ClearInk);

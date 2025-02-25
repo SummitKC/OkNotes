@@ -23,9 +23,7 @@ namespace TwoOkNotes.ViewModels
     {
         private string iconPath = "pack://application:,,,/Assets/Images/Testingbook.png";
         private FileSavingServices fileSavingServices { get; } = new();
-        private double numberOfPagesl;
         private CanvasModel canvasModel;
-        public PenViewModel CurrentPenModel { get; set; }
 
 
         private string _selectedSort; 
@@ -133,10 +131,7 @@ namespace TwoOkNotes.ViewModels
             CancelPageCreationCommand = new RelayCommand(CancelPageCreation);
 
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
-            LoadAFileCommand = new RelayCommand(FindAndLoadFile);
-
-            CurrentPenModel = new PenViewModel();
-           
+            LoadAFileCommand = new RelayCommand(FindAndLoadFile);           
 
             SortOptions = new List<string> { "Name", "Date"  };
         }
@@ -159,7 +154,7 @@ namespace TwoOkNotes.ViewModels
                 EditingWindow editingWindow = new();
                 editingWindow.Title = "Untitled";
                 GetCanvasModel().Strokes = await FileSavingServices.GetFileContents(page.FilePath);
-                EditingWIndowViewModel editingWindowViewModel = new(canvasModel, CurrentPenModel, page.FilePath, page.Name);
+                EditingWIndowViewModel editingWindowViewModel = new(canvasModel, page.FilePath, page.Name);
                 editingWindow.DataContext = editingWindowViewModel;
                 editingWindow.Show();
             }
@@ -170,7 +165,6 @@ namespace TwoOkNotes.ViewModels
         {
             SavedPages.Clear();
             var currFilesTest = await fileSavingServices.GetMetadataNameAndFilePathAsync();
-            numberOfPagesl = currFilesTest.Count;
             foreach (var item in currFilesTest)
             {
                 if (item.Value.type == "OrphanPage")
@@ -234,7 +228,7 @@ namespace TwoOkNotes.ViewModels
         {
             EditingWindow newOpenWindow = new();
             newOpenWindow.Title = name;
-            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), CurrentPenModel, filePath, name);
+            EditingWIndowViewModel editingWindowViewModel = new(GetCanvasModel(), filePath, name);
             newOpenWindow.DataContext = editingWindowViewModel;
             newOpenWindow.Show();
         }
