@@ -88,7 +88,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public void InitializeColorOptions()
+        private void InitializeColorOptions()
         {
             ColorOptions = new ObservableCollection<Color>
             {
