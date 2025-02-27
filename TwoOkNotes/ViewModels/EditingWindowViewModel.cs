@@ -31,7 +31,7 @@ namespace TwoOkNotes.ViewModels
         private TimerHandler? _autoSaveTimer;
         private ObservableCollection<string> _sections;
         private ObservableCollection<string> _pages;
-        private ObservableCollection<PenModel> _penModels;
+        private ObservableCollection<KeyValuePair<string, PenModel>> _penModels;
         private bool isPageGridVisible;
         private bool isSectionGridVisible;
         public WindowSettings _windowSettings { get; set; }
@@ -204,7 +204,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public ObservableCollection<PenModel> PenModels
+        public ObservableCollection<KeyValuePair<string, PenModel>> PenModels
         {
             get => _penModels;
             set
@@ -410,8 +410,10 @@ namespace TwoOkNotes.ViewModels
         }
         public void SwitchPen(object? obj)
         {
-            Debug.WriteLine(obj);
-            if (obj is int index) CurrentPenModel.SwitchPen(index); 
+            if (obj is string penName)
+            {
+                CurrentPenModel.SwitchPen(penName);
+            }
         }
         public void DeletePen(object? obj)
         {

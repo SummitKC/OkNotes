@@ -23,24 +23,27 @@ namespace TwoOkNotes.ViewModels
     {
         private readonly SettingsServices _settingsServices;
         private PenModel _penSettings;
-        private int _currPenIndex;
+        private string _currentPenKey; 
         public ObservableCollection<Color> ColorOptions { get; set; }
-        private ObservableCollection<PenModel> _availablePens = new ();
+        private Dictionary<string, PenModel> _availablePens = new();
         public ICommand SwitchColorCommand { get; }
 
         private StrokeCollection _previewStrokes;
 
-        //public ICommand ChangePenColorCommand { get; } 
         public PenViewModel()
         {
             _settingsServices = new SettingsServices();
             _penSettings = new PenModel();
+            _penSettings.Name = "Default Pen";
             SwitchColorCommand = new RelayCommand(SwitchColor);
-            _availablePens.Add(_penSettings);
+            
+            // Initialize with default pen
+            _currentPenKey = _penSettings.Name;
+            _availablePens[_currentPenKey] = _penSettings;
+            
             InitializePenSettingsAsync();
-            InitializeColorOptions();
             CreatePreviewStroke();
-
+            InitializeColorOptions();
         }
 
         private async void InitializePenSettingsAsync()
@@ -48,16 +51,40 @@ namespace TwoOkNotes.ViewModels
             var loadedSettings = await _settingsServices.LoadPenSettings();
             if (loadedSettings != null)
             {
-                _penSettings = loadedSettings.LastUsedPen ?? new PenModel();
-                OnPropertyChanged(nameof(PenSettings));
-                _availablePens = new ObservableCollection<PenModel>(loadedSettings.Pens);
-
-                if (loadedSettings.Pens.IndexOf(_penSettings) > 0)
+                // Load last used pen if available
+                if (loadedSettings.LastUsedPen != null)
                 {
-                    _currPenIndex = loadedSettings.Pens.IndexOf(_penSettings);
-                } else _currPenIndex = 0;
-                CreatePreviewStroke();
+                    _penSettings = loadedSettings.LastUsedPen;
+                    OnPropertyChanged(nameof(PenSettings));
+                }
 
+                // Load available pens
+                if (loadedSettings.Pens != null && loadedSettings.Pens.Count > 0)
+                {
+                    _availablePens = new Dictionary<string, PenModel>(loadedSettings.Pens);
+                    
+                    // Set current pen key
+                    if (_availablePens.ContainsValue(_penSettings))
+                    {
+                        _currentPenKey = _availablePens.FirstOrDefault(x => x.Value == _penSettings).Key;
+                    }
+                    else if (_availablePens.Count > 0)
+                    {
+                        _currentPenKey = _availablePens.First().Key;
+                        _penSettings = _availablePens[_currentPenKey];
+                    }
+                }
+                else
+                {
+                    // If no pens were loaded, initialize with current pen
+                    _availablePens = new Dictionary<string, PenModel>
+                    {
+                        { _penSettings.Name, _penSettings }
+                    };
+                    _currentPenKey = _penSettings.Name;
+                }
+                CreatePreviewStroke();
+                InitializeColorOptions();
             }
         }
 
@@ -77,7 +104,6 @@ namespace TwoOkNotes.ViewModels
                 Colors.Gray
             };
         }
-
 
         public PenModel PenSettings
         {
@@ -263,36 +289,55 @@ namespace TwoOkNotes.ViewModels
             return _penSettings.getdrawingattributes();
         }
 
-        public ObservableCollection<PenModel> GetAvailablePens()
+        public ObservableCollection<KeyValuePair<string, PenModel>> GetAvailablePens()
         {
-            return _availablePens;
+            return new ObservableCollection<KeyValuePair<string, PenModel>>(_availablePens);
         }
 
         public void AddNewPen()
         {
             PenModel newPen = new PenModel();
-            newPen.Name = "Pen " + (_availablePens.Count + 1);
-            _availablePens.Add(newPen);
-            _currPenIndex = _availablePens.Count - 1;
+            string baseName = "Pen";
+            string penName = baseName + " " + (_availablePens.Count + 1);
+            
+            // Ensure unique name
+            int counter = 1;
+            while (_availablePens.ContainsKey(penName))
+            {
+                counter++;
+                penName = baseName + " " + counter;
+            }
+            
+            newPen.Name = penName;
+            _availablePens[penName] = newPen;
+            _currentPenKey = penName;
             PenSettings = newPen;
+            
             SavePenSettings();
             CreatePreviewStroke();
         }
 
-        public void SwitchPen(int index)
+        public void SwitchPen(string penName)
         {
-            PenSettings = _availablePens[index];
-            SavePenSettings();
-            CreatePreviewStroke();
+            if (_availablePens.ContainsKey(penName))
+            {
+                _currentPenKey = penName;
+                PenSettings = _availablePens[penName];
+                SavePenSettings();
+                CreatePreviewStroke();
+            }
         }
 
         public void DeletePen()
         {
             if (_availablePens.Count > 1)
             {
-                _availablePens.RemoveAt(_currPenIndex);
-                _currPenIndex = 0;
-                PenSettings = _availablePens[_currPenIndex];
+                _availablePens.Remove(_currentPenKey);
+                
+                // Switch to first available pen
+                _currentPenKey = _availablePens.First().Key;
+                PenSettings = _availablePens[_currentPenKey];
+                
                 SavePenSettings();
                 CreatePreviewStroke();
             }
@@ -300,14 +345,13 @@ namespace TwoOkNotes.ViewModels
 
         public async void SavePenSettings()
         {
-            PenSettingsModel curPenSettings = await _settingsServices.LoadPenSettings();
-            curPenSettings.LastUsedPen = _penSettings;
-            if (curPenSettings.Pens.Count <= _currPenIndex)
+            PenSettingsModel penSettings = new PenSettingsModel
             {
-                curPenSettings.Pens.Add(PenSettings);
-            }
-             curPenSettings.Pens[_currPenIndex] = _penSettings;
-            await _settingsServices.SavePenSettings(curPenSettings);
+                LastUsedPen = _penSettings,
+                Pens = _availablePens
+            };
+            
+            await _settingsServices.SavePenSettings(penSettings);
         }
     }
 }

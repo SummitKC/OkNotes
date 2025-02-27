@@ -8,7 +8,7 @@ namespace TwoOkNotes.Model
 {
     public class PenSettingsModel
     {
-        public PenModel LastUsedPen { get; set; } = new ();
-        public List<PenModel> Pens { get; set; } = new ();
+        public PenModel LastUsedPen { get; set; } = new();
+        public Dictionary<string, PenModel> Pens { get; set; } = new();
     }
 }

@@ -68,22 +68,22 @@
                 CommandParameter="True"
                 Margin="1"/>
 
-                    <ItemsControl ItemsSource="{Binding PenModels}" AlternationCount="1000">
+                    <ItemsControl ItemsSource="{Binding PenModels}">
                         <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Content="{Binding Name}"
-                            Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                            CommandParameter="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource Self}}"
-                            Margin="1"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Value.Name}"
+                                    Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding Key}"
+                                    Margin="1"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                     <Button Content="Add Pen"
                     Command="{Binding AddPenCommand}"
