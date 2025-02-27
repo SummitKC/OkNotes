@@ -25,8 +25,17 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel 
-            Grid.Row ="0"
+        <Grid Grid.Row ="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel 
+            Grid.Column="0"
             Orientation="Horizontal"
             Background="#1E1E1E">
 
@@ -50,21 +59,56 @@
                 Command="{Binding UndoCommand}"
                 Margin="1"/>
 
-            <Button Content="Toggle Eraser"
+                <StackPanel 
+                    Grid.Column="1"
+                    Orientation="Horizontal">
+
+                    <Button Content="Toggle Eraser"
                 Command="{Binding ToggleEraserCommand}"
                 CommandParameter="True"
                 Margin="1"/>
 
-            <Button Content="Toggle Pen"
+                    <ItemsControl ItemsSource="{Binding PenModels}" AlternationCount="1000">
+                        <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding Name}"
+                            Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            CommandParameter="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource Self}}"
+                            Margin="1"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+                    <Button Content="Add Pen"
+                    Command="{Binding AddPenCommand}"
+                    Margin="1"/>
+
+
+
+
+                    <Button Content="Toggle Pen"
                 Command="{Binding ToggleInkCommand}"
                 Margin="1"/>
+            
 
+                    
             <ToggleButton Content="Toggle Highlighter"
                 IsChecked="{Binding CurrentPenModel.IsHighlighter, Mode=TwoWay}"
                 CommandParameter="True"
                 Margin="1"/>
 
-            <Button Content="Toggle Select Tool"
+            </StackPanel>
+
+                <StackPanel 
+                    Grid.Column="2"
+                    Orientation="Horizontal">
+                    <Button Content="Toggle Select Tool"
                 Command="{Binding ToggleSelectionToolCommand}"
                 CommandParameter="True"
                 Margin="1"/>
@@ -89,9 +133,10 @@
                 Content="Zoom Out" 
                 Command="{Binding ZoomOutCommand}"
                 Margin="1"/>
+            </StackPanel>
 
-        </StackPanel>
-
+            </StackPanel>
+    </Grid>
         <Grid             
             Grid.Row="1"
             Background="Beige"

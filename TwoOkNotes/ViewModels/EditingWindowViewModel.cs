@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using TwoOkNotes.Services;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography.X509Certificates;
 
 
 
@@ -30,6 +31,7 @@ namespace TwoOkNotes.ViewModels
         private TimerHandler? _autoSaveTimer;
         private ObservableCollection<string> _sections;
         private ObservableCollection<string> _pages;
+        private ObservableCollection<PenModel> _penModels;
         private bool isPageGridVisible;
         private bool isSectionGridVisible;
         public WindowSettings _windowSettings { get; set; }
@@ -54,6 +56,9 @@ namespace TwoOkNotes.ViewModels
         public ICommand NewSectionCommand { get; }
         public ICommand SwitchSectionCommand { get; }
         public ICommand SwitchPagesCommand { get; }
+        public ICommand SwitchPenCommand { get; }
+        public ICommand AddPenCommand { get; }
+        public ICommand DeletePenCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, string filePath, string fileName)
         {
@@ -67,6 +72,7 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel = _currentCanvasModel;
             CurrentPenModel = new PenViewModel();
             CurrentCanvasModel.SetPen(CurrentPenModel);
+            _penModels = CurrentPenModel.GetAvailablePens();
             _keyHandler = new KeyHandler(CurrentCanvasModel, CurrentPenModel, this);
 
             ClearInkCommand = new RelayCommand(ClearInk);
@@ -84,40 +90,47 @@ namespace TwoOkNotes.ViewModels
             NewSectionCommand = new RelayCommand(CreateNewSection);
             SwitchSectionCommand = new RelayCommand(SwitchSections);
             SwitchPagesCommand = new RelayCommand(SwitchPages);
+            SwitchPenCommand = new RelayCommand(SwitchPen);
+            AddPenCommand = new RelayCommand(AddNewPen);
+            DeletePenCommand = new RelayCommand(DeletePen);
 
             SaveNote();
             InitAutoSaveTimer();
             SubscribeToStrokeEvents();
-            InitilizeWindowDimentions();
+            InitilizeWindowDimentionsAndPens();
             InitilizeSectionsAndPages();
-          
+
         }
 
-        private async void InitilizeWindowDimentions()
+        private async void InitilizeWindowDimentionsAndPens()
         {
             _windowSettings = await _settingsSercices.LoadEditingWindowSettings();
+            _penModels = CurrentPenModel.GetAvailablePens();
+            OnPropertyChanged(nameof(PenModels));
         }
 
         private async void InitilizeSectionsAndPages()
         {
             var sectionsList = await _savingServices.GetNotebookMetadata(_fileName);
 
-            if (sectionsList.Count > 0) 
+            if (sectionsList.Count > 0)
             {
-            Sections = new ObservableCollection<string>(sectionsList);
+                Sections = new ObservableCollection<string>(sectionsList);
                 currSection = currSection ?? _sections[0];
                 string sectionToLoad = currSection;
                 var pagesList = await _savingServices.GetSectionMetadata(_fileName, sectionToLoad);
-            Pages = new ObservableCollection<string>(pagesList);
-                    }
-            else {
+                Pages = new ObservableCollection<string>(pagesList);
+
+            }
+            else
+            {
                 Pages = new ObservableCollection<string>();
                 Pages.Add(_fileName);
                 //TODO: Change this to toggle the visiability of the section grid to false
                 //      Also lock the toggle button for the section grid to false 
+            }
         }
-        }
-
+        
         public double WindowWidth
         {
             get => _windowSettings._windowWidth;
@@ -191,6 +204,16 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        public ObservableCollection<PenModel> PenModels
+        {
+            get => _penModels;
+            set
+            {
+                _penModels = value;
+                OnPropertyChanged(nameof(PenModels));
+            }
+        }
+
         //temp only to test move out of this class later 
         private void DeleteNote(object? obj)
         {
@@ -255,8 +278,8 @@ namespace TwoOkNotes.ViewModels
                 CurrentCanvasModel.Strokes.Save(ms);
                 byte[] fileContent = ms.ToArray();
                 await FileSavingServices.SaveFileAsync(currFilePath, fileContent);
-                }
             }
+        }
 
         //Undo, check if there are any strokes in the canvas, if so, push the last stroke to the redo stack and remove it from the canvas
         private void Undo(object? obj)
@@ -341,10 +364,10 @@ namespace TwoOkNotes.ViewModels
         private async void CreateNewPage(object? obj)
         {
             int numPages = Pages.Count;
-            if (await _savingServices.CreatePage(_fileName, currSection, $"NewPage{numPages+1}.isf"))
+            if (await _savingServices.CreatePage(_fileName, currSection, $"NewPage{numPages + 1}.isf"))
             {
                 InitilizeSectionsAndPages();
-                SwitchPages($"NewPage{numPages+1}.isf");
+                SwitchPages($"NewPage{numPages + 1}.isf");
             }
             else Debug.WriteLine("Creating New Page");
         }
@@ -367,7 +390,6 @@ namespace TwoOkNotes.ViewModels
                 SwitchPages(Pages[0]);
             }
         }
-
         private async void SwitchPages(object? obj)
         {
             if (obj is string page)
@@ -379,6 +401,22 @@ namespace TwoOkNotes.ViewModels
                 CurrentCanvasModel.Strokes = pageContent;
                 SubscribeToStrokeEvents();
             }
+        }
+
+        public void AddNewPen(object? obj)
+        {
+            CurrentPenModel.AddNewPen();
+            PenModels = CurrentPenModel.GetAvailablePens();
+        }
+        public void SwitchPen(object? obj)
+        {
+            Debug.WriteLine(obj);
+            if (obj is int index) CurrentPenModel.SwitchPen(index); 
+        }
+        public void DeletePen(object? obj)
+        {
+            CurrentPenModel.DeletePen();
+            PenModels = CurrentPenModel.GetAvailablePens();
         }
 
         //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 
@@ -397,7 +435,6 @@ namespace TwoOkNotes.ViewModels
         {
             IsPenSettingOpen = !IsPenSettingOpen;
         }
-
         public async void SaveWindowSettings()
         {
             await _settingsSercices.SaveEditingWindowSettings(_windowSettings);

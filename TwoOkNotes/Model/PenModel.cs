@@ -15,6 +15,7 @@ namespace TwoOkNotes.Model
     //TODO: Change this logic to be in the viewmodel insted of the model, most functionality is working now 
     public class PenModel : ObservableObject
     {
+        public string Name { get; set; } = "Pen 1";
         public Color PenColor { get; set; } = Colors.White;
         public double Thickness { get; set; } = 20.0;
         public byte Opacity { get; set; } = (byte) 255;

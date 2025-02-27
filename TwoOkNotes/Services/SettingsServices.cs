@@ -29,7 +29,7 @@ namespace TwoOkNotes.Services
             _windowSettingsPath = Path.Combine(appFolder, "WindowSettings.json");
         }
 
-        public async Task SavePenSettings(PenModel settings)
+        public async Task SavePenSettings(PenSettingsModel settings)
         {
             var options = new JsonSerializerOptions
             {
@@ -40,16 +40,16 @@ namespace TwoOkNotes.Services
             await File.WriteAllTextAsync(_settingsFilePath, json);
         }
 
-        public async Task<PenModel> LoadPenSettings()
+        public async Task<PenSettingsModel> LoadPenSettings()
         {
             if (File.Exists(_settingsFilePath))
             {
                 string json = await File.ReadAllTextAsync(_settingsFilePath);
-                return JsonSerializer.Deserialize<PenModel>(json) ?? new PenModel();
+                return JsonSerializer.Deserialize<PenSettingsModel>(json) ?? new PenSettingsModel();
             }
             else
             {
-                return new PenModel();
+                return new PenSettingsModel();
             }
         }
 

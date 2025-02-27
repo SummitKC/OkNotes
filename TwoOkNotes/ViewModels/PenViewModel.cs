@@ -22,9 +22,10 @@ namespace TwoOkNotes.ViewModels
     public class PenViewModel : ObservableObject
     {
         private readonly SettingsServices _settingsServices;
-        public PenModel PenSettings { get; set; }
+        private PenModel _penSettings;
+        private int _currPenIndex;
         public ObservableCollection<Color> ColorOptions { get; set; }
-
+        private ObservableCollection<PenModel> _availablePens = new ();
         public ICommand SwitchColorCommand { get; }
 
         private StrokeCollection _previewStrokes;
@@ -33,11 +34,12 @@ namespace TwoOkNotes.ViewModels
         public PenViewModel()
         {
             _settingsServices = new SettingsServices();
-            PenSettings = new PenModel();
+            _penSettings = new PenModel();
             SwitchColorCommand = new RelayCommand(SwitchColor);
+            _availablePens.Add(_penSettings);
             InitializePenSettingsAsync();
-            CreatePreviewStroke();
             InitializeColorOptions();
+            CreatePreviewStroke();
 
         }
 
@@ -46,7 +48,16 @@ namespace TwoOkNotes.ViewModels
             var loadedSettings = await _settingsServices.LoadPenSettings();
             if (loadedSettings != null)
             {
-                PenSettings = loadedSettings;
+                _penSettings = loadedSettings.LastUsedPen ?? new PenModel();
+                OnPropertyChanged(nameof(PenSettings));
+                _availablePens = new ObservableCollection<PenModel>(loadedSettings.Pens);
+
+                if (loadedSettings.Pens.IndexOf(_penSettings) > 0)
+                {
+                    _currPenIndex = loadedSettings.Pens.IndexOf(_penSettings);
+                } else _currPenIndex = 0;
+                CreatePreviewStroke();
+
             }
         }
 
@@ -66,13 +77,29 @@ namespace TwoOkNotes.ViewModels
                 Colors.Gray
             };
         }
+
+
+        public PenModel PenSettings
+        {
+            get => _penSettings;
+            set
+            {
+                _penSettings = value;
+                SavePenSettings();
+                CreatePreviewStroke();
+                OnPropertyChanged(nameof(PenSettings));
+
+            }
+        }
+
         public Color PenColor
 
         {
-            get => PenSettings.PenColor;
+            get => _penSettings.PenColor;
             set
             {
-                PenSettings.PenColor = value;
+                Debug.WriteLine(value);
+                _penSettings.PenColor = value;
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(PenColor));
@@ -83,10 +110,10 @@ namespace TwoOkNotes.ViewModels
         }
         public double ThickNess
         {
-            get => PenSettings.Thickness;
+            get => _penSettings.Thickness;
             set
             {
-                PenSettings.Thickness = value;
+                _penSettings.Thickness = value;
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(ThickNess));
@@ -96,12 +123,12 @@ namespace TwoOkNotes.ViewModels
         }
         public byte Opacity
         {
-            get => PenSettings.Opacity;
+            get => _penSettings.Opacity;
             set
             {
 
-                PenSettings.Opacity = value;
-                PenSettings.PenColor = Color.FromArgb(PenSettings.Opacity, PenSettings.PenColor.R, PenSettings.PenColor.G, PenSettings.PenColor.B);
+                _penSettings.Opacity = value;
+                _penSettings.PenColor = Color.FromArgb(_penSettings.Opacity, _penSettings.PenColor.R, _penSettings.PenColor.G, _penSettings.PenColor.B);
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(Opacity));
@@ -112,10 +139,10 @@ namespace TwoOkNotes.ViewModels
 
         public StylusTip Tip
         {
-            get => PenSettings.Tip;
+            get => _penSettings.Tip;
             set
             {
-                PenSettings.Tip = value;
+                _penSettings.Tip = value;
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(Tip));
@@ -126,13 +153,13 @@ namespace TwoOkNotes.ViewModels
 
         public bool IsHighlighter
         {
-            get => PenSettings.IsHighlighter;
+            get => _penSettings.IsHighlighter;
             set
             {
-                PenSettings.IsHighlighter = value;
+                _penSettings.IsHighlighter = value;
                 if (value)
                 {
-                    PenSettings.PenColor = Color.FromArgb(128, 255, 255, 0);
+                    _penSettings.PenColor = Color.FromArgb(128, 255, 255, 0);
                 }
                 SavePenSettings();
                 CreatePreviewStroke();
@@ -142,10 +169,10 @@ namespace TwoOkNotes.ViewModels
 
         public bool IgnorePreassure
         {
-            get => PenSettings.IgnorePressure;
+            get => _penSettings.IgnorePressure;
             set
             {
-                PenSettings.IgnorePressure = value;
+                _penSettings.IgnorePressure = value;
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(IgnorePreassure));
@@ -156,10 +183,10 @@ namespace TwoOkNotes.ViewModels
 
         public bool FitToCurve
         {
-            get => PenSettings.FitToCurve;
+            get => _penSettings.FitToCurve;
             set
             {
-                PenSettings.FitToCurve = value;
+                _penSettings.FitToCurve = value;
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(FitToCurve));
@@ -195,7 +222,7 @@ namespace TwoOkNotes.ViewModels
         {
             if (obj is Color color)
             {
-                PenSettings.PenColor = color;
+                _penSettings.PenColor = color;
                 SavePenSettings();
                 CreatePreviewStroke();
             }
@@ -233,12 +260,54 @@ namespace TwoOkNotes.ViewModels
 
         public DrawingAttributes GetDrawingAttributes()
         {
-            return PenSettings.getdrawingattributes();
+            return _penSettings.getdrawingattributes();
+        }
+
+        public ObservableCollection<PenModel> GetAvailablePens()
+        {
+            return _availablePens;
+        }
+
+        public void AddNewPen()
+        {
+            PenModel newPen = new PenModel();
+            newPen.Name = "Pen " + (_availablePens.Count + 1);
+            _availablePens.Add(newPen);
+            _currPenIndex = _availablePens.Count - 1;
+            PenSettings = newPen;
+            SavePenSettings();
+            CreatePreviewStroke();
+        }
+
+        public void SwitchPen(int index)
+        {
+            PenSettings = _availablePens[index];
+            SavePenSettings();
+            CreatePreviewStroke();
+        }
+
+        public void DeletePen()
+        {
+            if (_availablePens.Count > 1)
+            {
+                _availablePens.RemoveAt(_currPenIndex);
+                _currPenIndex = 0;
+                PenSettings = _availablePens[_currPenIndex];
+                SavePenSettings();
+                CreatePreviewStroke();
+            }
         }
 
         public async void SavePenSettings()
         {
-            await _settingsServices.SavePenSettings(PenSettings);
+            PenSettingsModel curPenSettings = await _settingsServices.LoadPenSettings();
+            curPenSettings.LastUsedPen = _penSettings;
+            if (curPenSettings.Pens.Count <= _currPenIndex)
+            {
+                curPenSettings.Pens.Add(PenSettings);
+            }
+             curPenSettings.Pens[_currPenIndex] = _penSettings;
+            await _settingsServices.SavePenSettings(curPenSettings);
         }
     }
 }
