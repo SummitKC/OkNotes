@@ -21,16 +21,17 @@
     </UserControl.Resources>
 
 
-    <Border BorderBrush="#3C3C3C" BorderThickness="2" CornerRadius="15" Background="#1E1E1E" Padding="10" Margin="0,0,0,4">
+    <Border BorderBrush="#3C3C3C" BorderThickness="2" CornerRadius="15" Background="#1E1E1E" Padding="10" >
         <Grid Background="#1E1E1E" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <StackPanel>
+            <StackPanel  Grid.RowSpan="4">
                 <!-- Preview Area -->
-                <InkCanvas x:Name="PreviewCanvas" Width="379" Height="134" Background="#2C2C2C" Margin="10"
+                <InkCanvas x:Name="PreviewCanvas" Width="379" Height="134" Background="#2C2C2C"
                            Strokes="{Binding PreviewStrokes}" IsEnabled="False"/>
 
                 <!-- Color Selection Buttons -->
@@ -56,7 +57,7 @@
                 </ItemsControl>
 
                 <!-- Divider -->
-                <Separator Margin="10" Background="#404040" Height="2"/>
+                <Separator Margin="5" Background="#404040" Height="2"/>
 
                 <!-- Color Picker -->
                 <mah:ColorCanvas x:Name="MyColorPicker" 
@@ -77,18 +78,75 @@
                                HorizontalAlignment="Center"/>
                 </ToggleButton>
 
-                <Separator Margin="10" Background="#404040" Height="2"/>
+                <Separator Margin="5" Background="#404040" Height="2"/>
 
                 <!-- Thickness Slider -->
-                <TextBlock Text="Pen Thickness" Foreground="White" FontSize="18" HorizontalAlignment="Center" Margin="5"/>
+                <TextBlock Text="Pen Thickness" Foreground="White" FontSize="16" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="5"/>
                 <Slider Minimum="1" Maximum="50" Value="{Binding ThickNess, Mode=TwoWay}" Width="340" Style="{StaticResource CustomSliderStyle}"/>
+
+                <Separator Margin="5" Background="#404040" Height="2"/>
+
+                <!-- Opacity Slider -->
+                <TextBlock Text="Opacity" Foreground="White" FontSize="16" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="5"/>
+                <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="340" Style="{StaticResource CustomSliderStyle}"/>
+
+                <Separator Margin="5" Background="#404040" Height="2"/>
+
+                <!-- Smoothness, Preassure and Pen Shape -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <ToggleButton Height="58"
+                              Width="180"
+                              FontFamily="Segoe UI"
+                              FontSize="16"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"
+                              IsChecked="{Binding FitToCurve, Mode=TwoWay}">    
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <TextBlock TextAlignment="Center">Enable</TextBlock>
+                            <TextBlock TextAlignment="Center">Smoothness</TextBlock>
+                        </StackPanel>
+                    </ToggleButton>
+
+                    <Separator Margin="3" Background="#404040" Height="2"/>
+
+                    <ToggleButton Height="58"
+                              Width="180"
+                              FontFamily="Segoe UI"
+                              FontSize="16"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"
+                              IsChecked="{Binding IgnorePreassure, Mode=TwoWay}">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <TextBlock TextAlignment="Center">Ignore</TextBlock>
+                            <TextBlock TextAlignment="Center">Pressure</TextBlock>
+                        </StackPanel>
+                    </ToggleButton>
+
+                    <Separator Margin="3" Background="#404040" Height="2"/>
+
+                    <!--<Button Height="58"
+                              Width="120"
+                              FontFamily="Segoe UI"
+                              FontSize="16"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <TextBlock TextAlignment="Center">Switch</TextBlock>
+                            <TextBlock TextAlignment="Center">Tip Shape</TextBlock>
+                        </StackPanel>
+                    </Button>-->
+
+                </StackPanel>
 
                 <Separator Margin="10" Background="#404040" Height="2"/>
 
-                <!-- Opacity Slider -->
-                <TextBlock Text="Opacity" Foreground="White" FontSize="16" HorizontalAlignment="Center" Margin="5"/>
-                <Slider Minimum="0" Maximum="255" Value="{Binding Opacity, Mode=TwoWay}" Width="340" Style="{StaticResource CustomSliderStyle}"/>
+                <Button FontFamily="Segoe UI" FontSize="16" Command="{Binding DeletePenCommand}">
+                    <TextBlock>Delete Pen</TextBlock>                    
+                </Button>
+
             </StackPanel>
+
         </Grid>
     </Border>
 </UserControl>

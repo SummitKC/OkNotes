@@ -27,8 +27,11 @@ namespace TwoOkNotes.ViewModels
         public ObservableCollection<Color> ColorOptions { get; set; }
         private Dictionary<string, PenModel> _availablePens = new();
         public ICommand SwitchColorCommand { get; }
+        public ICommand DeletePenCommand { get; }
 
         private StrokeCollection _previewStrokes;
+
+        public event EventHandler? PenDeleted;
 
         public PenViewModel()
         {
@@ -36,7 +39,8 @@ namespace TwoOkNotes.ViewModels
             _penSettings = new PenModel();
             _penSettings.Name = "Default Pen";
             SwitchColorCommand = new RelayCommand(SwitchColor);
-            
+            DeletePenCommand = new RelayCommand(DeletePen);
+
             // Initialize with default pen
             _currentPenKey = _penSettings.Name;
             _availablePens[_currentPenKey] = _penSettings;
@@ -55,7 +59,6 @@ namespace TwoOkNotes.ViewModels
                 if (loadedSettings.LastUsedPen != null)
                 {
                     _penSettings = loadedSettings.LastUsedPen;
-                    OnPropertyChanged(nameof(PenSettings));
                 }
 
                 // Load available pens
@@ -64,7 +67,7 @@ namespace TwoOkNotes.ViewModels
                     _availablePens = new Dictionary<string, PenModel>(loadedSettings.Pens);
                     
                     // Set current pen key
-                    if (_availablePens.ContainsValue(_penSettings))
+                    if (_availablePens.ContainsKey(_penSettings.Name))
                     {
                         _currentPenKey = _availablePens.FirstOrDefault(x => x.Value == _penSettings).Key;
                     }
@@ -84,7 +87,6 @@ namespace TwoOkNotes.ViewModels
                     _currentPenKey = _penSettings.Name;
                 }
                 CreatePreviewStroke();
-                InitializeColorOptions();
             }
         }
 
@@ -101,7 +103,9 @@ namespace TwoOkNotes.ViewModels
                 Colors.Orange,
                 Colors.Pink,
                 Colors.Brown,
-                Colors.Gray
+                Colors.Gray,
+                Colors.White,
+                Colors.LightBlue
             };
         }
 
@@ -129,8 +133,6 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(PenColor));
-
-
             }
 
         }
@@ -158,8 +160,6 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(Opacity));
-
-
             }
         }
 
@@ -176,17 +176,12 @@ namespace TwoOkNotes.ViewModels
 
             }
         }
-
         public bool IsHighlighter
         {
             get => _penSettings.IsHighlighter;
             set
             {
                 _penSettings.IsHighlighter = value;
-                if (value)
-                {
-                    _penSettings.PenColor = Color.FromArgb(128, 255, 255, 0);
-                }
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(IsHighlighter));
@@ -202,8 +197,6 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(IgnorePreassure));
-
-
             }
         }
 
@@ -328,7 +321,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public void DeletePen()
+        public void DeletePen(object? obj)
         {
             if (_availablePens.Count > 1)
             {
@@ -340,6 +333,9 @@ namespace TwoOkNotes.ViewModels
                 
                 SavePenSettings();
                 CreatePreviewStroke();
+
+                PenDeleted?.Invoke(this, EventArgs.Empty);
+
             }
         }
 

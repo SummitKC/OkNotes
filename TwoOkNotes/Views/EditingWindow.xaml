@@ -63,9 +63,12 @@
                     Grid.Column="1"
                     Orientation="Horizontal">
 
-                    <Button Content="Toggle Eraser"
+                    <RadioButton Content="Toggle Eraser"
                 Command="{Binding ToggleEraserCommand}"
                 CommandParameter="True"
+                GroupName="Pens"
+                                                             Style="{StaticResource CustomRadioButton}"
+
                 Margin="1"/>
 
                     <ItemsControl ItemsSource="{Binding PenModels}">
@@ -77,9 +80,11 @@
 
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Content="{Binding Value.Name}"
+                                <RadioButton Content="{Binding Value.Name}"
                                     Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding Key}"
+                                    GroupName="Pens"
+                                    Style="{StaticResource CustomRadioButton}"
                                     Margin="1"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -88,19 +93,13 @@
                     <Button Content="Add Pen"
                     Command="{Binding AddPenCommand}"
                     Margin="1"/>
-
-
-
-
-                    <Button Content="Toggle Pen"
-                Command="{Binding ToggleInkCommand}"
-                Margin="1"/>
-            
-
                     
-            <ToggleButton Content="Toggle Highlighter"
+            <RadioButton Content="Toggle Highlighter"
                 IsChecked="{Binding CurrentPenModel.IsHighlighter, Mode=TwoWay}"
                 CommandParameter="True"
+                GroupName="Pens"
+                                                                      Style="{StaticResource CustomRadioButton}"
+
                 Margin="1"/>
 
             </StackPanel>
