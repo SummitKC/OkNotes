@@ -39,22 +39,22 @@
             Orientation="Horizontal"
             Background="#1E1E1E">
 
-            <Button 
+                <Button 
                 Content="Save"
                 Command="{Binding SaveNoteCommand}"
                 Margin="1"/>
 
-            <Button 
+                <Button 
                 Content="Delete"
                 Command="{Binding DeleteNoteCommand}"
                 Margin="1"/>
 
-            <Button 
+                <Button 
                 Content="Clear"
                 Command="{Binding ClearInkCommand}"
                 Margin="1"/>
 
-            <Button 
+                <Button 
                 Content="Undo"
                 Command="{Binding UndoCommand}"
                 Margin="1"/>
@@ -63,12 +63,31 @@
                     Grid.Column="1"
                     Orientation="Horizontal">
 
-                    <RadioButton Content="Toggle Eraser"
+                    <RadioButton 
+                    
                 Command="{Binding ToggleEraserCommand}"
                 CommandParameter="True"
                 GroupName="Pens"
-                Style="{StaticResource CustomPenRadioButton}"
-                Margin="1"/>
+                Style="{StaticResource CustomPenRadioButton}">
+                        <Viewbox Width="50" Height="50" Stretch="Uniform" Margin="-16,-4,-13,0">
+
+                            <Grid>
+
+                                <Path Data="{StaticResource PenBodyGeometry}"
+                                    Fill="White"
+                                    Stroke="Black" StrokeThickness="0.05"/>
+
+                                <Path Data="{StaticResource PenTipGeometry}"
+                                    Fill="White"
+                                    Opacity="0.73" Stroke="Black" StrokeThickness="0.05"/>
+
+                                <Path Data="{StaticResource PenCenterGeometry}"
+                                    Fill="Black" Stroke="Black" StrokeThickness="0.05"/>
+                            </Grid>
+                        </Viewbox>
+
+
+                    </RadioButton>
 
                     <ItemsControl ItemsSource="{Binding PenModels}">
                         <ItemsControl.ItemsPanel>
@@ -79,12 +98,29 @@
 
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <RadioButton Content="{Binding Value.Name}"
+                                <RadioButton
                                     Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding Key}"
                                     GroupName="Pens"
                                     Style="{StaticResource CustomPenRadioButton}"
-                                    Margin="1"/>
+                                    Margin="1">
+                                    <Viewbox Width="50" Height="50" Stretch="Uniform" Margin="-16,-4,-13,0">
+
+                                        <Grid>
+                                            <!-- Using path data from resources -->
+                                            <Path Data="{StaticResource PenBodyGeometry}"
+                                    Fill="{Binding Value.PenColor, Converter={StaticResource ColorToBrushConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Stroke="Black" StrokeThickness="0.05"/>
+
+                                            <Path Data="{StaticResource PenTipGeometry}"
+                                    Fill="{Binding Value.PenColor, Converter={StaticResource ColorToBrushConverter}, Mode=TwoWay}"
+                                    Opacity="0.73" Stroke="Black" StrokeThickness="0.05"/>
+
+                                            <Path Data="{StaticResource PenCenterGeometry}"
+                                    Fill="Black" Stroke="Black" StrokeThickness="0.05"/>
+                                        </Grid>
+                                    </Viewbox>
+                                </RadioButton>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -92,8 +128,8 @@
                     <Button Content="Add Pen"
                     Command="{Binding AddPenCommand}"
                     Margin="1"/>
-                    
-            <RadioButton Content="Toggle Highlighter"
+
+                    <RadioButton Content="Toggle Highlighter"
                 IsChecked="{Binding CurrentPenModel.IsHighlighter, Mode=TwoWay}"
                 CommandParameter="True"
                 GroupName="Pens"
@@ -101,7 +137,7 @@
 
                 Margin="1"/>
 
-            </StackPanel>
+                </StackPanel>
 
                 <StackPanel 
                     Grid.Column="2"
@@ -111,30 +147,30 @@
                 CommandParameter="True"
                 Margin="1"/>
 
-            <Button 
+                    <Button 
                 Content="Redo"
                 Command="{Binding RedoCommand}"
                 Margin="1"/>
 
-            <Button 
+                    <Button 
                 
                 Content="Pen"
                 Command="{Binding TogglePenSettingsCommand}" 
                 Margin="1"/>
 
-            <Button 
+                    <Button 
                 Content="Zoom In" 
                 Command="{Binding ZoomInCommand}"
                 Margin="1"/>
 
-            <Button 
+                    <Button 
                 Content="Zoom Out" 
                 Command="{Binding ZoomOutCommand}"
                 Margin="1"/>
-            </StackPanel>
+                </StackPanel>
 
             </StackPanel>
-    </Grid>
+        </Grid>
         <Grid             
             Grid.Row="1"
             Background="Beige"

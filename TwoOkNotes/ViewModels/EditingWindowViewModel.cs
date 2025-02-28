@@ -93,6 +93,7 @@ namespace TwoOkNotes.ViewModels
             AddPenCommand = new RelayCommand(AddNewPen);
 
             CurrentPenModel.PenDeleted += OnPenDeleted;
+            CurrentPenModel.PenChanged += OnPenChanged;
 
             SaveNote();
             InitAutoSaveTimer();
@@ -257,6 +258,11 @@ namespace TwoOkNotes.ViewModels
         }
 
         private void OnPenDeleted(object? sender, EventArgs e)
+        {
+            PenModels = CurrentPenModel.GetAvailablePens();
+        }
+
+        private void OnPenChanged(object? sender, EventArgs e)
         {
             PenModels = CurrentPenModel.GetAvailablePens();
         }

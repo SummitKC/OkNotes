@@ -32,6 +32,7 @@ namespace TwoOkNotes.ViewModels
         private StrokeCollection _previewStrokes;
 
         public event EventHandler? PenDeleted;
+        public event EventHandler? PenChanged;
 
         public PenViewModel()
         {
@@ -133,6 +134,8 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(PenColor));
+                PenChanged?.Invoke(this, EventArgs.Empty);
+
             }
 
         }

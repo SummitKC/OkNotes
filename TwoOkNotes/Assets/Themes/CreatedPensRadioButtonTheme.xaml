@@ -7,13 +7,10 @@
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="RadioBorder"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="10"
                             BorderBrush="Black"
-                            BorderThickness="2"
-                            Padding="10"
-                            Margin="5"
-                            Height="30"
-                            Width="30">
+                            BorderThickness="1.5"
+                            Height="50"
+                            Width="50">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
 
