@@ -11,7 +11,9 @@
                             BorderBrush="Black"
                             BorderThickness="2"
                             Padding="10"
-                            Margin="5">
+                            Margin="5"
+                            Height="30"
+                            Width="30">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
 
