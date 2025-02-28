@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /mintty.exe.stackdump
 *.idf
+/TwoOkNotes/TempNoteFolder
