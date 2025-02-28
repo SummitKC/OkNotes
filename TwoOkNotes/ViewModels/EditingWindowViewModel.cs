@@ -441,11 +441,19 @@ namespace TwoOkNotes.ViewModels
         //When called the visivility of the pen settings will change to the opposite of what it is currently
         public void TogglePenSettings(object? obj)
         {
+            // If a pen key is provided, switch to that pen first
+            if (obj is string penKey)
+            {
+                CurrentPenModel.SwitchPen(penKey);
+            }
+            
+            // Toggle the pen settings panel
             IsPenSettingOpen = !IsPenSettingOpen;
         }
         public async void SaveWindowSettings()
         {
             await _settingsSercices.SaveEditingWindowSettings(_windowSettings);
         }
+
     }
 }

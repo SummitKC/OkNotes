@@ -7,7 +7,7 @@
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="RadioBorder"
                             Background="{TemplateBinding Background}"
-                            BorderBrush="Black"
+                            BorderBrush="#0000"
                             BorderThickness="1.5"
                             Height="50"
                             Width="50">

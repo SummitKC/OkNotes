@@ -133,8 +133,8 @@ namespace TwoOkNotes.ViewModels
                 _penSettings.PenColor = value;
                 SavePenSettings();
                 CreatePreviewStroke();
-                OnPropertyChanged(nameof(PenColor));
                 PenChanged?.Invoke(this, EventArgs.Empty);
+                OnPropertyChanged(nameof(PenColor));
 
             }
 
@@ -247,6 +247,7 @@ namespace TwoOkNotes.ViewModels
                 _penSettings.PenColor = color;
                 SavePenSettings();
                 CreatePreviewStroke();
+                OnPropertyChanged(nameof(PenColor));
             }
         }
 
