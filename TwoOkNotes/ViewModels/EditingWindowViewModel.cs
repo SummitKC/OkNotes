@@ -58,7 +58,6 @@ namespace TwoOkNotes.ViewModels
         public ICommand SwitchPagesCommand { get; }
         public ICommand SwitchPenCommand { get; }
         public ICommand AddPenCommand { get; }
-        public ICommand DeletePenCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, string filePath, string fileName)
         {
@@ -92,7 +91,8 @@ namespace TwoOkNotes.ViewModels
             SwitchPagesCommand = new RelayCommand(SwitchPages);
             SwitchPenCommand = new RelayCommand(SwitchPen);
             AddPenCommand = new RelayCommand(AddNewPen);
-            DeletePenCommand = new RelayCommand(DeletePen);
+
+            CurrentPenModel.PenDeleted += OnPenDeleted;
 
             SaveNote();
             InitAutoSaveTimer();
@@ -256,6 +256,11 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel.Strokes.StrokesChanged += Strokes_StrokesChanged;
         }
 
+        private void OnPenDeleted(object? sender, EventArgs e)
+        {
+            PenModels = CurrentPenModel.GetAvailablePens();
+        }
+
         // when event is triggered, check if strokes are added or removed, if so, save the note
         private void Strokes_StrokesChanged(object? sender, StrokeCollectionChangedEventArgs e)
         {
@@ -414,11 +419,6 @@ namespace TwoOkNotes.ViewModels
             {
                 CurrentPenModel.SwitchPen(penName);
             }
-        }
-        public void DeletePen(object? obj)
-        {
-            CurrentPenModel.DeletePen();
-            PenModels = CurrentPenModel.GetAvailablePens();
         }
 
         //Toggle the pen settings, and calls the OnPropertyChanged method when the state changes 
