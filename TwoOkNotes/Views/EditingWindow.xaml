@@ -67,8 +67,7 @@
                 Command="{Binding ToggleEraserCommand}"
                 CommandParameter="True"
                 GroupName="Pens"
-                                                             Style="{StaticResource CustomRadioButton}"
-
+                Style="{StaticResource CustomPenRadioButton}"
                 Margin="1"/>
 
                     <ItemsControl ItemsSource="{Binding PenModels}">
@@ -84,7 +83,7 @@
                                     Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding Key}"
                                     GroupName="Pens"
-                                    Style="{StaticResource CustomRadioButton}"
+                                    Style="{StaticResource CustomPenRadioButton}"
                                     Margin="1"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -98,7 +97,7 @@
                 IsChecked="{Binding CurrentPenModel.IsHighlighter, Mode=TwoWay}"
                 CommandParameter="True"
                 GroupName="Pens"
-                                                                      Style="{StaticResource CustomRadioButton}"
+                Style="{StaticResource CustomPenRadioButton}"
 
                 Margin="1"/>
 

@@ -12,9 +12,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Assets/Themes/LauncherButtonTheme.xaml"/>
                 <ResourceDictionary Source="Assets/Themes/LauncherComboBoxTheme.xaml"/>
-                <ResourceDictionary Source="Assets/Themes/ColorPickerRadioButtonTheme.xaml"/>
                 <ResourceDictionary Source="Assets/Themes/PenSettingsToggleButtonTheme.xaml"/>
                 <ResourceDictionary Source="Assets/Themes/SliderTheme.xaml"/>
+                <ResourceDictionary Source="Assets/Themes/CreatedPensRadioButtonTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
