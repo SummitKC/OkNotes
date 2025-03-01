@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="Assets/Themes/CreatedPensRadioButtonTheme.xaml"/>
                 <ResourceDictionary Source="Assets/Themes/ColorPickerRadioButtonTheme.xaml"/>
                 <ResourceDictionary Source="Assets/Themes/EditingWindowButtons.xaml"/>
+                <ResourceDictionary Source="Assets/Themes/SectionsAndPagesButtonThemes.xaml"/>
                 <ResourceDictionary Source="Assets/Images/PenIcon.xaml"/> 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

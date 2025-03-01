@@ -25,7 +25,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- The floating toolbar with updated button styles -->
         <Border Grid.Row="0" 
                 Background="#1c1c21"
                 CornerRadius="10"
@@ -50,7 +49,7 @@
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal">
 
-                    <!-- Navigation buttons -->
+                    <!-- Undo Redo -->
                     <Button Content="↩"
                             Command="{Binding UndoCommand}"
                             Style="{StaticResource NavigationButton}"
@@ -61,7 +60,7 @@
                             Style="{StaticResource NavigationButton}"
                             ToolTip="Redo"/>
 
-                    <!-- Zoom buttons moved after undo/redo -->
+                    <!-- Zoom buttons -->
                     <Button Content="🔍+"
                             Command="{Binding ZoomInCommand}"
                             Style="{StaticResource FloatingButton}"
@@ -85,7 +84,7 @@
                             ToolTip="Clear"/>
 
                     <StackPanel Orientation="Horizontal">
-                        <!-- Replaced pen eraser with emoji -->
+                        <!--  Eraser and Pens-->
                         <RadioButton Content="🧽"
                                     Command="{Binding ToggleEraserCommand}"
                                     CommandParameter="True"
@@ -105,13 +104,12 @@
                                 <DataTemplate>
                                     <!-- Container for pen and settings button -->
                                     <Grid>
-                                        <RadioButton
+                                        <RadioButton x:Name="PenRadioButton"
                     Command="{Binding DataContext.SwitchPenCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     CommandParameter="{Binding Key}"
                     GroupName="Pens"
                     Style="{StaticResource PenRadioButton}">
 
-                                            <!-- Grid to properly align contents -->
                                             <Grid>
                                                 <!-- Pen Icon -->
                                                 <Viewbox Width="50" Height="50" Stretch="Uniform" Margin="-16,-4,-13,0">
@@ -134,10 +132,12 @@
                                         <Button 
                     Style="{StaticResource PenSettingsButton}"
                     Command="{Binding DataContext.TogglePenSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding Key}"
                     Width="16" Height="16"
                     HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom"
-                    Margin="2"/>
+                    Margin="2"
+                    Visibility="{Binding IsChecked, ElementName=PenRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -174,7 +174,8 @@
                     Width="16" Height="16"
                     HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom"
-                    Margin="0,0,-12,0"/>
+                    Margin="0,0,-12,0"
+                    Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </Grid>
 
                         </RadioButton>
@@ -274,26 +275,29 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" 
-                  Background="#29182f"
-                  Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
-                  >
+                  Background="#252530"
+                  Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}">
 
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
                     <Button Command="{Binding DataContext.NewSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Width="200"
-                    Height="20"
-                     VerticalAlignment="Top">
-                        <TextBlock Text="New Section" />
+                        Style="{StaticResource AddNewButtonStyle}"
+                        Width="180">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="➕ " FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock Text="New Section" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
                     </Button>
                 </Grid>
 
+                <Border Grid.Row="1" Style="{StaticResource HorizontalDivider}"/>
 
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="2">
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Grid.Row="0"
                                   MaxHeight="1360">
@@ -308,96 +312,83 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel 
-                                            Orientation="Vertical"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top" Margin="10">
-                                        <Button Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                   CommandParameter="{Binding}"
-                   Width="100" 
-                   Height="20" 
-                   Background="#E6F7FA" 
-                   BorderThickness="2" 
-                   BorderBrush="#E6F7FA">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding}" 
-                              FontSize="10" 
-                              HorizontalAlignment="Center"/>
-                                            </StackPanel>
-                                        </Button>
-                                    </StackPanel>
-
+                                    <RadioButton Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Width="180" 
+                                                Height="Auto" 
+                                                Style="{StaticResource SecPagRadioButtons}" 
+                                                >
+                                        <Grid>
+                                            <TextBlock Text="{Binding}" 
+                                                    FontSize="12" 
+                                                    HorizontalAlignment="Center"
+                                                    TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </RadioButton>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
 
                         </ItemsControl>
-
                     </ScrollViewer>
                 </Grid>
             </Grid>
 
-            <StackPanel Grid.Column="1" Background="#1E1E1E"                   
-                     Visibility="{Binding IsPagesGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
->
+            <Grid Grid.Column="1" 
+                  Background="#2A2A38" 
+                  Visibility="{Binding IsPagesGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}">
 
-                <Grid Grid.Column="1" Background="#29182f">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0">
-                        <Button Command="{Binding DataContext.NewPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Width="200"
-                    Height="20"
-                     VerticalAlignment="Top">
-                            <TextBlock Text="New Page" />
-                        </Button>
-                    </Grid>
-
-
-                    <Grid Grid.Row="1">
-
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                            <ItemsControl ItemsSource="{Binding Pages, Mode = TwoWay}"
-                                  Grid.ColumnSpan="2">
-
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel 
-                                            Orientation="Vertical"
-                                            HorizontalAlignment="Center"
-                                            Margin="10">
-                                            <Button Command="{Binding DataContext.SwitchPagesCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                   CommandParameter="{Binding}"
-                                     Width="100" 
-                                     Height="20" 
-                                     Background="#E6F7FA" 
-                                     BorderThickness="2" 
-                                     BorderBrush="#E6F7FA">
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding}" 
-                                                    FontSize="10" 
-                                                    HorizontalAlignment="Center"/>
-                                                </StackPanel>
-                                            </Button>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                        </ScrollViewer>
-                    </Grid>
+                <Grid Grid.Row="0">
+                    <Button Command="{Binding DataContext.NewPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                           Style="{StaticResource AddNewButtonStyle}"
+                           Width="180">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="➕ " FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock Text="New Page" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                 </Grid>
-            </StackPanel>
+
+                <Border Grid.Row="1" Style="{StaticResource HorizontalDivider}"/>
+
+                <Grid Grid.Row="2">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Pages, Mode = TwoWay}"
+                                    Grid.ColumnSpan="2">
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <RadioButton Command="{Binding DataContext.SwitchPagesCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               CommandParameter="{Binding}"
+                                               Width="180" 
+                                               Height="Auto" 
+                                               Style="{StaticResource SecPagRadioButtons}" 
+                                               GroupName="PageButtons">
+                                        <Grid>
+                                            <TextBlock Text="{Binding}" 
+                                                      FontSize="12" 
+                                                      HorizontalAlignment="Center"
+                                                      TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </RadioButton>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Auto"
