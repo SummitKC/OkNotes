@@ -47,7 +47,8 @@
                                          Height="60" 
                                          Background="{Binding Converter={StaticResource ColorToBrushConverter}}" 
                                          Command="{Binding DataContext.SwitchColorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                         CommandParameter="{Binding}">
+                                         CommandParameter="{Binding}"
+                                         GroupName="Colors">
                                 <RadioButton.Style>
                                     <StaticResource ResourceKey="CustomRadioButton"/>
                                 </RadioButton.Style>
@@ -101,7 +102,8 @@
                               FontSize="16"
                               HorizontalContentAlignment="Center"
                               VerticalContentAlignment="Center"
-                              IsChecked="{Binding FitToCurve, Mode=TwoWay}">    
+                              IsChecked="{Binding FitToCurve, Mode=TwoWay}">
+                        
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                             <TextBlock TextAlignment="Center">Enable</TextBlock>
                             <TextBlock TextAlignment="Center">Smoothness</TextBlock>

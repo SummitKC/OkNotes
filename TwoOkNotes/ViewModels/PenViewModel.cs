@@ -244,10 +244,10 @@ namespace TwoOkNotes.ViewModels
         {
             if (obj is Color color)
             {
-                _penSettings.PenColor = color;
+                PenSettings.PenColor = color;
                 SavePenSettings();
                 CreatePreviewStroke();
-                OnPropertyChanged(nameof(PenColor));
+                PenChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
