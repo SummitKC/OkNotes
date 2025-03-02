@@ -18,7 +18,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
-    <Grid>
+    <Grid Background="#2f3134">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -206,75 +206,52 @@
             </Grid>
         </Border>
 
-        <Grid              Grid.Row="1"
-            Background="Beige"
-            >
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" MaxWidth="200"/>
-                <ColumnDefinition Width="Auto" MaxWidth="200"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <ToggleButton 
-             Grid.Column="0"
-             Content="☰"
-             IsChecked="{Binding IsSectionsGridVisible}"
-             Width="26"
-             Height="30"
-             Background="#2196F3"
-             Foreground="White"
-             FontSize="24"
-             HorizontalAlignment="Left"
-             VerticalAlignment="Top"
-             Panel.ZIndex="100"
-             BorderThickness="0"
-             Cursor="Hand">
-                <ToggleButton.Effect>
-                    <DropShadowEffect Color="Black" 
-                         BlurRadius="10" 
-                         ShadowDepth="4" 
-                         Direction="320" 
-                         Opacity="0.5"/>
-                </ToggleButton.Effect>
-            </ToggleButton>
-
-            <ToggleButton 
-             Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
-             Grid.Column="1"
-             Content="☰"
-             IsChecked="{Binding IsPagesGridVisible}"
-             Width="26"
-             Height="30"
-             Background="#2196F3"
-             Foreground="White"
-             FontSize="24"
-             HorizontalAlignment="Left"
-             VerticalAlignment="Top"
-             Panel.ZIndex="100"
-             BorderThickness="0"
-             Cursor="Hand">
-                <ToggleButton.Effect>
-                    <DropShadowEffect Color="Black" 
-                         BlurRadius="10" 
-                         ShadowDepth="4" 
-                         Direction="320" 
-                         Opacity="0.5"/>
-                </ToggleButton.Effect>
-            </ToggleButton>
-
-
-        </Grid>
 
         <Grid Grid.Row="2">
 
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto" MaxWidth="200"/>
                 <ColumnDefinition Width="Auto" MaxWidth="200"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" 
+            <Grid Background="#252530">
+                <Button Content="☰"
+                        Style="{StaticResource AddNewButtonStyle}"
+                        VerticalAlignment="Top" Margin="5,5,10,0"
+                        Command="{Binding ToggleVisibilityCommand}"
+                        Visibility="{Binding IsNoteBook, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!--<ToggleButton 
+      Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}"
+      Grid.Column="1"
+      Content="☰"
+      IsChecked="{Binding IsPagesGridVisible}"
+      Width="26"
+      Height="30"
+      Background="#2196F3"
+      Foreground="White"
+      FontSize="24"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Top"
+      Panel.ZIndex="100"
+      BorderThickness="0"
+      Cursor="Hand">
+                    <ToggleButton.Effect>
+                        <DropShadowEffect Color="Black" 
+                  BlurRadius="10" 
+                  ShadowDepth="4" 
+                  Direction="320" 
+                  Opacity="0.5"/>
+                    </ToggleButton.Effect>
+                </ToggleButton>-->
+
+            </Grid>
+
+
+            <Grid Grid.Column="1" 
                   Background="#252530"
                   Visibility="{Binding IsSectionsGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}">
 
@@ -317,13 +294,12 @@
                                                 Width="180" 
                                                 Height="Auto" 
                                                 Style="{StaticResource SecPagRadioButtons}" 
-                                                >
-                                        <Grid>
-                                            <TextBlock Text="{Binding}" 
+                                                GroupName="Sections"
+                                                 >
+                                        <TextBlock Text="{Binding}" 
                                                     FontSize="12" 
                                                     HorizontalAlignment="Center"
                                                     TextWrapping="Wrap"/>
-                                        </Grid>
                                     </RadioButton>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -333,7 +309,7 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Column="1" 
+            <Grid Grid.Column="2" 
                   Background="#2A2A38" 
                   Visibility="{Binding IsPagesGridVisible, Converter={StaticResource BooleanToCollapsedConverter}}">
 
@@ -392,7 +368,7 @@
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Auto"
-                          Grid.Column="2" 
+                          Grid.Column="3" 
                           Background="#2C2C2C">
 
                 <ContentControl Content="{Binding CurrentCanvasModel}"        
@@ -412,7 +388,7 @@
                Width="400" 
                Height="Auto" 
                Margin="0,0,1642,0"  
-               Grid.Column="2" />
+               Grid.Column="3" />
         </Grid>
 
     </Grid>

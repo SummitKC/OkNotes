@@ -34,6 +34,14 @@ namespace TwoOkNotes.ViewModels
         private ObservableCollection<KeyValuePair<string, PenModel>> _penModels;
         private bool isPageGridVisible;
         private bool isSectionGridVisible;
+        private bool _isNoteBook = true;
+        public int _visibilityIndex = 0;
+        private List<(bool section, bool page)> _visibilityStates = new List<(bool, bool)>
+        {
+            (true, true),
+            (true, false),
+            (false, false)
+        };
         public WindowSettings _windowSettings { get; set; }
         private FileSavingServices _savingServices { get; set; }
         private SettingsServices _settingsSercices { get; set; }
@@ -58,6 +66,7 @@ namespace TwoOkNotes.ViewModels
         public ICommand SwitchPagesCommand { get; }
         public ICommand SwitchPenCommand { get; }
         public ICommand AddPenCommand { get; }
+        public ICommand ToggleVisibilityCommand { get; }
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, string filePath, string fileName)
         {
@@ -91,6 +100,7 @@ namespace TwoOkNotes.ViewModels
             SwitchPagesCommand = new RelayCommand(SwitchPages);
             SwitchPenCommand = new RelayCommand(SwitchPen);
             AddPenCommand = new RelayCommand(AddNewPen);
+            ToggleVisibilityCommand = new RelayCommand(ToggleVisibility);
 
             CurrentPenModel.PenDeleted += OnPenDeleted;
             CurrentPenModel.PenChanged += OnPenChanged;
@@ -125,8 +135,7 @@ namespace TwoOkNotes.ViewModels
             }
             else
             {
-                Pages = new ObservableCollection<string>();
-                Pages.Add(_fileName);
+                _isNoteBook = false;
                 //TODO: Change this to toggle the visiability of the section grid to false
                 //      Also lock the toggle button for the section grid to false 
             }
@@ -164,6 +173,15 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        public bool IsNoteBook
+        {
+            get => _isNoteBook;
+            set
+            {
+                _isNoteBook = value;
+                OnPropertyChanged(nameof(IsNoteBook));
+            }
+        }
         public bool IsPagesGridVisible
         {
             get => isPageGridVisible;
@@ -213,6 +231,15 @@ namespace TwoOkNotes.ViewModels
                 _penModels = value;
                 OnPropertyChanged(nameof(PenModels));
             }
+        }
+
+        public void ToggleVisibility(object? obj)
+        {
+            if (_visibilityIndex > 2) _visibilityIndex = 0;
+            var visibilityState = _visibilityStates[_visibilityIndex];
+            IsSectionsGridVisible = visibilityState.section;
+            IsPagesGridVisible = visibilityState.page;
+            _visibilityIndex++;
         }
 
         //temp only to test move out of this class later 
@@ -399,6 +426,7 @@ namespace TwoOkNotes.ViewModels
                 currSection = section;
                 InitilizeSectionsAndPages();
                 SwitchPages(Pages[0]);
+                
             }
         }
         private async void SwitchPages(object? obj)
