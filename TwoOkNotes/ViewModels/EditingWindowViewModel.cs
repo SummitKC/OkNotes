@@ -122,23 +122,32 @@ namespace TwoOkNotes.ViewModels
 
         private async void InitilizeSectionsAndPages()
         {
+            await InitializeSections();
+            await InitializePages(currSection);
+        }
+
+        private async Task InitializeSections()
+        {
             var sectionsList = await _savingServices.GetNotebookMetadata(_fileName);
 
             if (sectionsList.Count > 0)
             {
                 Sections = new ObservableCollection<string>(sectionsList);
                 currSection = currSection ?? _sections[0];
-                string sectionToLoad = currSection;
-                var pagesList = await _savingServices.GetSectionMetadata(_fileName, sectionToLoad);
-                Pages = new ObservableCollection<string>(pagesList);
-
             }
             else
             {
                 _isNoteBook = false;
-                //TODO: Change this to toggle the visiability of the section grid to false
-                //      Also lock the toggle button for the section grid to false 
             }
+        }
+
+        private async Task InitializePages(string? sectionName)
+        {
+            if (string.IsNullOrEmpty(sectionName))
+                return;
+
+            var pagesList = await _savingServices.GetSectionMetadata(_fileName, sectionName);
+            Pages = new ObservableCollection<string>(pagesList);
         }
         
         public double WindowWidth
@@ -424,9 +433,11 @@ namespace TwoOkNotes.ViewModels
             if (obj is string section && section != currSection)
             {
                 currSection = section;
-                InitilizeSectionsAndPages();
-                SwitchPages(Pages[0]);
-                
+                _ = InitializePages(currSection);
+                if (Pages != null && Pages.Count > 0)
+                {
+                    SwitchPages(Pages[0]);
+                }
             }
         }
         private async void SwitchPages(object? obj)
