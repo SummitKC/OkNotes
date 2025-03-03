@@ -91,6 +91,8 @@ namespace TwoOkNotes.ViewModels
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(FitToCurve));
                 OnPropertyChanged(nameof(IgnorePreassure));
+                OnPropertyChanged(nameof(ThickNess));
+                OnPropertyChanged(nameof(Opacity)); 
             }
         }
 
@@ -122,6 +124,10 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(PenSettings));
+                OnPropertyChanged(nameof(FitToCurve));
+                OnPropertyChanged(nameof(IgnorePreassure));
+                OnPropertyChanged(nameof(ThickNess));
+                OnPropertyChanged(nameof(Opacity));
             }
         }
 
