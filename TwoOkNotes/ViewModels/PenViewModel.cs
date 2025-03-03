@@ -24,7 +24,7 @@ namespace TwoOkNotes.ViewModels
         private readonly SettingsServices _settingsServices;
         private PenModel _penSettings;
         private string _currentPenKey; 
-        public ObservableCollection<Color> ColorOptions { get; set; }
+        public ObservableCollection<Color>? ColorOptions { get; set; }
         private Dictionary<string, PenModel> _availablePens = new();
         public ICommand SwitchColorCommand { get; }
         public ICommand DeletePenCommand { get; }
@@ -45,10 +45,11 @@ namespace TwoOkNotes.ViewModels
             // Initialize with default pen
             _currentPenKey = _penSettings.Name;
             _availablePens[_currentPenKey] = _penSettings;
-            
-            InitializePenSettingsAsync();
-            CreatePreviewStroke();
+
             InitializeColorOptions();
+            _previewStrokes = new StrokeCollection();
+            CreatePreviewStroke();
+            InitializePenSettingsAsync();
         }
 
         private async void InitializePenSettingsAsync()
@@ -88,6 +89,8 @@ namespace TwoOkNotes.ViewModels
                     _currentPenKey = _penSettings.Name;
                 }
                 CreatePreviewStroke();
+                OnPropertyChanged(nameof(FitToCurve));
+                OnPropertyChanged(nameof(IgnorePreassure));
             }
         }
 
@@ -119,7 +122,6 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(PenSettings));
-
             }
         }
 
