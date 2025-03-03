@@ -100,6 +100,8 @@ namespace TwoOkNotes.ViewModels
         public ICommand CreatePageCommand { get; }
         public ICommand CancelPageCreationCommand { get; }
 
+        public ICommand CycleSortCommand { get; }
+
         private ObservableCollection<PageModel> _savedPages;
         public ObservableCollection<PageModel> SavedPages
         {
@@ -134,6 +136,7 @@ namespace TwoOkNotes.ViewModels
             LoadAFileCommand = new RelayCommand(FindAndLoadFile);           
 
             SortOptions = new List<string> { "Name", "Date"  };
+            SelectedSort = "Name";
         }
 
         //just gives a new canvas model
@@ -207,6 +210,7 @@ namespace TwoOkNotes.ViewModels
                 }
             }
         }
+
 
         //Icon's Getter and Setter
         public string ImagePath
