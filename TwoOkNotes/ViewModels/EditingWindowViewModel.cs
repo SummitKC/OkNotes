@@ -255,6 +255,7 @@ namespace TwoOkNotes.ViewModels
         private void DeleteNote(object? obj)
         {
             _savingServices.DeleteFile(currFilePath);
+            _ = InitializePages(currSection);
         }
 
         //Tick system for autosaving the note
@@ -462,6 +463,7 @@ namespace TwoOkNotes.ViewModels
         {
             if (obj is string penName)
             {
+                CurrentCanvasModel.SetInk(); 
                 CurrentPenModel.SwitchPen(penName);
             }
         }
