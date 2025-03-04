@@ -480,18 +480,14 @@ namespace TwoOkNotes.ViewModels
         private async void CreateNewPage(object? obj)
         {
             if (currSection == null) return;
-            
+
             int numPages = Pages.Count;
             string newPageName = $"NewPage{numPages + 1}.isf";
             if (await _savingServices.CreatePage(_fileName, currSection.Name, newPageName))
             {
-                InitilizeSectionsAndPages();
-                var newPages = await _savingServices.GetSectionMetadata(_fileName, currSection.Name);
-                var newPage = newPages.pages.FirstOrDefault(p => p.Name == newPageName);
-                if (newPage != null)
-                {
-                    SwitchPages(newPage);
-                }
+                var newPage = new NoteBookPage { Name = newPageName };
+                Pages.Add(newPage);
+                SwitchPages(newPage);
             }
             else Debug.WriteLine("Creating New Page");
         }
@@ -547,6 +543,7 @@ namespace TwoOkNotes.ViewModels
             else if (obj is NoteBookPage pageObj)
             {
                 newIndex = Pages.IndexOf(pageObj);
+                Debug.WriteLine(newIndex);
             }
 
             if (newIndex >= 0 && currSection != null)
