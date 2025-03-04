@@ -177,13 +177,13 @@ namespace TwoOkNotes.ViewModels
                 else
                 {
                     var notebookMetadata = await fileSavingServices.GetNotebookMetadata(item.Key);
-                    if (notebookMetadata.Count > 0)
+                    if (notebookMetadata.sections.Count > 0)
                     {
-                        NoteBookSection Section = notebookMetadata[0];
+                        NoteBookSection Section = notebookMetadata.sections[0];
                         var sectionMetadata = await fileSavingServices.GetSectionMetadata(item.Key, Section.Name);
-                        if (sectionMetadata.Count > 0)
+                        if (sectionMetadata.pages.Count > 0)
                         {
-                            NoteBookPage Page = sectionMetadata[0];
+                            NoteBookPage Page = sectionMetadata.pages[0];
                             string filePath = fileSavingServices.GetCurrFilePath(item.Key, Section.Name, Page.Name);
                             SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = filePath, LastUpdatedDate = item.Value.LastAccessTime });
                         }

@@ -15,11 +15,13 @@ namespace TwoOkNotes.Model
     public class NoteBookMetaData
     {
         public List<NoteBookSection> Sections { get; set; } = new();
+        public int ActiveSectionIndex { get; set; } = 0;
     }
 
     public class SectionMetaData 
     {
         public List<NoteBookPage> Pages { get; set; } = new();
+        public int ActivePageIndex { get; set; } = 0;
     }
 
 }

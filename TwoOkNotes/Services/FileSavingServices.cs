@@ -140,18 +140,18 @@ namespace TwoOkNotes.Services
             return false;
         }
 
-        public async Task<ObservableCollection<NoteBookSection>> GetNotebookMetadata(string notebookName)
+        public async Task<(ObservableCollection<NoteBookSection> sections, int activeIndex)> GetNotebookMetadata(string notebookName)
         {
             string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
             var metadata = await LoadMetadataAsync<NoteBookMetaData>(metadataFilePath);
-            return new ObservableCollection<NoteBookSection>(metadata.Sections);
+            return (new ObservableCollection<NoteBookSection>(metadata.Sections), metadata.ActiveSectionIndex);
         }
 
-        public async Task<ObservableCollection<NoteBookPage>> GetSectionMetadata(string notebookName, string sectionName)
+        public async Task<(ObservableCollection<NoteBookPage> pages, int activeIndex)> GetSectionMetadata(string notebookName, string sectionName)
         {
             string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
             var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
-            return new ObservableCollection<NoteBookPage>(metadata.Pages);
+            return (new ObservableCollection<NoteBookPage>(metadata.Pages), metadata.ActivePageIndex);
         }
 
         public string GetCurrFilePath(string? noteBookName, string? sectionName, string pageName)
@@ -314,6 +314,24 @@ namespace TwoOkNotes.Services
                 File.Delete(filePath);
 
             }
+        }
+
+        public async Task UpdateSectionMetadata(string notebookName, ObservableCollection<NoteBookSection> sections, int activeSectionIndex)
+        {
+            string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
+            var metadata = await LoadMetadataAsync<NoteBookMetaData>(metadataFilePath);
+            metadata.Sections = sections.ToList();
+            metadata.ActiveSectionIndex = activeSectionIndex;
+            await SaveMetadataAsync(metadata, metadataFilePath);
+        }
+
+        public async Task UpdatePageMetadata(string notebookName, string sectionName, ObservableCollection<NoteBookPage> pages, int activePageIndex)
+        {
+            string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
+            var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
+            metadata.Pages = pages.ToList();
+            metadata.ActivePageIndex = activePageIndex;
+            await SaveMetadataAsync(metadata, metadataFilePath);
         }
     }
 }

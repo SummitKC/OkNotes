@@ -45,6 +45,8 @@ namespace TwoOkNotes.ViewModels
         public WindowSettings _windowSettings { get; set; }
         private FileSavingServices _savingServices { get; set; }
         private SettingsServices _settingsSercices { get; set; }
+        private int _activeSectionIndex = 0;
+        private int _activePageIndex = 0;
 
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
@@ -128,12 +130,22 @@ namespace TwoOkNotes.ViewModels
 
         private async Task InitializeSections()
         {
-            var sectionsList = await _savingServices.GetNotebookMetadata(_fileName);
+            var result = await _savingServices.GetNotebookMetadata(_fileName);
 
-            if (sectionsList.Count > 0)
+            if (result.sections.Count > 0)
             {
-                Sections = sectionsList;
-                currSection = currSection ?? _sections[0];
+                Sections = result.sections;
+                // Use the stored active index
+                _activeSectionIndex = result.activeIndex;
+                
+                // Validate the index is within bounds
+                if (_activeSectionIndex < 0 || _activeSectionIndex >= Sections.Count)
+                    _activeSectionIndex = 0;
+                
+                currSection = _sections[_activeSectionIndex];
+                
+                // Update UI active states
+                UpdateSectionActiveState();
             }
             else
             {
@@ -146,8 +158,64 @@ namespace TwoOkNotes.ViewModels
             if (section == null)
                 return;
 
-            var pagesList = await _savingServices.GetSectionMetadata(_fileName, section.Name);
-            Pages = pagesList;
+            var result = await _savingServices.GetSectionMetadata(_fileName, section.Name);
+            Pages = result.pages;
+            
+            if (Pages.Count > 0)
+            {
+                // Use the stored active index
+                _activePageIndex = result.activeIndex;
+                
+                // Validate the index is within bounds
+                if (_activePageIndex < 0 || _activePageIndex >= Pages.Count)
+                    _activePageIndex = 0;
+                    
+                currPage = Pages[_activePageIndex];
+                
+                // Update UI active states
+                UpdatePageActiveState();
+                
+                await LoadPageContent(currPage);
+            }
+        }
+
+        private void UpdateSectionActiveState()
+        {
+            // Update IsActive flag based on current active index for UI
+            for (int i = 0; i < Sections.Count; i++)
+            {
+                Sections[i].IsActive = (i == _activeSectionIndex);
+            }
+        }
+
+        private void UpdatePageActiveState()
+        {
+            // Update IsActive flag based on current active index for UI
+            for (int i = 0; i < Pages.Count; i++)
+            {
+                Pages[i].IsActive = (i == _activePageIndex);
+            }
+        }
+
+        private async Task LoadPageContent(NoteBookPage page)
+        {
+            if (page != null && currSection != null)
+            {
+                // Deactivate current page if exists and different
+                if (currPage != null && currPage != page)
+                {
+                    currPage.IsActive = false;
+                }
+                
+                currPage = page;
+                currPage.IsActive = true;
+                
+                string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection.Name, currPage.Name);
+                currFilePath = updateFP;
+                var pageContent = await FileSavingServices.GetFileContents(updateFP);
+                CurrentCanvasModel.Strokes = pageContent;
+                SubscribeToStrokeEvents();
+            }
         }
         
         public double WindowWidth
@@ -419,7 +487,7 @@ namespace TwoOkNotes.ViewModels
             {
                 InitilizeSectionsAndPages();
                 var newPages = await _savingServices.GetSectionMetadata(_fileName, currSection.Name);
-                var newPage = newPages.FirstOrDefault(p => p.Name == newPageName);
+                var newPage = newPages.pages.FirstOrDefault(p => p.Name == newPageName);
                 if (newPage != null)
                 {
                     SwitchPages(newPage);
@@ -441,67 +509,61 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        private void SwitchSections(object? obj)
+        private async void SwitchSections(object? obj)
         {
-            NoteBookSection? section = null;
+            int newIndex = -1;
             
             if (obj is string sectionName)
             {
-                section = _sections.FirstOrDefault(s => s.Name == sectionName);
+                newIndex = Sections.ToList().FindIndex(s => s.Name == sectionName);
             }
             else if (obj is NoteBookSection secObj)
             {
-                section = secObj;
+                newIndex = Sections.IndexOf(secObj);
             }
 
-            if (section != null && section != currSection)
+            if (newIndex >= 0 && newIndex != _activeSectionIndex)
             {
-                // Deactivate current section if exists
-                if (currSection != null)
-                {
-                    currSection.IsActive = false;
-                }
+                _activeSectionIndex = newIndex;
+                currSection = Sections[_activeSectionIndex];
                 
-                currSection = section;
-                currSection.IsActive = true;
+                UpdateSectionActiveState();
+                
+                // Save metadata with updated active index
+                await _savingServices.UpdateSectionMetadata(_fileName, Sections, _activeSectionIndex);
                 
                 _ = InitializePages(currSection);
-                if (Pages != null && Pages.Count > 0)
-                {
-                    SwitchPages(Pages[0]);
-                }
             }
         }
 
         private async void SwitchPages(object? obj)
         {
-            NoteBookPage? page = null;
+            int newIndex = -1;
             
             if (obj is string pageName)
             {
-                page = _pages.FirstOrDefault(p => p.Name == pageName);
+                newIndex = Pages.ToList().FindIndex(p => p.Name == pageName);
             }
             else if (obj is NoteBookPage pageObj)
             {
-                page = pageObj;
+                newIndex = Pages.IndexOf(pageObj);
             }
 
-            if (page != null && currSection != null)
+            if (newIndex >= 0 && currSection != null)
             {
-                // Deactivate current page if exists
-                if (currPage != null)
-                {
-                    currPage.IsActive = false;
-                }
+                _activePageIndex = newIndex;
+                currPage = Pages[_activePageIndex];
                 
-                currPage = page;
-                currPage.IsActive = true;
+                UpdatePageActiveState();
                 
                 string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection.Name, currPage.Name);
                 currFilePath = updateFP;
                 var pageContent = await FileSavingServices.GetFileContents(updateFP);
                 CurrentCanvasModel.Strokes = pageContent;
                 SubscribeToStrokeEvents();
+                
+                // Save metadata with updated active index
+                await _savingServices.UpdatePageMetadata(_fileName, currSection.Name, Pages, _activePageIndex);
             }
         }
 
