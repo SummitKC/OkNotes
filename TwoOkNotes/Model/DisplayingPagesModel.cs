@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TwoOkNotes.Model
 {
-    public class PageModel
+    public class DisplayingPagesModel
     {
         public required string Name { get; set; }
         public required string FilePath { get; set; }

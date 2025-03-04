@@ -102,8 +102,8 @@ namespace TwoOkNotes.ViewModels
 
         public ICommand CycleSortCommand { get; }
 
-        private ObservableCollection<PageModel> _savedPages;
-        public ObservableCollection<PageModel> SavedPages
+        private ObservableCollection<DisplayingPagesModel> _savedPages;
+        public ObservableCollection<DisplayingPagesModel> SavedPages
         {
             get => _savedPages;
             set
@@ -117,7 +117,7 @@ namespace TwoOkNotes.ViewModels
         //Initilizing the command
         public HomeViewModel()
         {
-            SavedPages = new ObservableCollection<PageModel>();
+            SavedPages = new ObservableCollection<DisplayingPagesModel>();
             LoadSavedPages();
 
             IsNotebookInputVisible = false;
@@ -152,7 +152,7 @@ namespace TwoOkNotes.ViewModels
         //Create a new editingWindow and it's viewmodel, set it's data context to the viewmodel, so the window is binded to that instance of the viewmodel and loads it in the window
         private async void LoadCurrentFile(object? obj)
         {
-            if (obj is PageModel page)
+            if (obj is DisplayingPagesModel page)
             {
                 EditingWindow editingWindow = new();
                 editingWindow.Title = "Untitled";
@@ -172,20 +172,20 @@ namespace TwoOkNotes.ViewModels
             {
                 if (item.Value.type == "OrphanPage")
                 {
-                    SavedPages.Add(new PageModel { Name = item.Key, FilePath = item.Value.Fileapth, LastUpdatedDate = item.Value.LastAccessTime });
+                    SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = item.Value.Fileapth, LastUpdatedDate = item.Value.LastAccessTime });
                 }
                 else
                 {
                     var notebookMetadata = await fileSavingServices.GetNotebookMetadata(item.Key);
                     if (notebookMetadata.Count > 0)
                     {
-                        string Section = notebookMetadata[0];
-                        var sectionMetadata = await fileSavingServices.GetSectionMetadata(item.Key, Section);
+                        NoteBookSection Section = notebookMetadata[0];
+                        var sectionMetadata = await fileSavingServices.GetSectionMetadata(item.Key, Section.Name);
                         if (sectionMetadata.Count > 0)
                         {
-                            string Page = sectionMetadata[0];
-                            string filePath = fileSavingServices.GetCurrFilePath(item.Key, Section, Page);
-                            SavedPages.Add(new PageModel { Name = item.Key, FilePath = filePath, LastUpdatedDate = item.Value.LastAccessTime });
+                            NoteBookPage Page = sectionMetadata[0];
+                            string filePath = fileSavingServices.GetCurrFilePath(item.Key, Section.Name, Page.Name);
+                            SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = filePath, LastUpdatedDate = item.Value.LastAccessTime });
                         }
                     }
                 }
@@ -199,13 +199,13 @@ namespace TwoOkNotes.ViewModels
                 switch (sortOption)
                 {
                     case "Name":
-                        SavedPages = new ObservableCollection<PageModel>(SavedPages.OrderBy(x => x.Name));
+                        SavedPages = new ObservableCollection<DisplayingPagesModel>(SavedPages.OrderBy(x => x.Name));
                         break;
                     case "Date":
-                        SavedPages = new ObservableCollection<PageModel>(SavedPages.OrderBy(x => x.LastUpdatedDate));
+                        SavedPages = new ObservableCollection<DisplayingPagesModel>(SavedPages.OrderBy(x => x.LastUpdatedDate));
                         break;
                     default:
-                        SavedPages = new ObservableCollection<PageModel>(SavedPages.OrderBy(x => x.LastUpdatedDate));
+                        SavedPages = new ObservableCollection<DisplayingPagesModel>(SavedPages.OrderBy(x => x.LastUpdatedDate));
                         break;
                 }
             }

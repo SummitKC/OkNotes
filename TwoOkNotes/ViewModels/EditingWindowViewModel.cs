@@ -25,12 +25,12 @@ namespace TwoOkNotes.ViewModels
         private bool _isPenSettingOpen;
         private string _fileName;
         private string currFilePath;
-        private string? currSection;
-        private string? currPage;
+        private NoteBookSection? currSection;
+        private NoteBookPage? currPage;
         private readonly KeyHandler _keyHandler;
         private TimerHandler? _autoSaveTimer;
-        private ObservableCollection<string> _sections;
-        private ObservableCollection<string> _pages;
+        private ObservableCollection<NoteBookSection> _sections;
+        private ObservableCollection<NoteBookPage> _pages;
         private ObservableCollection<KeyValuePair<string, PenModel>> _penModels;
         private bool isPageGridVisible;
         private bool isSectionGridVisible;
@@ -132,7 +132,7 @@ namespace TwoOkNotes.ViewModels
 
             if (sectionsList.Count > 0)
             {
-                Sections = new ObservableCollection<string>(sectionsList);
+                Sections = sectionsList;
                 currSection = currSection ?? _sections[0];
             }
             else
@@ -141,13 +141,13 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        private async Task InitializePages(string? sectionName)
+        private async Task InitializePages(NoteBookSection? section)
         {
-            if (string.IsNullOrEmpty(sectionName))
+            if (section == null)
                 return;
 
-            var pagesList = await _savingServices.GetSectionMetadata(_fileName, sectionName);
-            Pages = new ObservableCollection<string>(pagesList);
+            var pagesList = await _savingServices.GetSectionMetadata(_fileName, section.Name);
+            Pages = pagesList;
         }
         
         public double WindowWidth
@@ -212,7 +212,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public ObservableCollection<string> Sections
+        public ObservableCollection<NoteBookSection> Sections
         {
             get => _sections;
             set
@@ -222,7 +222,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
-        public ObservableCollection<string> Pages
+        public ObservableCollection<NoteBookPage> Pages
         {
             get => _pages;
             set
@@ -411,11 +411,19 @@ namespace TwoOkNotes.ViewModels
 
         private async void CreateNewPage(object? obj)
         {
+            if (currSection == null) return;
+            
             int numPages = Pages.Count;
-            if (await _savingServices.CreatePage(_fileName, currSection, $"NewPage{numPages + 1}.isf"))
+            string newPageName = $"NewPage{numPages + 1}.isf";
+            if (await _savingServices.CreatePage(_fileName, currSection.Name, newPageName))
             {
                 InitilizeSectionsAndPages();
-                SwitchPages($"NewPage{numPages + 1}.isf");
+                var newPages = await _savingServices.GetSectionMetadata(_fileName, currSection.Name);
+                var newPage = newPages.FirstOrDefault(p => p.Name == newPageName);
+                if (newPage != null)
+                {
+                    SwitchPages(newPage);
+                }
             }
             else Debug.WriteLine("Creating New Page");
         }
@@ -423,17 +431,40 @@ namespace TwoOkNotes.ViewModels
         private async void CreateNewSection(object? obj)
         {
             int numSections = Sections.Count;
-            await _savingServices.CreateSection($"NewSection{numSections}", _fileName);
-            InitilizeSectionsAndPages();
-            SwitchSections($"NewSection{numSections}");
-
+            string newSectionName = $"NewSection{numSections}";
+            await _savingServices.CreateSection(newSectionName, _fileName);
+            await InitializeSections();
+            var newSection = _sections.FirstOrDefault(s => s.Name == newSectionName);
+            if (newSection != null)
+            {
+                SwitchSections(newSection);
+            }
         }
 
         private void SwitchSections(object? obj)
         {
-            if (obj is string section && section != currSection)
+            NoteBookSection? section = null;
+            
+            if (obj is string sectionName)
             {
+                section = _sections.FirstOrDefault(s => s.Name == sectionName);
+            }
+            else if (obj is NoteBookSection secObj)
+            {
+                section = secObj;
+            }
+
+            if (section != null && section != currSection)
+            {
+                // Deactivate current section if exists
+                if (currSection != null)
+                {
+                    currSection.IsActive = false;
+                }
+                
                 currSection = section;
+                currSection.IsActive = true;
+                
                 _ = InitializePages(currSection);
                 if (Pages != null && Pages.Count > 0)
                 {
@@ -441,12 +472,32 @@ namespace TwoOkNotes.ViewModels
                 }
             }
         }
+
         private async void SwitchPages(object? obj)
         {
-            if (obj is string page)
+            NoteBookPage? page = null;
+            
+            if (obj is string pageName)
             {
+                page = _pages.FirstOrDefault(p => p.Name == pageName);
+            }
+            else if (obj is NoteBookPage pageObj)
+            {
+                page = pageObj;
+            }
+
+            if (page != null && currSection != null)
+            {
+                // Deactivate current page if exists
+                if (currPage != null)
+                {
+                    currPage.IsActive = false;
+                }
+                
                 currPage = page;
-                string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection, currPage);
+                currPage.IsActive = true;
+                
+                string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection.Name, currPage.Name);
                 currFilePath = updateFP;
                 var pageContent = await FileSavingServices.GetFileContents(updateFP);
                 CurrentCanvasModel.Strokes = pageContent;

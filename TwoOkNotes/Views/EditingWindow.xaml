@@ -295,8 +295,9 @@
                                                 Height="Auto" 
                                                 Style="{StaticResource SecPagRadioButtons}" 
                                                 GroupName="Sections"
+                                                IsChecked="{Binding IsActive, Mode=TwoWay}" 
                                                  >
-                                        <TextBlock Text="{Binding}" 
+                                        <TextBlock Text="{Binding Name}" 
                                                     FontSize="12" 
                                                     HorizontalAlignment="Center"
                                                     TextWrapping="Wrap"/>
@@ -351,9 +352,11 @@
                                                Width="180" 
                                                Height="Auto" 
                                                Style="{StaticResource SecPagRadioButtons}" 
-                                               GroupName="PageButtons">
+                                               GroupName="PageButtons"
+                                               IsChecked="{Binding IsActive, Mode=TwoWay}"  
+                                                 >
                                         <Grid>
-                                            <TextBlock Text="{Binding}" 
+                                            <TextBlock Text="{Binding Name}" 
                                                       FontSize="12" 
                                                       HorizontalAlignment="Center"
                                                       TextWrapping="Wrap"/>
