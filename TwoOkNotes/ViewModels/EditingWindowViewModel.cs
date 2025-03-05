@@ -482,7 +482,7 @@ namespace TwoOkNotes.ViewModels
             if (currSection == null) return;
 
             int numPages = Pages.Count;
-            string newPageName = $"NewPage{numPages + 1}.isf";
+            string newPageName = $"Page {numPages + 1}.isf";
             if (await _savingServices.CreatePage(_fileName, currSection.Name, newPageName))
             {
                 var newPage = new NoteBookPage { Name = newPageName };
@@ -495,7 +495,7 @@ namespace TwoOkNotes.ViewModels
         private async void CreateNewSection(object? obj)
         {
             int numSections = Sections.Count;
-            string newSectionName = $"NewSection{numSections}";
+            string newSectionName = $"Section {numSections + 1}";
             await _savingServices.CreateSection(newSectionName, _fileName);
             await InitializeSections();
             var newSection = _sections.FirstOrDefault(s => s.Name == newSectionName);

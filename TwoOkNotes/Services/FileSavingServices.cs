@@ -83,7 +83,7 @@ namespace TwoOkNotes.Services
                     metadata.NoteBooks.Add(directoryName);
                 }
                 await SaveMetadataAsync(metadata, _globalMetaDataLocation);
-                bool sectionCreated = await CreateSection("Section1", directoryName);
+                bool sectionCreated = await CreateSection("Section 1", directoryName);
                 return sectionCreated;
             }
             return false;
@@ -103,7 +103,7 @@ namespace TwoOkNotes.Services
                     metadata.Sections.Add(new NoteBookSection { Name = sectionName });
                 }
                 await SaveMetadataAsync(metadata, metadataFilePath);
-                bool pageCreated = await CreatePage(notebookName, sectionName, "Page1.isf");
+                bool pageCreated = await CreatePage(notebookName, sectionName, "Page 1.isf");
                 return pageCreated;
             }
             return false; // Section already exists
