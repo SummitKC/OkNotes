@@ -15,7 +15,6 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <services:FileNameConverter x:Key="FileNameConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 

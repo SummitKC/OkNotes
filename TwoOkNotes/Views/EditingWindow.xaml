@@ -356,7 +356,7 @@
                                                IsChecked="{Binding IsActive, Mode=TwoWay}"  
                                                  >
                                         <Grid>
-                                            <TextBlock Text="{Binding Name}" 
+                                            <TextBlock Text="{Binding Name, Converter={StaticResource FileNameConverter}}" 
                                                       FontSize="12" 
                                                       HorizontalAlignment="Center"
                                                       TextWrapping="Wrap"/>

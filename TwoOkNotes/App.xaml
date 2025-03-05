@@ -9,6 +9,7 @@
         <ResourceDictionary>
             <converters:BooleanToCollapsedConverter x:Key="BooleanToCollapsedConverter" />
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+            <converters:FileNameConverter x:Key="FileNameConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Assets/Themes/LauncherButtonTheme.xaml"/>
                 <ResourceDictionary Source="Assets/Themes/LauncherComboBoxTheme.xaml"/>
