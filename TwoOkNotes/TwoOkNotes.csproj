@@ -9,12 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Assets\Fonts\**" />
+    <EmbeddedResource Remove="Assets\Fonts\**" />
+    <None Remove="Assets\Fonts\**" />
+    <Page Remove="Assets\Fonts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Remove="Assets\Themes\LauncherButtonTheme.xaml" />
     <Page Remove="Assets\Themes\LauncherComboBoxTheme.xaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\Fonts\" />
     <Folder Include="Assets\Images\" />
     <Folder Include="TempNoteFolder\" />
   </ItemGroup>

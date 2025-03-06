@@ -11,8 +11,12 @@
         KeyUp="Window_KeyUp"
         MouseWheel="Window_MouseWheel"
         Title="{Binding WindowTitle}" 
-        Height="1440" 
-        Width="2460">
+        Height="{Binding WindowHeight}" 
+        Width="{Binding WindowWidth}"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        BorderThickness="1"
+        BorderBrush="#333333">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -20,12 +24,30 @@
 
     <Grid Background="#2f3134">
         <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" 
+        <!-- Custom Title Bar -->
+        <Grid Grid.Row="0" Style="{StaticResource CustomTitleBar}" MouseDown="TitleBar_MouseDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="{Binding WindowTitle}" Style="{StaticResource WindowTitleText}"/>
+
+            <Button Grid.Column="2" Content="─" Style="{StaticResource MinimizeButton}" Click="MinimizeButton_Click"/>
+            <Button Grid.Column="3" Content="□" Style="{StaticResource MaximizeButton}" Click="MaximizeButton_Click"/>
+            <Button Grid.Column="4" Content="x" Style="{StaticResource CloseButton}" Click="CloseButton_Click"/>
+        </Grid>
+
+        <Border Grid.Row="1" 
                 Background="#1c1c21"
                 CornerRadius="10"
                 Margin="10"
@@ -48,6 +70,18 @@
 
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal">
+
+
+                    <StackPanel Orientation="Horizontal">
+
+                        <Button Content="💾"
+                                Command="{Binding SaveNoteCommand}"
+                                Style="{StaticResource FloatingButton}"
+                                ToolTip="Save"/>
+
+                    </StackPanel>
+
+                    <Rectangle Width="2" Height="30" Fill="Gray"/>
 
                     <!-- Undo Redo -->
                     <Button Content="↩"
@@ -72,7 +106,7 @@
                             ToolTip="Zoom Out"/>
 
                     <!-- Selection and Clear tools -->
-                    <Button Content="✓"
+                    <Button Content="👆"
                             Command="{Binding ToggleSelectionToolCommand}"
                             CommandParameter="True"
                             Style="{StaticResource FloatingButton}"
@@ -83,13 +117,16 @@
                             Style="{StaticResource FloatingButton}"
                             ToolTip="Clear"/>
 
+                    <Rectangle Width="2" Height="30" Fill="Gray"/>
+
                     <StackPanel Orientation="Horizontal">
                         <!--  Eraser and Pens-->
-                        <RadioButton Content="🧽"
+                        <RadioButton Content="🧼"
                                     Command="{Binding ToggleEraserCommand}"
                                     CommandParameter="True"
                                     GroupName="Pens"
-                                     Foreground="White"
+                                    Foreground="White"
+                                    FontSize="25"
                                     Style="{StaticResource PenRadioButton}"
                                     ToolTip="Eraser"/>
 
@@ -136,7 +173,7 @@
                     Width="16" Height="16"
                     HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom"
-                    Margin="2"
+                    Margin="2,0"
                     Visibility="{Binding IsChecked, ElementName=PenRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     </Grid>
                                 </DataTemplate>
@@ -154,28 +191,18 @@
                             <Grid>
                                 <Viewbox Width="50" Height="50" Stretch="Uniform" Margin="-16,-4,-13,0">
                                     <Grid>
-                                        <Path Data="{StaticResource PenBodyGeometry}"
+                                        <Path Data="{StaticResource HighlighterBodyGeometry}"
                       Fill="Yellow"
                       Stroke="Black" StrokeThickness="0.05"/>
 
-                                        <Path Data="{StaticResource PenTipGeometry}"
+                                        <Path Data="{StaticResource HighlighterTipGeometry}"
                       Fill="Yellow"
                       Opacity="0.73" Stroke="Black" StrokeThickness="0.05"/>
 
-                                        <Path Data="{StaticResource PenCenterGeometry}"
+                                        <Path Data="{StaticResource HighlighterCenterGeometry}"
                       Fill="Black" Stroke="Black" StrokeThickness="0.05"/>
                                     </Grid>
                                 </Viewbox>
-
-
-                                <Button 
-                    Style="{StaticResource PenSettingsButton}"
-                    Command="{Binding DataContext.TogglePenSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Width="16" Height="16"
-                    HorizontalAlignment="Right" 
-                    VerticalAlignment="Bottom"
-                    Margin="0,0,-12,0"
-                    Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </Grid>
 
                         </RadioButton>
@@ -189,26 +216,13 @@
 
 
                     </StackPanel>
-
-                    <StackPanel Orientation="Horizontal">
-
-                        <Button Content="💾"
-                                Command="{Binding SaveNoteCommand}"
-                                Style="{StaticResource FloatingButton}"
-                                ToolTip="Save"/>
-
-                        <Button Content="🗑️"
-                                Command="{Binding DeleteNoteCommand}"
-                                Style="{StaticResource FloatingButton}"
-                                ToolTip="Delete"/>
-                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
 
 
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -220,7 +234,9 @@
             <Grid Background="#252530">
                 <Button Content="☰"
                         Style="{StaticResource AddNewButtonStyle}"
-                        VerticalAlignment="Top" Margin="5,5,10,0"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Center"
+                        Margin="5,5,10,0"
                         Command="{Binding ToggleVisibilityCommand}"
                         Visibility="{Binding IsNoteBook, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
@@ -289,19 +305,86 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <RadioButton Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
-                                                Width="180" 
-                                                Height="Auto" 
-                                                Style="{StaticResource SecPagRadioButtons}" 
-                                                GroupName="Sections"
-                                                IsChecked="{Binding IsActive, Mode=TwoWay}" 
-                                                 >
-                                        <TextBlock Text="{Binding Name}" 
-                                                    FontSize="12" 
-                                                    HorizontalAlignment="Center"
-                                                    TextWrapping="Wrap"/>
-                                    </RadioButton>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <RadioButton Grid.Row="0"
+                                                    Command="{Binding DataContext.SwitchSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Width="180" 
+                                                    Height="Auto" 
+                                                    Style="{StaticResource SecPagRadioButtons}" 
+                                                    GroupName="Sections"
+                                                    IsChecked="{Binding IsActive, Mode=TwoWay}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0"
+                                                          Text="{Binding Name}" 
+                                                          FontSize="12" 
+                                                          HorizontalAlignment="Center"
+                                                          TextWrapping="Wrap"/>
+
+                                                <Button Grid.Column="1"
+                                                        Content="⋮" 
+                                                        Width="20" 
+                                                        Height="20" 
+                                                        Padding="0"
+                                                        Margin="2,0"
+                                                        FontSize="14"
+                                                        HorizontalAlignment="Right"
+                                                        Style="{StaticResource ContextMenuButtonStyle}"
+                                                        ToolTip="Options"
+                                                        x:Name="MenuButton">
+                                                    <Button.Triggers>
+                                                        <EventTrigger RoutedEvent="Button.Click">
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetName="SectionPopup" 
+                                                                                                   Storyboard.TargetProperty="IsOpen">
+                                                                        <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True"/>
+                                                                    </BooleanAnimationUsingKeyFrames>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Button.Triggers>
+                                                </Button>
+
+                                                <Popup x:Name="SectionPopup" 
+                                                       PlacementTarget="{Binding ElementName=MenuButton}" 
+                                                       Placement="Bottom" 
+                                                       StaysOpen="False">
+                                                    <Border Background="#2A2A38" 
+                                                            BorderBrush="#3A3A48" 
+                                                            BorderThickness="1" 
+                                                            CornerRadius="3">
+                                                        <StackPanel Orientation="Vertical" Margin="5">
+                                                            <Button Content="Rename" 
+                                                                    Width="100" 
+                                                                    Height="30" 
+                                                                    Margin="0,2"
+                                                                    Style="{StaticResource PopupMenuButton}"
+                                                                    Command="{Binding DataContext.RenameSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="Delete" 
+                                                                    Width="100" 
+                                                                    Height="30" 
+                                                                    Margin="0,2"
+                                                                    Style="{StaticResource PopupMenuButton}"
+                                                                    Command="{Binding DataContext.DeleteSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+                                        </RadioButton>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
 
@@ -347,21 +430,87 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <RadioButton Command="{Binding DataContext.SwitchPagesCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                               CommandParameter="{Binding}"
-                                               Width="180" 
-                                               Height="Auto" 
-                                               Style="{StaticResource SecPagRadioButtons}" 
-                                               GroupName="PageButtons"
-                                               IsChecked="{Binding IsActive, Mode=TwoWay}"  
-                                                 >
-                                        <Grid>
-                                            <TextBlock Text="{Binding Name, Converter={StaticResource FileNameConverter}}" 
-                                                      FontSize="12" 
-                                                      HorizontalAlignment="Center"
-                                                      TextWrapping="Wrap"/>
-                                        </Grid>
-                                    </RadioButton>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Normal display mode -->
+                                        <RadioButton Grid.Row="0"
+                                                    Command="{Binding DataContext.SwitchPagesCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Width="180" 
+                                                    Height="Auto" 
+                                                    Style="{StaticResource SecPagRadioButtons}" 
+                                                    GroupName="PageButtons"
+                                                    IsChecked="{Binding IsActive, Mode=TwoWay}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0"
+                                                          Text="{Binding Name, Converter={StaticResource FileNameConverter}}" 
+                                                          FontSize="12" 
+                                                          HorizontalAlignment="Center"
+                                                          TextWrapping="Wrap"/>
+
+                                                <Button Grid.Column="1"
+                                                        Content="⋮" 
+                                                        Width="20" 
+                                                        Height="20" 
+                                                        Padding="0"
+                                                        Margin="2,0"
+                                                        FontSize="14"
+                                                        HorizontalAlignment="Right"
+                                                        Style="{StaticResource ContextMenuButtonStyle}"
+                                                        ToolTip="Options"
+                                                        x:Name="PageMenuButton">
+                                                    <Button.Triggers>
+                                                        <EventTrigger RoutedEvent="Button.Click">
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetName="PagePopup" 
+                                                                                                   Storyboard.TargetProperty="IsOpen">
+                                                                        <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True"/>
+                                                                    </BooleanAnimationUsingKeyFrames>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Button.Triggers>
+                                                </Button>
+
+                                                <Popup x:Name="PagePopup" 
+                                                       PlacementTarget="{Binding ElementName=PageMenuButton}" 
+                                                       Placement="Bottom" 
+                                                       StaysOpen="False">
+                                                    <Border Background="#2A2A38" 
+                                                            BorderBrush="#3A3A48" 
+                                                            BorderThickness="1" 
+                                                            CornerRadius="3">
+                                                        <StackPanel Orientation="Vertical" Margin="5">
+                                                            <Button Content="Rename" 
+                                                                    Width="100" 
+                                                                    Height="30" 
+                                                                    Margin="0,2"
+                                                                    Style="{StaticResource PopupMenuButton}"
+                                                                    Command="{Binding DataContext.RenamePageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="Delete" 
+                                                                    Width="100" 
+                                                                    Height="30" 
+                                                                    Margin="0,2"
+                                                                    Style="{StaticResource PopupMenuButton}"
+                                                                    Command="{Binding DataContext.DeletePageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+                                        </RadioButton>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -373,25 +522,26 @@
                           HorizontalScrollBarVisibility="Auto"
                           Grid.Column="3" 
                           Background="#2C2C2C">
+                <ScrollViewer.Resources>
+                    <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource CustomScrollBarStyle}"/>
+                </ScrollViewer.Resources>
 
                 <ContentControl Content="{Binding CurrentCanvasModel}"        
                     Height="10000" 
                     Width="10000"  
-                    VerticalAlignment="Top"/>
-
+                    />
             </ScrollViewer>
 
-            <views:PenSettings 
-               DataContext="{Binding CurrentPenModel}"
-               Visibility="{Binding DataContext.IsPenSettingOpen, 
-                       RelativeSource={RelativeSource AncestorType=Window}, 
-                       Converter={StaticResource BooleanToVisibilityConverter}}"
-                 HorizontalAlignment="Right" 
-               VerticalAlignment="Top" 
-               Width="400" 
-               Height="Auto" 
-               Margin="0,0,1644,0"  
-               Grid.Column="3" />
+            <Popup IsOpen="{Binding IsPenSettingOpen}" 
+                   StaysOpen="False"
+                   Placement="Mouse"
+                   AllowsTransparency="True"
+                   PopupAnimation="Fade">
+                <views:PenSettings 
+                   DataContext="{Binding CurrentPenModel}"
+                   Height="Auto" 
+                   Width="400"/>
+            </Popup>
         </Grid>
 
     </Grid>

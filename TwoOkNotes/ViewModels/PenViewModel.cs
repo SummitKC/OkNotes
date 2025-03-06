@@ -171,6 +171,7 @@ namespace TwoOkNotes.ViewModels
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(Opacity));
+                PenChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -187,18 +188,46 @@ namespace TwoOkNotes.ViewModels
 
             }
         }
+
+        //InkCanvas Highlighter places the highlighter's strokes under previous strokes for 
         public bool IsHighlighter
         {
             get => _penSettings.IsHighlighter;
             set
             {
+                // Set the highlighter flag
                 _penSettings.IsHighlighter = value;
+
+                if (value)
+                {
+                    // Store original color and opacity when switching to highlighter
+                    if (!_penSettings.HasStoredPenSettings)
+                    {
+                        _penSettings.StoredColor = _penSettings.PenColor;
+                        _penSettings.StoredOpacity = _penSettings.Opacity;
+                        _penSettings.HasStoredPenSettings = true;
+                    }
+
+                    // Set to standard highlighter color (greenish yellow) with reduced opacity
+                    byte highlighterOpacity = 128; // 50% opacity
+                    _penSettings.PenColor = Color.FromArgb(highlighterOpacity, 255, 255, 102); // Yellow-green highlighter
+                    _penSettings.Opacity = highlighterOpacity;
+                }
+                // If turning highlighter off, restore original color and opacity
+                else if (_penSettings.HasStoredPenSettings)
+                {
+                    _penSettings.PenColor = _penSettings.StoredColor;
+                    _penSettings.Opacity = _penSettings.StoredOpacity;
+                    _penSettings.HasStoredPenSettings = false;
+                }
+
                 SavePenSettings();
                 CreatePreviewStroke();
                 OnPropertyChanged(nameof(IsHighlighter));
+                OnPropertyChanged(nameof(PenColor));
+                OnPropertyChanged(nameof(Opacity));
             }
         }
-
         public bool IgnorePreassure
         {
             get => _penSettings.IgnorePressure;

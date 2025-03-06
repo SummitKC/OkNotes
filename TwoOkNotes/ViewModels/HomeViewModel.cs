@@ -88,7 +88,6 @@ namespace TwoOkNotes.ViewModels
 
         //
         public ICommand LoadCurrentFileCommand { get; }
-        public ICommand LoadAFileCommand { get;  }
         public ICommand CreateAPageCommand { get; }
         public ICommand CreateANoteBookCommand { get; }
 
@@ -133,7 +132,6 @@ namespace TwoOkNotes.ViewModels
             CancelPageCreationCommand = new RelayCommand(CancelPageCreation);
 
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
-            LoadAFileCommand = new RelayCommand(FindAndLoadFile);           
 
             SortOptions = new List<string> { "Name", "Date"  };
             SelectedSort = "Name";
@@ -222,10 +220,6 @@ namespace TwoOkNotes.ViewModels
                 OnPropertyChanged(nameof(ImagePath));
             }
         }
-        private void FindAndLoadFile(object? obj)
-        {
-            string uFilePath = FileSavingServices.GetFilePathFromUser();
-        }
 
         //TODO: Move creating the file here
         private void OpenNewWindow(string name, string filePath)
@@ -259,7 +253,7 @@ namespace TwoOkNotes.ViewModels
             {
                 if (await fileSavingServices.CreateNotebook(notebookName))
                 {
-                    string filePath = fileSavingServices.GetCurrFilePath(notebookName, "Section1", "Page1.isf");
+                    string filePath = fileSavingServices.GetCurrFilePath(notebookName, "Section 1", "Page 1.isf");
                     OpenNewWindow(notebookName, filePath);
                     NewNotebookName = string.Empty;
                     IsNotebookInputVisible = false;

@@ -24,6 +24,9 @@ namespace TwoOkNotes.Model
         public bool IsHighlighter { get; set; } = false;
         public bool IgnorePressure { get; set; } = false;
         public bool FitToCurve { get; set; } = false;
+        public Color StoredColor { get; set; }
+        public byte StoredOpacity { get; set; } = 255;
+        public bool HasStoredPenSettings { get; set; } = false;
 
         public DrawingAttributes getdrawingattributes()
         {
@@ -34,7 +37,6 @@ namespace TwoOkNotes.Model
                 Width = Thickness,
                 Height = Thickness,
                 StylusTip = Tip,
-                IsHighlighter = IsHighlighter,
                 IgnorePressure = IgnorePressure,
                 FitToCurve = FitToCurve,
             };

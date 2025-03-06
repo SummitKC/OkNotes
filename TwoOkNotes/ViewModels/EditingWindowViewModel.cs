@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using TwoOkNotes.Services;
 using System.Collections.ObjectModel;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows;
 
 
 
@@ -47,13 +48,16 @@ namespace TwoOkNotes.ViewModels
         private SettingsServices _settingsSercices { get; set; }
         private int _activeSectionIndex = 0;
         private int _activePageIndex = 0;
+        
+        // Add properties for maximum window dimensions
+        public double MaxWindowWidth { get; private set; }
+        public double MaxWindowHeight { get; private set; }
 
         //List the current Canvas Model, and I commands for the buttons
         public CanvasModel CurrentCanvasModel { get; set; }
         public PenViewModel CurrentPenModel { get; set; }
         public ICommand SaveNoteCommand { get; }
         public ICommand ClearInkCommand { get; }
-        public ICommand DeleteNoteCommand { get; }
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
         public ICommand ToggleEraserCommand { get; }
@@ -69,14 +73,24 @@ namespace TwoOkNotes.ViewModels
         public ICommand SwitchPenCommand { get; }
         public ICommand AddPenCommand { get; }
         public ICommand ToggleVisibilityCommand { get; }
+        public ICommand RenameSectionCommand { get; }
+        public ICommand DeleteSectionCommand { get; }
+        public ICommand RenamePageCommand { get; }
+        public ICommand DeletePageCommand { get; }
+
         //Setting commands for the buttons and Initilizing the Canvas Model
         public EditingWIndowViewModel(CanvasModel _currentCanvasModel, string filePath, string fileName)
         {
-            //Metadata 
+            //Metadata and Settings 
             _savingServices = new FileSavingServices();
             _settingsSercices = new SettingsServices();
             _windowSettings = new WindowSettings();
 
+            // Initialize max window dimensions to the primary screen size
+            MaxWindowWidth = SystemParameters.PrimaryScreenWidth;
+            MaxWindowHeight = SystemParameters.PrimaryScreenHeight;
+
+            //Setting required things to models, or arguements being passed through 
             currFilePath = filePath;
             _fileName = fileName;
             CurrentCanvasModel = _currentCanvasModel;
@@ -85,8 +99,8 @@ namespace TwoOkNotes.ViewModels
             _penModels = CurrentPenModel.GetAvailablePens();
             _keyHandler = new KeyHandler(CurrentCanvasModel, CurrentPenModel, this);
 
+            //Initilizing the commands for the buttons
             ClearInkCommand = new RelayCommand(ClearInk);
-            DeleteNoteCommand = new RelayCommand(DeleteNote);
             UndoCommand = new RelayCommand(Undo);
             RedoCommand = new RelayCommand(Redo);
             TogglePenSettingsCommand = new RelayCommand(TogglePenSettings);
@@ -103,11 +117,16 @@ namespace TwoOkNotes.ViewModels
             SwitchPenCommand = new RelayCommand(SwitchPen);
             AddPenCommand = new RelayCommand(AddNewPen);
             ToggleVisibilityCommand = new RelayCommand(ToggleVisibility);
+            RenameSectionCommand = new RelayCommand(RenameSection);
+            DeleteSectionCommand = new RelayCommand(DeleteSection);
+            RenamePageCommand = new RelayCommand(RenamePage);
+            DeletePageCommand = new RelayCommand(DeletePage);
 
+            //Subscribing to the events for the pen model
             CurrentPenModel.PenDeleted += OnPenDeleted;
             CurrentPenModel.PenChanged += OnPenChanged;
 
-            SaveNote();
+            //Initilizing the window dimentions and pens                
             InitAutoSaveTimer();
             SubscribeToStrokeEvents();
             InitilizeWindowDimentionsAndPens();
@@ -115,6 +134,7 @@ namespace TwoOkNotes.ViewModels
 
         }
 
+        //Initilizing the window dimentions and pens
         private async void InitilizeWindowDimentionsAndPens()
         {
             _windowSettings = await _settingsSercices.LoadEditingWindowSettings();
@@ -122,12 +142,14 @@ namespace TwoOkNotes.ViewModels
             OnPropertyChanged(nameof(PenModels));
         }
 
+        //Initilizing the sections and pages
         private async void InitilizeSectionsAndPages()
         {
             await InitializeSections();
             await InitializePages(currSection);
         }
 
+        //Initilizing the sections
         private async Task InitializeSections()
         {
             var result = await _savingServices.GetNotebookMetadata(_fileName);
@@ -149,10 +171,12 @@ namespace TwoOkNotes.ViewModels
             }
             else
             {
+                //if it's not a note book, no need to add sections
                 _isNoteBook = false;
             }
         }
 
+        //Initilizing the pages
         private async Task InitializePages(NoteBookSection? section)
         {
             if (section == null)
@@ -179,6 +203,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Update the active state of the section to save to metadata so the user can begin where they left off last time
         private void UpdateSectionActiveState()
         {
             // Update IsActive flag based on current active index for UI
@@ -187,7 +212,8 @@ namespace TwoOkNotes.ViewModels
                 Sections[i].IsActive = (i == _activeSectionIndex);
             }
         }
-
+        
+        //Update the active state of the section to save to metadata so the user can begin where they left off last time
         private void UpdatePageActiveState()
         {
             // Update IsActive flag based on current active index for UI
@@ -197,6 +223,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Load the page content after switching 
         private async Task LoadPageContent(NoteBookPage page)
         {
             if (page != null && currSection != null)
@@ -206,24 +233,30 @@ namespace TwoOkNotes.ViewModels
                 {
                     currPage.IsActive = false;
                 }
-                
+                //Setting it's active flag to true for the Button Binding and 
                 currPage = page;
                 currPage.IsActive = true;
                 
                 string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection.Name, currPage.Name);
+                
+                // Update the current file path
                 currFilePath = updateFP;
+                
+                Debug.WriteLine($"Loading page from: {currFilePath}");
                 var pageContent = await FileSavingServices.GetFileContents(updateFP);
                 CurrentCanvasModel.Strokes = pageContent;
                 SubscribeToStrokeEvents();
             }
         }
-        
+
+        //Window Width and Height properties
         public double WindowWidth
         {
             get => _windowSettings._windowWidth;
             set
             {
-                _windowSettings._windowWidth = value;
+                // Ensure the window width doesn't exceed the screen width
+                _windowSettings._windowWidth = Math.Min(value, MaxWindowWidth);
                 OnPropertyChanged(nameof(WindowWidth));
                 SaveWindowSettings();
             }
@@ -234,7 +267,8 @@ namespace TwoOkNotes.ViewModels
             get => _windowSettings._windowHeight;
             set
             {
-                _windowSettings._windowHeight = value;
+                // Ensure the window height doesn't exceed the screen height
+                _windowSettings._windowHeight = Math.Min(value, MaxWindowHeight);
                 OnPropertyChanged(nameof(WindowHeight));
                 SaveWindowSettings();
             }
@@ -250,6 +284,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Setting the visibility of the toggle button that toggles the visibility of the sections and pages
         public bool IsNoteBook
         {
             get => _isNoteBook;
@@ -259,6 +294,7 @@ namespace TwoOkNotes.ViewModels
                 OnPropertyChanged(nameof(IsNoteBook));
             }
         }
+        //Page Visiability toggle button
         public bool IsPagesGridVisible
         {
             get => isPageGridVisible;
@@ -269,6 +305,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Section Visiability toggle button
         public bool IsSectionsGridVisible
         {
             get => isSectionGridVisible;
@@ -280,6 +317,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //List of the sections
         public ObservableCollection<NoteBookSection> Sections
         {
             get => _sections;
@@ -290,6 +328,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //List of the pages
         public ObservableCollection<NoteBookPage> Pages
         {
             get => _pages;
@@ -299,7 +338,7 @@ namespace TwoOkNotes.ViewModels
                 OnPropertyChanged(nameof(Pages));
             }
         }
-
+        //List of the pen models
         public ObservableCollection<KeyValuePair<string, PenModel>> PenModels
         {
             get => _penModels;
@@ -310,6 +349,7 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Cycle through the visibility states of the sections and pages
         public void ToggleVisibility(object? obj)
         {
             if (_visibilityIndex > 2) _visibilityIndex = 0;
@@ -319,12 +359,6 @@ namespace TwoOkNotes.ViewModels
             _visibilityIndex++;
         }
 
-        //temp only to test move out of this class later 
-        private void DeleteNote(object? obj)
-        {
-            _savingServices.DeleteFile(currFilePath);
-            _ = InitializePages(currSection);
-        }
 
         //Tick system for autosaving the note
         private void InitAutoSaveTimer()
@@ -339,17 +373,19 @@ namespace TwoOkNotes.ViewModels
             SaveNote();
         }
 
-        //
+        //On key down and key up events
         public void OnKeyDown(KeyEventArgs e)
         {
             _keyHandler.OnKeyDown(e);
         }
 
+        //On key up events
         public void OnKeyUp(KeyEventArgs e)
         {
             _keyHandler.OnKeyUp(e);
         }
 
+        //On mouse wheel events
         public void OnMouseWheel(MouseWheelEventArgs e)
         {
             _keyHandler.onMouseWheal(e);
@@ -362,11 +398,13 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel.Strokes.StrokesChanged += Strokes_StrokesChanged;
         }
 
+        //When a pen is deleted, update the pen models
         private void OnPenDeleted(object? sender, EventArgs e)
         {
             PenModels = CurrentPenModel.GetAvailablePens();
         }
 
+        //When a pen is changed, update the pen models
         private void OnPenChanged(object? sender, EventArgs e)
         {
             PenModels = CurrentPenModel.GetAvailablePens();
@@ -387,6 +425,8 @@ namespace TwoOkNotes.ViewModels
                 SaveNote();
             }
         }
+
+        //Save the note to the file
         private async void SaveNote()
         {
             using (MemoryStream ms = new MemoryStream())
@@ -477,14 +517,18 @@ namespace TwoOkNotes.ViewModels
             CurrentCanvasModel.ClearCanvas();
         }
 
+        //Create new page
         private async void CreateNewPage(object? obj)
         {
+            //Validate the current section
             if (currSection == null) return;
 
-            int numPages = Pages.Count;
-            string newPageName = $"Page {numPages + 1}.isf";
+            //Get a unique page name since pages now can be deleted, setting it to Page Length + 1 would confligt with the existing names and would not create new files
+            string newPageName = GenerateUniquePageName();
+            //Call the create page method from the saving services
             if (await _savingServices.CreatePage(_fileName, currSection.Name, newPageName))
             {
+                //Update the Page observable list Switch to the new page
                 var newPage = new NoteBookPage { Name = newPageName };
                 Pages.Add(newPage);
                 SwitchPages(newPage);
@@ -492,10 +536,10 @@ namespace TwoOkNotes.ViewModels
             else Debug.WriteLine("Creating New Page");
         }
 
+        //Create new section
         private async void CreateNewSection(object? obj)
         {
-            int numSections = Sections.Count;
-            string newSectionName = $"Section {numSections + 1}";
+            string newSectionName = GenerateUniqueSectionName();
             await _savingServices.CreateSection(newSectionName, _fileName);
             await InitializeSections();
             var newSection = _sections.FirstOrDefault(s => s.Name == newSectionName);
@@ -505,8 +549,58 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Generate a unique section name by checking the existing section names
+        private string GenerateUniqueSectionName()
+        {
+            int highestNumber = 0;
+            
+            // Regular expression to match "Section X" where X is a number
+            var regex = new System.Text.RegularExpressions.Regex(@"Section\s+(\d+)");
+            
+            foreach (var section in Sections)
+            {
+                var match = regex.Match(section.Name);
+                if (match.Success && int.TryParse(match.Groups[1].Value, out int number))
+                {
+                    if (number > highestNumber)
+                    {
+                        highestNumber = number;
+                    }
+                }
+            }
+            
+            return $"Section {highestNumber + 1}";
+        }
+
+        //Generate a unique page name by checking the existing page names
+        private string GenerateUniquePageName()
+        {
+            int highestNumber = 0;
+            
+            // Regular expression to match "Page X.isf" where X is a number
+            var regex = new System.Text.RegularExpressions.Regex(@"Page\s+(\d+)");
+            
+            foreach (var page in Pages)
+            {
+                // Extract the name without extension for comparison
+                string nameWithoutExt = Path.GetFileNameWithoutExtension(page.Name);
+                var match = regex.Match(nameWithoutExt);
+                if (match.Success && int.TryParse(match.Groups[1].Value, out int number))
+                {
+                    if (number > highestNumber)
+                    {
+                        highestNumber = number;
+                    }
+                }
+            }
+            
+            return $"Page {highestNumber + 1}.isf";
+        }
+
+        //Switch the sections
         private async void SwitchSections(object? obj)
         {
+            //Set the new index to -1 so if the incex is not found, it will not switch to another random page
             int newIndex = -1;
             
             if (obj is string sectionName)
@@ -518,8 +612,15 @@ namespace TwoOkNotes.ViewModels
                 newIndex = Sections.IndexOf(secObj);
             }
 
-            if (newIndex >= 0 && newIndex != _activeSectionIndex)
+            if (newIndex >= 0)
             {
+                // Save the current page content before switching
+                if (currSection != null && currPage != null)
+                {
+                    SaveNote();
+                }
+
+                // Deactivate current section if and activate and switch to the new one 
                 _activeSectionIndex = newIndex;
                 currSection = Sections[_activeSectionIndex];
                 
@@ -528,10 +629,12 @@ namespace TwoOkNotes.ViewModels
                 // Save metadata with updated active index
                 await _savingServices.UpdateSectionMetadata(_fileName, Sections, _activeSectionIndex);
                 
-                _ = InitializePages(currSection);
+                // Initialize pages with the new section
+                await InitializePages(currSection);
             }
         }
 
+        //Same as the switch sections but for the pages
         private async void SwitchPages(object? obj)
         {
             int newIndex = -1;
@@ -564,11 +667,14 @@ namespace TwoOkNotes.ViewModels
             }
         }
 
+        //Add a new pen to the pen models
         public void AddNewPen(object? obj)
         {
             CurrentPenModel.AddNewPen();
             PenModels = CurrentPenModel.GetAvailablePens();
         }
+
+        //Switch the pen
         public void SwitchPen(object? obj)
         {
             if (obj is string penName)
@@ -601,10 +707,207 @@ namespace TwoOkNotes.ViewModels
             // Toggle the pen settings panel
             IsPenSettingOpen = !IsPenSettingOpen;
         }
+
+        //Saving window settings 
         public async void SaveWindowSettings()
         {
             await _settingsSercices.SaveEditingWindowSettings(_windowSettings);
         }
 
+        //Rename the section
+        private async void RenameSection(object? parameter)
+        {
+            if (parameter is NoteBookSection section)
+            {
+                string oldName = section.Name;
+                
+                // Use the editing window as the owner instead of Application.Current.MainWindow
+                var dialog = new Views.RenameDialog(oldName);
+                
+                // Find the current EditingWindow to use as owner
+                Window? currentWindow = null;
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window is Views.EditingWindow)
+                    {
+                        currentWindow = window;
+                        break;
+                    }
+                }
+                
+                dialog.Owner = currentWindow;
+                
+                if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.NewName) && dialog.NewName != oldName)
+                {
+                    // Check if the section name already exists
+                    if (Sections.Any(s => s.Name.Equals(dialog.NewName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("A section with this name already exists. Please choose a different name.",
+                            "Name Already Exists", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    
+                    // Save current page content before renaming
+                    SaveNote();
+                    
+                    bool result = await _savingServices.RenameSection(_fileName, oldName, dialog.NewName);
+                    if (result)
+                    {
+                        // Store the current page name before refreshing
+                        string currentPageName = currPage?.Name ?? string.Empty;
+                        
+                        // Refresh sections and pages after rename
+                        InitilizeSectionsAndPages();
+                        
+                        // Find the renamed section and select it
+                        var renamedSection = _sections.FirstOrDefault(s => s.Name == dialog.NewName);
+                        if (renamedSection != null)
+                        {
+                            SwitchSections(renamedSection);
+                            
+                            // If we had an active page, try to reactivate it with the updated path
+                            if (!string.IsNullOrEmpty(currentPageName) && Pages.Any(p => p.Name == currentPageName))
+                            {
+                                var pageToSelect = Pages.First(p => p.Name == currentPageName);
+                                SwitchPages(pageToSelect);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to rename section. The name may be invalid or already exists.",
+                            "Rename Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+        }
+
+        private async void DeleteSection(object? parameter)
+        {
+
+            if (parameter is NoteBookSection section)
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    $"Are you sure you want to delete section '{section.Name}' and all its pages? This action cannot be undone.",
+                    "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                
+                if (result == MessageBoxResult.Yes)
+                {
+                    bool deleted = await _savingServices.DeleteSection(_fileName, section.Name);
+
+                    if (deleted)
+                    {
+                        InitilizeSectionsAndPages();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to delete section.",
+                            "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private async void RenamePage(object? parameter)
+        {
+            if (parameter is NoteBookPage page && currSection != null)
+            {
+                // Extract the page name without extension for display
+                string fileName = page.Name;
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+                
+                // Use the existing RenameDialog window
+                var dialog = new Views.RenameDialog(fileNameWithoutExt);
+                
+                // Find the current EditingWindow to use as owner
+                Window? currentWindow = null;
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window is Views.EditingWindow)
+                    {
+                        currentWindow = window;
+                        break;
+                    }
+                }
+                
+                dialog.Owner = currentWindow;
+                
+                if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.NewName) && dialog.NewName != fileNameWithoutExt)
+                {
+                    // Add .isf extension if needed
+                    string newNameWithExt = dialog.NewName.EndsWith(".isf", StringComparison.OrdinalIgnoreCase) 
+                        ? dialog.NewName : dialog.NewName + ".isf";
+                    
+                    // Check if the page name already exists in this section
+                    if (Pages.Any(p => p.Name.Equals(newNameWithExt, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("A page with this name already exists in this section. Please choose a different name.",
+                            "Name Already Exists", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                        
+                    bool result = await _savingServices.RenamePage(_fileName, currSection.Name, fileName, newNameWithExt);
+                    if (result)
+                    {
+                        // Save any pending changes to the current page before refreshing
+                        SaveNote();
+                        
+                        // Refresh pages after rename
+                        await InitializePages(currSection);
+                        
+                        // Find and select the renamed page
+                        var renamedPage = _pages.FirstOrDefault(p => p.Name == newNameWithExt);
+                        if (renamedPage != null)
+                        {
+                            SwitchPages(renamedPage);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to rename page. The name may be invalid or already exists.",
+                            "Rename Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+        }
+
+        private async void DeletePage(object? parameter)
+        {
+            if (parameter is NoteBookPage page && currSection != null)
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    $"Are you sure you want to delete page '{Path.GetFileNameWithoutExtension(page.Name)}'? This action cannot be undone.",
+                    "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                
+                if (result == MessageBoxResult.Yes)
+                {
+                    bool deleted = await _savingServices.DeletePage(_fileName, currSection.Name, page.Name);
+                    if (deleted)
+                    {
+                        await InitializePages(currSection);
+                        
+                        // If there are still pages, select the first one
+                        if (_pages.Count > 0)
+                        {
+                            SwitchPages(_pages[0]);
+                        }
+                        else
+                        {
+                            // No pages left, create a new one
+                            CreateNewPage(null);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to delete page.",
+                            "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
     }
 }
+
+
+

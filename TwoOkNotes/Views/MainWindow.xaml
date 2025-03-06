@@ -8,7 +8,10 @@
         mc:Ignorable="d"
         Height="600" Width="900"
         WindowStyle="None"
-        ResizeMode="NoResize">
+        AllowsTransparency="True"
+        BorderThickness="1"
+        BorderBrush="#333333"
+        ResizeMode="CanResize">
 
     <Window.DataContext>
         <local:HomeViewModel />
@@ -20,214 +23,266 @@
 
     <Border Background="#0F1117"
             CornerRadius="10">
-        <Grid Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="175"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="47"/>
-                <RowDefinition/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
-            <Border Grid.Column="1" 
-                    Background="#151621" 
-                    CornerRadius="6" 
-                    Width="150" 
-                    Height="36" 
-                    VerticalAlignment="Center" 
-                    HorizontalAlignment="Center">
-                <Border.Effect>
-                    <DropShadowEffect Color="#BB9AF7" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/>
-                </Border.Effect>
-                <TextBlock Text="TwoOkNotes"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"
-                           Foreground="#BB9AF7"
-                           FontSize="22"
-                           FontWeight="Bold"/>
-            </Border>
-
-            <Border Grid.Row="1" Background="#151621" Margin="1,31,5,10" CornerRadius="8">
-                <StackPanel>
-                    <RadioButton Content="Home"
-                                 Height="54"
-                                 Foreground="#BB9AF7"
-                                 FontSize="14"
-                                 Style="{StaticResource LauncherButtonTheme}"/>
-
-                    <RadioButton Content="Open File"
-                                 Height="50"
-                                 Foreground="#9D7CD8"
-                                 FontSize="14"
-                                 Style="{StaticResource LauncherButtonTheme}"
-                                 Command="{Binding LoadAFileCommand}"/>
-
-                    <RadioButton Content="New NoteBook"
-                                 Height="50"
-                                 Foreground="#9D7CD8"
-                                 FontSize="14"
-                                 Style="{StaticResource LauncherButtonTheme}"
-                                 Command="{Binding ToggleNotebookInputCommand }"/>
-
-                    <Grid Visibility="{Binding IsNotebookInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="10">
-                        <StackPanel>
-                            <TextBox Text="{Binding NewNotebookName, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="150"
-                                     Background="#0F1117"
-                                     Foreground="#C0CAF5"
-                                     BorderBrush="#464c59"
-                                     services:PlaceholderService.Placeholder="Enter notebook name" />
-
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                                <Button Content="Create" 
-                                        Command="{Binding CreateNotebookCommand}"
-                                        Style="{StaticResource AddNewButtonStyle}"
-                                        Width="70"
-                                        Height="30"
-                                        Margin="0,0,5,0"/>
-                                <Button Content="Cancel"
-                                        Command="{Binding CancelNotebookCreationCommand}"
-                                        Style="{StaticResource AddNewButtonStyle}"
-                                        Width="70"
-                                        Height="30"
-                                        Background="#555566"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-
-
-                    <RadioButton Content="New Page"
-                                 Height="50"
-                                 Foreground="#9D7CD8"
-                                 FontSize="14"
-                                 Style="{StaticResource LauncherButtonTheme}"
-                                 Command="{Binding TogglePageInputCommand}"/>
-
-                    <Grid Visibility="{Binding IsPageInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="10">
-                        <StackPanel>
-                            <TextBox Text="{Binding NewPageName, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="150"
-                                     Background="#0F1117"
-                                     Foreground="#C0CAF5"
-                                     BorderBrush="#40434b"
-                                     services:PlaceholderService.Placeholder="Enter page name" />
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                                <Button Content="Create"
-                                        Command="{Binding CreatePageCommand}"
-                                        Style="{StaticResource AddNewButtonStyle}"
-                                        Width="70"
-                                        Height="30"
-                                        Margin="0,0,5,0"/>
-                                <Button Content="Cancel"
-                                        Command="{Binding CancelPageCreationCommand}"
-                                        Style="{StaticResource AddNewButtonStyle}"
-                                        Width="70"
-                                        Height="30"
-                                        Background="#555566"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-
-                    <RadioButton Content="Exit"
-                                 Height="48"
-                                 Foreground="#9D7CD8"
-                                 FontSize="14"
-                                 Style="{StaticResource LauncherButtonTheme}"/>
-                </StackPanel>
-            </Border>
-
-            <Grid Grid.Column="1" Margin="10,30,10,10" Grid.Row="1">
-                <Grid Height="30" VerticalAlignment="Top">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <ComboBox ItemsSource="{Binding SortOptions}"
-                                  SelectedItem="{Binding SelectedSort}"
-                                  Width="100"
-                                  Style="{StaticResource LauncherComboBoxTheme}"
-                                  Margin="0,0,10,0"
-                                  ToolTip="Select sort method">
-                            <ComboBox.Resources>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#45ffffff"/>
-                                </Style>
-                            </ComboBox.Resources>
-                        </ComboBox>
-                    </StackPanel>
-                </Grid>
+            
+            <Grid Grid.Row="0" Style="{StaticResource CustomTitleBar}" MouseDown="TitleBar_MouseDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled"
-                              Margin="0,35,0,0">
+                <TextBlock Grid.Column="0" Text="TwoOkNotes" Style="{StaticResource WindowTitleText}"/>
+                
+                <Button Grid.Column="2" Content="─" Style="{StaticResource MinimizeButton}" Click="MinimizeButton_Click"/>
+                <Button Grid.Column="3" Content="□" Style="{StaticResource MaximizeButton}" Click="MaximizeButton_Click"/>
+                <Button Grid.Column="4" Content="x" Style="{StaticResource CloseButton}" Click="CloseButton_Click"/>
+            </Grid>
+            
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="47"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Column="1" 
+                        Background="#151621" 
+                        CornerRadius="6" 
+                        Width="150" 
+                        Height="36" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#BB9AF7" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/>
+                    </Border.Effect>
+                    <TextBlock Text="TwoOkNotes"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Foreground="#BB9AF7"
+                               FontSize="22"
+                               FontWeight="Bold"/>
+                </Border>
+
+                <Border Grid.Row="1" Background="#151621" Margin="1,31,5,10" CornerRadius="8">
+                    <StackPanel>
+
+
+                        <RadioButton Content="New NoteBook"
+                                     Height="50"
+                                     Foreground="#9D7CD8"
+                                     FontSize="14"
+                                     Style="{StaticResource LauncherButtonTheme}"
+                                     Command="{Binding ToggleNotebookInputCommand }"/>
+
+                        <RadioButton Content="New Page"
+                                     Height="50"
+                                     Foreground="#9D7CD8"
+                                     FontSize="14"
+                                     Style="{StaticResource LauncherButtonTheme}"
+                                     Command="{Binding TogglePageInputCommand}"/>
+
+                        <RadioButton Content="Exit"
+                                     Height="48"
+                                     Foreground="#9D7CD8"
+                                     FontSize="14"
+                                     Style="{StaticResource LauncherButtonTheme}"/>
+                    </StackPanel>
+                </Border>
+
+                <Grid Grid.Column="1" Margin="10,30,10,10" Grid.Row="1">
+                    <Grid Height="30" VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <ComboBox ItemsSource="{Binding SortOptions}"
+                                      SelectedItem="{Binding SelectedSort}"
+                                      Width="100"
+                                      Style="{StaticResource LauncherComboBoxTheme}"
+                                      Margin="0,0,10,0"
+                                      ToolTip="Select sort method">
+                                <ComboBox.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#45ffffff"/>
+                                    </Style>
+                                </ComboBox.Resources>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
                     
-                    <Border Background="#151621" CornerRadius="8">
-                        <ItemsControl ItemsSource="{Binding SavedPages, Mode=TwoWay}" 
-                                      Grid.ColumnSpan="2">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel HorizontalAlignment="Center"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel HorizontalAlignment="Center" Margin="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Margin="0,35,0,0">
+                        <ScrollViewer.Resources>
+                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource CustomScrollBarStyle}"/>
+                        </ScrollViewer.Resources>
+                        
+                        <Border Background="#151621" CornerRadius="8">
+                            <ItemsControl ItemsSource="{Binding SavedPages, Mode=TwoWay}" 
+                                          Grid.ColumnSpan="2">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel HorizontalAlignment="Center"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel HorizontalAlignment="Center" Margin="10">
 
-                                        <Button Command="{Binding DataContext.LoadCurrentFileCommand, 
-                                            RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}"
-                                            Width="100" 
-                                            Height="141" 
-                                            BorderThickness="1" 
-                                            Cursor="Hand">
-                                            <Button.Style>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Background" Value="#1A1B26"/>
-                                                    <Setter Property="BorderBrush" Value="#2D2D44"/>
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="Button">
-                                                                <Border Background="{TemplateBinding Background}"
-                                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                                                        CornerRadius="6">
-                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                                <ControlTemplate.Triggers>
-                                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter Property="Background" Value="#222331"/>
-                                                                        <Setter Property="BorderBrush" Value="#BB9AF7"/>
-                                                                    </Trigger>
-                                                                </ControlTemplate.Triggers>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </Button.Style>
-                                            <StackPanel>
-                                                <TextBlock Text="📄" 
-                                                           FontSize="100" 
-                                                           HorizontalAlignment="Center"
-                                                           Foreground="#2691d3"/>
-                                            </StackPanel>
-                                        </Button>
+                                            <Button Command="{Binding DataContext.LoadCurrentFileCommand, 
+                                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Width="100" 
+                                                Height="141" 
+                                                BorderThickness="1" 
+                                                Cursor="Hand">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Background" Value="#1A1B26"/>
+                                                        <Setter Property="BorderBrush" Value="#2D2D44"/>
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border Background="{TemplateBinding Background}"
+                                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                                            CornerRadius="6">
+                                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    </Border>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter Property="Background" Value="#222331"/>
+                                                                            <Setter Property="BorderBrush" Value="#BB9AF7"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                                <StackPanel>
+                                                    <TextBlock Text="📄" 
+                                                               FontSize="100" 
+                                                               HorizontalAlignment="Center"
+                                                               Foreground="#2691d3"/>
+                                                </StackPanel>
+                                            </Button>
 
-                                        <TextBlock Text="{Binding Name, Converter={StaticResource FileNameConverter}}"
-                                                   Foreground="#C0CAF5"
-                                                   FontSize="16" 
-                                                   HorizontalAlignment="Center" 
-                                                   TextAlignment="Center"
-                                                   Margin="5" 
-                                                   Height="50"
-                                                   Width="100"
-                                                   TextWrapping="Wrap"
-                                                   TextTrimming="CharacterEllipsis">
-                                        </TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                </ScrollViewer>
+                                            <TextBlock Text="{Binding Name, Converter={StaticResource FileNameConverter}}"
+                                                       Foreground="#C0CAF5"
+                                                       FontSize="16" 
+                                                       HorizontalAlignment="Center" 
+                                                       TextAlignment="Center"
+                                                       Margin="5" 
+                                                       Height="50"
+                                                       Width="100"
+                                                       TextWrapping="Wrap"
+                                                       TextTrimming="CharacterEllipsis">
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </ScrollViewer>
+                    
+                    <Grid Panel.ZIndex="100" Background="#80000000" 
+                          Visibility="{Binding IsNotebookInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border Background="#151621" 
+                                BorderBrush="#BB9AF7" 
+                                BorderThickness="1" 
+                                CornerRadius="8"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="300"
+                                Padding="20">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="0" Opacity="0.7"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Create New Notebook" 
+                                           Foreground="#BB9AF7" 
+                                           FontSize="18" 
+                                           FontWeight="Bold" 
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,15"/>
+                                <TextBox Text="{Binding NewNotebookName, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="200"
+                                         Background="#0F1117"
+                                         Foreground="#C0CAF5"
+                                         BorderBrush="#464c59"
+                                         services:PlaceholderService.Placeholder="Enter notebook name" />
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                                    <Button Content="Create" 
+                                            Command="{Binding CreateNotebookCommand}"
+                                            Style="{StaticResource AddNewButtonStyle}"
+                                            Width="70"
+                                            Height="30"
+                                            Margin="0,0,5,0"/>
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelNotebookCreationCommand}"
+                                            Style="{StaticResource AddNewButtonStyle}"
+                                            Width="70"
+                                            Height="30"
+                                            Background="#555566"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    
+                    <Grid Panel.ZIndex="100" Background="#80000000" 
+                          Visibility="{Binding IsPageInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border Background="#151621" 
+                                BorderBrush="#BB9AF7" 
+                                BorderThickness="1" 
+                                CornerRadius="8"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="300"
+                                Padding="20">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="0" Opacity="0.7"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Create New Page" 
+                                           Foreground="#BB9AF7" 
+                                           FontSize="18" 
+                                           FontWeight="Bold" 
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,15"/>
+                                <TextBox Text="{Binding NewPageName, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="200"
+                                         Background="#0F1117"
+                                         Foreground="#C0CAF5"
+                                         BorderBrush="#40434b"
+                                         services:PlaceholderService.Placeholder="Enter page name" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                                    <Button Content="Create"
+                                            Command="{Binding CreatePageCommand}"
+                                            Style="{StaticResource AddNewButtonStyle}"
+                                            Width="70"
+                                            Height="30"
+                                            Margin="0,0,5,0"/>
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelPageCreationCommand}"
+                                            Style="{StaticResource AddNewButtonStyle}"
+                                            Width="70"
+                                            Height="30"
+                                            Background="#555566"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     </Border>

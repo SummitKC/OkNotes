@@ -36,7 +36,7 @@ namespace TwoOkNotes.Services
 
             DefaultNotesStorage noteDir = JsonSerializer.Deserialize<DefaultNotesStorage>(File.ReadAllText(_defaultNotesDirectoryLocation));
             _notesDirectory = noteDir.DefaultFilePath;
-            
+
 
 
             _globalMetaDataLocation = Path.Combine(_notesDirectory, "GlobalMetaData.json");
@@ -57,7 +57,7 @@ namespace TwoOkNotes.Services
             {
                 DefaultNotesStorage defDirectoryPath = new()
                 {
-                    DefaultFilePath = GetDirectoryPathFromUser() 
+                    DefaultFilePath = GetDirectoryPathFromUser()
                 };
                 await SaveMetadataAsync(defDirectoryPath, filePath);
             }
@@ -156,7 +156,9 @@ namespace TwoOkNotes.Services
 
         public string GetCurrFilePath(string? noteBookName, string? sectionName, string pageName)
         {
-            return Path.Combine(_notesDirectory, noteBookName ?? "", sectionName ?? "", pageName);
+            string path = Path.Combine(_notesDirectory, noteBookName ?? "", sectionName ?? "", pageName);
+            Debug.WriteLine($"Generated file path: {path}");
+            return path;
         }
 
         //TODO: when maning is implemented change return type to bool for name repete check 
@@ -187,9 +189,9 @@ namespace TwoOkNotes.Services
                 await File.WriteAllBytesAsync(filePath, fileContent);
                 return true;
             }
-            catch (FileNotFoundException ) 
+            catch (FileNotFoundException)
             {
-                
+
                 return false;
             }
         }
@@ -207,7 +209,7 @@ namespace TwoOkNotes.Services
         }
 
         //TODO: Looks like this save and the 5 second timer are clashing 
-        private async Task SaveMetadataAsync<T>(T metaData, string filePath)
+        private static async Task SaveMetadataAsync<T>(T metaData, string filePath)
         {
             string json = JsonSerializer.Serialize(metaData, new JsonSerializerOptions { WriteIndented = true });
             int retryCount = 3;
@@ -263,11 +265,11 @@ namespace TwoOkNotes.Services
 
                 if (fileContent.Length > 0)
                 {
-                using (var memoryStream = new MemoryStream(fileContent))
-                {
-                    return new StrokeCollection(memoryStream);
+                    using (var memoryStream = new MemoryStream(fileContent))
+                    {
+                        return new StrokeCollection(memoryStream);
+                    }
                 }
-            }
             }
             return new StrokeCollection();
         }
@@ -332,6 +334,205 @@ namespace TwoOkNotes.Services
             metadata.Pages = pages.ToList();
             metadata.ActivePageIndex = activePageIndex;
             await SaveMetadataAsync(metadata, metadataFilePath);
+        }
+
+        public async Task<bool> DeleteSection(string notebookName, string sectionName)
+        {
+            try
+            {
+                string sectionPath = Path.Combine(_notesDirectory, notebookName, sectionName);
+                if (!Directory.Exists(sectionPath))
+                {
+                    Debug.WriteLine($"Section directory not found: {sectionPath}");
+                    return false;
+                }
+
+                string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
+                if (!File.Exists(metadataFilePath))
+                {
+                    Debug.WriteLine($"Notebook metadata file not found: {metadataFilePath}");
+                    return false;
+                }
+
+                // Load notebook metadata
+                var metadata = await LoadMetadataAsync<NoteBookMetaData>(metadataFilePath);
+
+                // Remove the section from the metadata
+                var sectionToRemove = metadata.Sections.FirstOrDefault(s => s.Name == sectionName);
+                if (sectionToRemove != null)
+                {
+                    metadata.Sections.Remove(sectionToRemove);
+                    // Adjust active section index if needed
+                    if (metadata.ActiveSectionIndex >= metadata.Sections.Count && metadata.Sections.Count > 0)
+                        metadata.ActiveSectionIndex = metadata.Sections.Count - 1;
+                    else if (metadata.Sections.Count == 0)
+                        metadata.ActiveSectionIndex = -1;
+
+                    await SaveMetadataAsync(metadata, metadataFilePath);
+                }
+
+                // Delete the directory and its contents
+                Directory.Delete(sectionPath, true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting section: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeletePage(string notebookName, string sectionName, string pageName)
+        {
+            try
+            {
+                string pagePath = Path.Combine(_notesDirectory, notebookName, sectionName, pageName);
+                if (!File.Exists(pagePath))
+                {
+                    Debug.WriteLine($"Page file not found: {pagePath}");
+                    return false;
+                }
+
+                string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
+                if (!File.Exists(metadataFilePath))
+                {
+                    Debug.WriteLine($"Section metadata file not found: {metadataFilePath}");
+                    return false;
+                }
+
+                // Load section metadata
+                var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
+
+                // Remove the page from the metadata
+                var pageToRemove = metadata.Pages.FirstOrDefault(p => p.Name == pageName);
+                if (pageToRemove != null)
+                {
+                    metadata.Pages.Remove(pageToRemove);
+                    // Adjust active page index if needed
+                    if (metadata.ActivePageIndex >= metadata.Pages.Count && metadata.Pages.Count > 0)
+                        metadata.ActivePageIndex = metadata.Pages.Count - 1;
+                    else if (metadata.Pages.Count == 0)
+                        metadata.ActivePageIndex = -1;
+
+                    await SaveMetadataAsync(metadata, metadataFilePath);
+                }
+
+                // Delete the file
+                File.Delete(pagePath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting page: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> RenameSection(string notebookName, string oldSectionName, string newSectionName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(newSectionName))
+                    return false;
+
+                string oldPath = Path.Combine(_notesDirectory, notebookName, oldSectionName);
+                if (!Directory.Exists(oldPath))
+                {
+                    Debug.WriteLine($"Section directory not found: {oldPath}");
+                    return false;
+                }
+
+                string newPath = Path.Combine(_notesDirectory, notebookName, newSectionName);
+                if (Directory.Exists(newPath))
+                {
+                    Debug.WriteLine($"Target section directory already exists: {newPath}");
+                    return false;
+                }
+
+                Debug.WriteLine($"Renaming section from '{oldPath}' to '{newPath}'");
+
+                string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
+                if (!File.Exists(metadataFilePath))
+                {
+                    Debug.WriteLine($"Notebook metadata file not found: {metadataFilePath}");
+                    return false;
+                }
+
+                // Load notebook metadata
+                var metadata = await LoadMetadataAsync<NoteBookMetaData>(metadataFilePath);
+
+                // Update section name in metadata
+                var sectionToUpdate = metadata.Sections.FirstOrDefault(s => s.Name == oldSectionName);
+                if (sectionToUpdate != null)
+                {
+                    sectionToUpdate.Name = newSectionName;
+                    await SaveMetadataAsync(metadata, metadataFilePath);
+                }
+
+                // Rename the directory
+                Directory.Move(oldPath, newPath);
+                Debug.WriteLine($"Section directory successfully renamed from '{oldSectionName}' to '{newSectionName}'");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error renaming section: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> RenamePage(string notebookName, string sectionName, string oldPageName, string newPageName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(newPageName))
+                    return false;
+
+                // Ensure the new name has the .isf extension
+                if (!newPageName.EndsWith(".isf", StringComparison.OrdinalIgnoreCase))
+                    newPageName += ".isf";
+
+                string oldPath = Path.Combine(_notesDirectory, notebookName, sectionName, oldPageName);
+                if (!File.Exists(oldPath))
+                {
+                    Debug.WriteLine($"Page file not found: {oldPath}");
+                    return false;
+                }
+
+                string newPath = Path.Combine(_notesDirectory, notebookName, sectionName, newPageName);
+                if (File.Exists(newPath))
+                {
+                    Debug.WriteLine($"Target page file already exists: {newPath}");
+                    return false;
+                }
+
+                string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
+                if (!File.Exists(metadataFilePath))
+                {
+                    Debug.WriteLine($"Section metadata file not found: {metadataFilePath}");
+                    return false;
+                }
+
+                // Load section metadata
+                var metadata = await LoadMetadataAsync<SectionMetaData>(metadataFilePath);
+
+                // Update page name in metadata
+                var pageToUpdate = metadata.Pages.FirstOrDefault(p => p.Name == oldPageName);
+                if (pageToUpdate != null)
+                {
+                    pageToUpdate.Name = newPageName;
+                    await SaveMetadataAsync(metadata, metadataFilePath);
+                }
+
+                // Rename the file
+                File.Move(oldPath, newPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error renaming page: {ex.Message}");
+                return false;
+            }
         }
     }
 }
