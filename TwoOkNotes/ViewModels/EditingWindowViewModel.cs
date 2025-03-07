@@ -396,7 +396,8 @@ namespace TwoOkNotes.ViewModels
         //On mouse wheel events
         public void OnMouseWheel(MouseWheelEventArgs e)
         {
-            _keyHandler.onMouseWheal(e);
+            // Mark the event as handled based on KeyHandler's return value
+            e.Handled = _keyHandler.OnMouseWheel(e);
         }
 
 

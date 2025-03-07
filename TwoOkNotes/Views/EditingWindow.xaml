@@ -521,7 +521,8 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Auto"
                           Grid.Column="3" 
-                          Background="#2C2C2C">
+                          Background="#2C2C2C"
+                          PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                 <ScrollViewer.Resources>
                     <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource CustomScrollBarStyle}"/>
                 </ScrollViewer.Resources>

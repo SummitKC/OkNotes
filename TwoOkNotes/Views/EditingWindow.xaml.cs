@@ -37,6 +37,20 @@ namespace TwoOkNotes.Views
             }
         }
 
+        // Add this method to handle the ScrollViewer's PreviewMouseWheel event
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // Check if Ctrl key is pressed
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                // Mark the event as handled to prevent the ScrollViewer from scrolling
+                e.Handled = true;
+                
+                // Forward the event to the window for zooming
+                Window_MouseWheel(sender, e);
+            }
+        }
+
         // Title bar event handlers
         private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
