@@ -22,7 +22,7 @@
     </Window.Resources>
 
     <Border Background="#0F1117"
-            CornerRadius="10">
+            >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
@@ -92,11 +92,13 @@
                                      Style="{StaticResource LauncherButtonTheme}"
                                      Command="{Binding TogglePageInputCommand}"/>
 
+                        
                         <RadioButton Content="Exit"
                                      Height="48"
                                      Foreground="#9D7CD8"
                                      FontSize="14"
-                                     Style="{StaticResource LauncherButtonTheme}"/>
+                                     Style="{StaticResource LauncherButtonTheme}"
+                                     Click="CloseButton_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -136,45 +138,97 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel HorizontalAlignment="Center" Margin="10">
+                                            <Grid>
+                                                <Button Command="{Binding DataContext.LoadCurrentFileCommand, 
+                                                        RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Width="100" 
+                                                        Height="150" 
+                                                        BorderThickness="1" 
+                                                        Cursor="Hand">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Background" Value="#1A1B26"/>
+                                                            <Setter Property="BorderBrush" Value="#2D2D44"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}"
+                                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                                CornerRadius="6">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                                <Setter Property="Background" Value="#222331"/>
+                                                                                <Setter Property="BorderBrush" Value="#BB9AF7"/>
+                                                                            </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </Button.Style>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Icon}" 
+                                                                   FontSize="100" 
+                                                                   HorizontalAlignment="Center"
+                                                                   Foreground="#2691d3"/>
+                                                    </StackPanel>
+                                                </Button>
 
-                                            <Button Command="{Binding DataContext.LoadCurrentFileCommand, 
-                                                RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
-                                                Width="100" 
-                                                Height="141" 
-                                                BorderThickness="1" 
-                                                Cursor="Hand">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Setter Property="Background" Value="#1A1B26"/>
-                                                        <Setter Property="BorderBrush" Value="#2D2D44"/>
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="Button">
-                                                                    <Border Background="{TemplateBinding Background}"
-                                                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                                            CornerRadius="6">
-                                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                    </Border>
-                                                                    <ControlTemplate.Triggers>
-                                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                                            <Setter Property="Background" Value="#222331"/>
-                                                                            <Setter Property="BorderBrush" Value="#BB9AF7"/>
-                                                                        </Trigger>
-                                                                    </ControlTemplate.Triggers>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Style>
-                                                </Button.Style>
-                                                <StackPanel>
-                                                    <TextBlock Text="📄" 
-                                                               FontSize="100" 
-                                                               HorizontalAlignment="Center"
-                                                               Foreground="#2691d3"/>
-                                                </StackPanel>
-                                            </Button>
+                                                <!-- Options button for context menu -->
+                                                <Button Content="⋮"
+                                                        Width="24"
+                                                        Height="24"
+                                                        Style="{StaticResource ContextMenuButtonStyle}"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        Margin="0,5,5,0"
+                                                        x:Name="ItemMenuButton">
+                                                    <Button.Triggers>
+                                                        <EventTrigger RoutedEvent="Button.Click">
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetName="ItemPopup" 
+                                                                                                   Storyboard.TargetProperty="IsOpen">
+                                                                        <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True"/>
+                                                                    </BooleanAnimationUsingKeyFrames>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Button.Triggers>
+                                                </Button>
+
+                                                <!-- Popup menu with rename and delete options -->
+                                                <Popup x:Name="ItemPopup" 
+                                                       PlacementTarget="{Binding ElementName=ItemMenuButton}" 
+                                                       Placement="Bottom" 
+                                                       StaysOpen="False">
+                                                    <Border Background="#2A2A38" 
+                                                            BorderBrush="#3A3A48" 
+                                                            BorderThickness="1" 
+                                                            CornerRadius="3">
+                                                        <StackPanel Orientation="Vertical" Margin="5">
+                                                            <Button Content="Rename" 
+                                                                    Width="100" 
+                                                                    Height="30" 
+                                                                    Margin="0,2"
+                                                                    Style="{StaticResource PopupMenuButton}"
+                                                                    Command="{Binding DataContext.RenameItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="Delete" 
+                                                                    Width="100" 
+                                                                    Height="30" 
+                                                                    Margin="0,2"
+                                                                    Style="{StaticResource PopupMenuButton}"
+                                                                    Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
 
                                             <TextBlock Text="{Binding Name, Converter={StaticResource FileNameConverter}}"
                                                        Foreground="#C0CAF5"

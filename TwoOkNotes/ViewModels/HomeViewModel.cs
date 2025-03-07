@@ -100,6 +100,10 @@ namespace TwoOkNotes.ViewModels
         public ICommand CancelPageCreationCommand { get; }
 
         public ICommand CycleSortCommand { get; }
+        
+        // New commands for rename and delete
+        public ICommand RenameItemCommand { get; }
+        public ICommand DeleteItemCommand { get; }
 
         private ObservableCollection<DisplayingPagesModel> _savedPages;
         public ObservableCollection<DisplayingPagesModel> SavedPages
@@ -132,6 +136,10 @@ namespace TwoOkNotes.ViewModels
             CancelPageCreationCommand = new RelayCommand(CancelPageCreation);
 
             LoadCurrentFileCommand = new RelayCommand(LoadCurrentFile);
+            
+            // Initialize new commands
+            RenameItemCommand = new RelayCommand(RenameItemAsync);
+            DeleteItemCommand = new RelayCommand(DeleteItemAsync);
 
             SortOptions = new List<string> { "Name", "Date"  };
             SelectedSort = "Name";
@@ -170,7 +178,7 @@ namespace TwoOkNotes.ViewModels
             {
                 if (item.Value.type == "OrphanPage")
                 {
-                    SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = item.Value.Fileapth, LastUpdatedDate = item.Value.LastAccessTime });
+                    SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = item.Value.Fileapth, LastUpdatedDate = item.Value.LastAccessTime, Icon = "📝" });
                 }
                 else
                 {
@@ -183,7 +191,7 @@ namespace TwoOkNotes.ViewModels
                         {
                             NoteBookPage Page = sectionMetadata.pages[0];
                             string filePath = fileSavingServices.GetCurrFilePath(item.Key, Section.Name, Page.Name);
-                            SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = filePath, LastUpdatedDate = item.Value.LastAccessTime });
+                            SavedPages.Add(new DisplayingPagesModel { Name = item.Key, FilePath = filePath, LastUpdatedDate = item.Value.LastAccessTime, Icon = "📒" });
                         }
                     }
                 }
@@ -306,6 +314,112 @@ namespace TwoOkNotes.ViewModels
             else
             {
                 MessageBox.Show("Please enter a page name.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // Rename a page or notebook
+        private async void RenameItemAsync(object? parameter)
+        {
+            if (parameter is DisplayingPagesModel item)
+            {
+                // Get the current item name without extension for display
+                string currentName = item.Name;
+                /*
+                 * Due to how it's set up earlier in developement, 
+                 * notebook's filepath is set to it's first page so it will have the .isf extension
+                 * while the page's file path is set up so the .isf will get added later on
+                 * making .isf check is the opposite of what it should be
+                 */
+                string itemType = item.FilePath.Contains(".isf") ? "notebook" : "page";
+                
+                // Create and configure the rename dialog
+                var dialog = new Views.RenameDialog(currentName);
+                
+                // Find the current window to use as owner
+                Window? currentWindow = Application.Current.MainWindow;
+                
+                dialog.Owner = currentWindow;
+                
+                if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.NewName) && dialog.NewName != currentName)
+                {
+                    // Check if name already exists
+                    if (SavedPages.Any(p => p.Name.Equals(dialog.NewName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show($"A {itemType} with this name already exists. Please choose a different name.",
+                            "Name Already Exists", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    
+                    bool result = false;
+                    
+                    // Determine if we're renaming a page or notebook
+                    if (itemType == "page")
+                    {
+                        // For orphan pages
+                        result = await fileSavingServices.RenameOrphanPage(currentName, dialog.NewName);
+                    }
+                    else
+                    {
+                        // For notebooks
+                        result = await fileSavingServices.RenameNotebook(currentName, dialog.NewName);
+                    }
+                    
+                    if (result)
+                    {
+                        LoadSavedPages(); // Refresh the list
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to rename {itemType}. The name may be invalid or already exists.",
+                            "Rename Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+        }
+
+        // Delete a page or notebook
+        private async void DeleteItemAsync(object? parameter)
+        {
+            if (parameter is DisplayingPagesModel item)
+            {
+                /*
+                * Due to how it's set up earlier in developement, 
+                * notebook's filepath is set to it's first page so it will have the .isf extension
+                * while the page's file path is set up so the .isf will get added later on
+                * making .isf check is the opposite of what it should be
+                */
+                string itemType = item.FilePath.Contains(".isf") ? "notebook" : "page";
+                
+                MessageBoxResult result = MessageBox.Show(
+                    $"Are you sure you want to delete {itemType} '{item.Name}'? This action cannot be undone.",
+                    "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                
+                if (result == MessageBoxResult.Yes)
+                {
+                    bool deleted = false;
+                    
+                    // Determine if we're deleting a page or notebook
+                    if (itemType == "page")
+                    {
+                        // For orphan pages
+                        deleted = await fileSavingServices.DeleteOrphanPage(item.Name);
+                    }
+                    else
+                    {
+                        // For notebooks
+                        deleted = await fileSavingServices.DeleteNotebook(item.Name);
+                    }
+                    
+                    if (deleted)
+                    {
+                        LoadSavedPages(); // Refresh the list
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to delete {itemType}.",
+                            "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }
         }
     }

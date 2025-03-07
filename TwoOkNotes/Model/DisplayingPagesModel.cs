@@ -11,5 +11,6 @@ namespace TwoOkNotes.Model
         public required string Name { get; set; }
         public required string FilePath { get; set; }
         public required DateTime LastUpdatedDate { get; set; }
+        public required string Icon { get; set; }
     }
 }

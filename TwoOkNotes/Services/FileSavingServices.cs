@@ -534,5 +534,157 @@ namespace TwoOkNotes.Services
                 return false;
             }
         }
+
+        public async Task<bool> DeleteNotebook(string notebookName)
+        {
+            try
+            {
+                string notebookPath = Path.Combine(_notesDirectory, notebookName);
+                if (!Directory.Exists(notebookPath))
+                {
+                    Debug.WriteLine($"Notebook directory not found: {notebookPath}");
+                    return false;
+                }
+
+                // Load global metadata
+                var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
+
+                // Remove the notebook from the metadata
+                if (metadata.NoteBooks.Contains(notebookName))
+                {
+                    metadata.NoteBooks.Remove(notebookName);
+                    await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                }
+
+                // Delete the directory and all its contents
+                Directory.Delete(notebookPath, true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting notebook: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> RenameNotebook(string oldName, string newName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(newName))
+                    return false;
+
+                string oldPath = Path.Combine(_notesDirectory, oldName);
+                if (!Directory.Exists(oldPath))
+                {
+                    Debug.WriteLine($"Notebook directory not found: {oldPath}");
+                    return false;
+                }
+
+                string newPath = Path.Combine(_notesDirectory, newName);
+                if (Directory.Exists(newPath))
+                {
+                    Debug.WriteLine($"Target notebook directory already exists: {newPath}");
+                    return false;
+                }
+
+                // Update notebook name in global metadata
+                var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
+                
+                if (metadata.NoteBooks.Contains(oldName))
+                {
+                    metadata.NoteBooks.Remove(oldName);
+                    metadata.NoteBooks.Add(newName);
+                    await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                }
+
+                // Rename the directory
+                Directory.Move(oldPath, newPath);
+                Debug.WriteLine($"Notebook directory successfully renamed from '{oldName}' to '{newName}'");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error renaming notebook: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteOrphanPage(string pageName)
+        {
+            try
+            {
+                string pagePath = Path.Combine(_notesDirectory, pageName);
+                if (!File.Exists(pagePath))
+                {
+                    Debug.WriteLine($"Orphan page not found: {pagePath}");
+                    return false;
+                }
+
+                // Update global metadata
+                var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
+                
+                if (metadata.OrphanPages.Contains(pageName))
+                {
+                    metadata.OrphanPages.Remove(pageName);
+                    await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                }
+
+                // Delete the file
+                File.Delete(pagePath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting orphan page: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> RenameOrphanPage(string oldName, string newName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(newName))
+                    return false;
+
+                // Ensure the new name has the .isf extension
+                if (!newName.EndsWith(".isf", StringComparison.OrdinalIgnoreCase))
+                    newName += ".isf";
+
+                string oldPath = Path.Combine(_notesDirectory, oldName);
+                if (!File.Exists(oldPath))
+                {
+                    Debug.WriteLine($"Orphan page not found: {oldPath}");
+                    return false;
+                }
+
+                string newPath = Path.Combine(_notesDirectory, newName);
+                if (File.Exists(newPath))
+                {
+                    Debug.WriteLine($"Target page already exists: {newPath}");
+                    return false;
+                }
+
+                // Update global metadata
+                var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
+                
+                if (metadata.OrphanPages.Contains(oldName))
+                {
+                    metadata.OrphanPages.Remove(oldName);
+                    metadata.OrphanPages.Add(newName);
+                    await SaveMetadataAsync(metadata, _globalMetaDataLocation);
+                }
+
+                // Rename the file
+                File.Move(oldPath, newPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error renaming orphan page: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

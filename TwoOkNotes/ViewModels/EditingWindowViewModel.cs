@@ -138,7 +138,15 @@ namespace TwoOkNotes.ViewModels
         private async void InitilizeWindowDimentionsAndPens()
         {
             _windowSettings = await _settingsSercices.LoadEditingWindowSettings();
+
             _penModels = CurrentPenModel.GetAvailablePens();
+            int attempts = 0;
+            while (attempts < 3)
+            {
+                await Task.Delay(200);
+                _penModels = CurrentPenModel.GetAvailablePens();
+                attempts++;
+            }
             OnPropertyChanged(nameof(PenModels));
         }
 
@@ -495,7 +503,7 @@ namespace TwoOkNotes.ViewModels
         {
             if (obj is string str && bool.TryParse(str, out bool isEraser))
             {
-                CurrentCanvasModel.SetEraser(isEraser, 0);
+                CurrentCanvasModel.SetEraser(isEraser, 1);
             }
         }
 
