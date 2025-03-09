@@ -41,7 +41,10 @@ A modern note-taking application with hierarchical organization, rich pen tools,
 - 50MB free disk space
 
 ### Installation
-- Soon. Running off .csproj for now
+- Go to [TwoOkNotesV1.0](https://github.com/SummitKC/OkNotes/releases/tag/v1.0) and download TwoOkNotesV1.0.zip. 
+- Extract the folder and open the extracted folder
+- Open the TwoOkNotes application. 
+
 
 ---
 
