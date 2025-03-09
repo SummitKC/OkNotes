@@ -820,6 +820,13 @@ namespace TwoOkNotes.ViewModels
                 
                 if (result == MessageBoxResult.Yes)
                 {
+                    if (Sections.Count == 1)
+                    {
+                        MessageBox.Show("Cannot delete the last section. A notebook must have at least one section.",
+                            "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     bool deleted = await _savingServices.DeleteSection(_fileName, section.Name);
 
                     if (deleted)
