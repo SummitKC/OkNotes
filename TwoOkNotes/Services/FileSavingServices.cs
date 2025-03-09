@@ -195,19 +195,19 @@ namespace TwoOkNotes.Services
                 }
                 catch (IOException ex)
                 {
-                    // If it's the last retry, return false
+                    MessageBox.Show($"IO error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                         return false;
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    // If it's the last retry, return false
+                    MessageBox.Show($"Access denied: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                         return false;
                 }
                 catch (Exception ex)
                 {
-                    // If it's the last retry, return false
+                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                         return false;
                 }
@@ -237,19 +237,19 @@ namespace TwoOkNotes.Services
                 }
                 catch (FileNotFoundException ex)
                 {
-                    // If it's the last retry, return false
+                    MessageBox.Show($"File not found: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                         return false;
                 }
                 catch (IOException ex)
                 {
-                    // If it's the last retry, return false
+                    MessageBox.Show($"IO error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                         return false;
                 }
                 catch (Exception ex)
                 {
-                    // If it's the last retry, return false
+                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                         return false;
                 }
@@ -279,6 +279,7 @@ namespace TwoOkNotes.Services
                         }
                         catch (JsonException ex)
                         {
+                            MessageBox.Show($"JSON error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             // Return a new instance if deserialization fails
                             return new T();
                         }
@@ -288,14 +289,17 @@ namespace TwoOkNotes.Services
             }
             catch (IOException ex)
             {
+                MessageBox.Show($"IO error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new T();
             }
             catch (UnauthorizedAccessException ex)
             {
+                MessageBox.Show($"Access denied: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new T();
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new T();
             }
         }
@@ -317,18 +321,21 @@ namespace TwoOkNotes.Services
                 }
                 catch (IOException ex)
                 {
+                    MessageBox.Show($"IO error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     // If it's the last retry, throw the exception
                     if (currentRetry == maxRetries)
                         throw;
                 }
                 catch (UnauthorizedAccessException ex)
                 {
+                    MessageBox.Show($"Access denied: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     // If it's the last retry, throw the exception
                     if (currentRetry == maxRetries)
                         throw;
                 }
                 catch (Exception ex)
                 {
+                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     // If it's the last retry, throw the exception
                     if (currentRetry == maxRetries)
                         throw;
@@ -396,18 +403,21 @@ namespace TwoOkNotes.Services
                 }
                 catch (IOException ex)
                 {
+                    MessageBox.Show($"IO error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     // If it's the last retry, return empty strokes
                     if (currentRetry == maxRetries)
                         return strokes;
                 }
                 catch (UnauthorizedAccessException ex)
                 {
+                    MessageBox.Show($"Access denied: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     // If it's the last retry, return empty strokes
                     if (currentRetry == maxRetries)
                         return strokes;
                 }
                 catch (Exception ex)
                 {
+                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     // If it's the last retry, return empty strokes
                     if (currentRetry == maxRetries)
                         return strokes;
@@ -470,14 +480,17 @@ namespace TwoOkNotes.Services
             }
             catch (IOException ex)
             {
+                MessageBox.Show($"IO error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 // Handle IO error silently
             }
             catch (UnauthorizedAccessException ex)
             {
+                MessageBox.Show($"Access denied: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 // Handle access denied silently
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 // Handle unexpected error silently
             }
         }
@@ -539,6 +552,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -582,6 +596,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -628,6 +643,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -678,6 +694,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -705,6 +722,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -745,6 +763,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -774,6 +793,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -817,6 +837,7 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }

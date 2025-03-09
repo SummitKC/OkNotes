@@ -9,6 +9,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using TwoOkNotes.Model;
 using System.Diagnostics;
+using System.Windows;
+
 namespace TwoOkNotes.Services
 {
     public class SettingsServices
@@ -29,15 +31,15 @@ namespace TwoOkNotes.Services
                     {
                         Directory.CreateDirectory(appFolder);
                     }
-                    catch (IOException ex)
+                    catch (IOException )
                     {
                         // Handle IO error silently
                     }
-                    catch (UnauthorizedAccessException ex)
+                    catch (UnauthorizedAccessException )
                     {
                         // Handle access denied silently
                     }
-                    catch (Exception ex)
+                    catch (Exception )
                     {
                         // Handle unexpected error silently
                     }
@@ -45,7 +47,7 @@ namespace TwoOkNotes.Services
                 _settingsFilePath = Path.Combine(appFolder, "PenSettings.json");
                 _windowSettingsPath = Path.Combine(appFolder, "WindowSettings.json");
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Fallback to default paths in case of error
                 _settingsFilePath = "PenSettings.json";
@@ -75,26 +77,26 @@ namespace TwoOkNotes.Services
                 }
                 catch (IOException ex)
                 {
-                    // If it's the last retry, just log the error
+                    MessageBox.Show($"IO error while saving settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                     {
-                        // Failed to save pen settings after multiple attempts
+                        // Failed to save settings after multiple attempts
                     }
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    // If it's the last retry, just log the error
+                    MessageBox.Show($"Access denied while saving settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                     {
-                        // Failed to save pen settings after multiple attempts
+                        // Failed to save settings after multiple attempts
                     }
                 }
                 catch (Exception ex)
                 {
-                    // If it's the last retry, just log the error
+                    MessageBox.Show($"Unexpected error while saving settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                     {
-                        // Failed to save pen settings after multiple attempts
+                        // Failed to save settings after multiple attempts
                     }
                 }
 
@@ -120,13 +122,13 @@ namespace TwoOkNotes.Services
                         {
                             return JsonSerializer.Deserialize<PenSettingsModel>(json) ?? new PenSettingsModel();
                         }
-                        catch (JsonException ex)
+                        catch (JsonException)
                         {
                             // Error deserializing pen settings JSON
                             return new PenSettingsModel();
                         }
                     }
-                    catch (IOException ex)
+                    catch (IOException )
                     {
                         // IO error while reading pen settings file
                         return new PenSettingsModel();
@@ -138,7 +140,7 @@ namespace TwoOkNotes.Services
                     return new PenSettingsModel();
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Unexpected error while loading pen settings
                 return new PenSettingsModel();
@@ -166,26 +168,26 @@ namespace TwoOkNotes.Services
                 }
                 catch (IOException ex)
                 {
-                    // If it's the last retry, just log the error
+                    MessageBox.Show($"IO error while saving settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                     {
-                        // Failed to save window settings after multiple attempts
+                        // Failed to save settings after multiple attempts
                     }
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    // If it's the last retry, just log the error
+                    MessageBox.Show($"Access denied while saving settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                     {
-                        // Failed to save window settings after multiple attempts
+                        // Failed to save settings after multiple attempts
                     }
                 }
                 catch (Exception ex)
                 {
-                    // If it's the last retry, just log the error
+                    MessageBox.Show($"Unexpected error while saving settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (currentRetry == maxRetries)
                     {
-                        // Failed to save window settings after multiple attempts
+                        // Failed to save settings after multiple attempts
                     }
                 }
 
@@ -211,13 +213,13 @@ namespace TwoOkNotes.Services
                         {
                             return JsonSerializer.Deserialize<WindowSettings>(json) ?? new WindowSettings();
                         }
-                        catch (JsonException ex)
+                        catch (JsonException )
                         {
                             // Error deserializing window settings JSON
                             return new WindowSettings();
                         }
                     }
-                    catch (IOException ex)
+                    catch (IOException )
                     {
                         // IO error while reading window settings file
                         return new WindowSettings();
@@ -229,7 +231,7 @@ namespace TwoOkNotes.Services
                     return new WindowSettings();
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Unexpected error while loading window settings
                 return new WindowSettings();

@@ -129,8 +129,8 @@ namespace TwoOkNotes.ViewModels
             //Initilizing the window dimentions and pens                
             InitAutoSaveTimer();
             SubscribeToStrokeEvents();
-            InitilizeWindowDimentionsAndPens();
             InitilizeSectionsAndPages();
+            InitilizeWindowDimentionsAndPens();
 
         }
 
@@ -259,7 +259,7 @@ namespace TwoOkNotes.ViewModels
             }
             catch (Exception ex)
             {
-                // Error loading page content
+                MessageBox.Show($"Error loading page content: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -460,7 +460,7 @@ namespace TwoOkNotes.ViewModels
             }
             catch (Exception ex)
             {
-                // Error saving note
+                MessageBox.Show($"Error saving note: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -628,50 +628,37 @@ namespace TwoOkNotes.ViewModels
         //Switch the sections
         private async void SwitchSections(object? obj)
         {
-            if (obj is NoteBookSection section)
+            //Set the new index to -1 so if the incex is not found, it will not switch to another random page
+            int newIndex = -1;
+
+            if (obj is string sectionName)
             {
-                // If the section is already active, do nothing
-                if (section.IsActive)
-                    return;
+                newIndex = Sections.ToList().FindIndex(s => s.Name == sectionName);
+            }
+            else if (obj is NoteBookSection secObj)
+            {
+                newIndex = Sections.IndexOf(secObj);
+            }
 
-                // Save current page content before switching
-                SaveNote();
-
-                // Find the index of the section in the collection
-                int newIndex = Sections.IndexOf(section);
-                if (newIndex != -1)
+            if (newIndex >= 0)
+            {
+                // Save the current page content before switching
+                if (currSection != null && currPage != null)
                 {
-                    // Update the active section index
-                    _activeSectionIndex = newIndex;
-                    UpdateSectionActiveState();
-
-                    // Update the current section
-                    currSection = section;
-
-                    // Load pages for the new section
-                    await InitializePages(section);
-
-                    // If there are pages, select the active one
-                    if (Pages.Count > 0)
-                    {
-                        var activePage = Pages.FirstOrDefault(p => p.IsActive);
-                        if (activePage != null)
-                        {
-                            await LoadPageContent(activePage);
-                        }
-                        else if (_activePageIndex >= 0 && _activePageIndex < Pages.Count)
-                        {
-                            await LoadPageContent(Pages[_activePageIndex]);
-                        }
-                        else
-                        {
-                            await LoadPageContent(Pages[0]);
-                        }
-                    }
-
-                    // Save the updated section metadata
-                    await _savingServices.UpdateSectionMetadata(_fileName, Sections, _activeSectionIndex);
+                    SaveNote();
                 }
+
+                // Deactivate current section if and activate and switch to the new one 
+                _activeSectionIndex = newIndex;
+                currSection = Sections[_activeSectionIndex];
+
+                UpdateSectionActiveState();
+
+                // Save metadata with updated active index
+                await _savingServices.UpdateSectionMetadata(_fileName, Sections, _activeSectionIndex);
+
+                // Initialize pages with the new section
+                await InitializePages(currSection);
             }
         }
 
@@ -929,7 +916,7 @@ namespace TwoOkNotes.ViewModels
                         // If there are still pages, select the first one
                         if (_pages.Count > 0)
                         {
-                            SwitchPages(_pages[0]);
+                            SwitchPages(_pages[_pages.Count-1]);
                         }
                         else
                         {
