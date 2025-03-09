@@ -234,26 +234,32 @@ namespace TwoOkNotes.ViewModels
         //Load the page content after switching 
         private async Task LoadPageContent(NoteBookPage page)
         {
-            if (page != null && currSection != null)
+            try
             {
-                // Deactivate current page if exists and different
-                if (currPage != null && currPage != page)
+                if (page != null && currSection != null)
                 {
-                    currPage.IsActive = false;
+                    // Deactivate current page if exists and different
+                    if (currPage != null && currPage != page)
+                    {
+                        currPage.IsActive = false;
+                    }
+                    //Setting it's active flag to true for the Button Binding and 
+                    currPage = page;
+                    currPage.IsActive = true;
+                    
+                    string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection.Name, currPage.Name);
+                    
+                    // Update the current file path
+                    currFilePath = updateFP;
+                    
+                    var pageContent = await FileSavingServices.GetFileContents(updateFP);
+                    CurrentCanvasModel.Strokes = pageContent;
+                    SubscribeToStrokeEvents();
                 }
-                //Setting it's active flag to true for the Button Binding and 
-                currPage = page;
-                currPage.IsActive = true;
-                
-                string updateFP = _savingServices.GetCurrFilePath(_fileName, currSection.Name, currPage.Name);
-                
-                // Update the current file path
-                currFilePath = updateFP;
-                
-                Debug.WriteLine($"Loading page from: {currFilePath}");
-                var pageContent = await FileSavingServices.GetFileContents(updateFP);
-                CurrentCanvasModel.Strokes = pageContent;
-                SubscribeToStrokeEvents();
+            }
+            catch (Exception ex)
+            {
+                // Error loading page content
             }
         }
 
@@ -438,11 +444,23 @@ namespace TwoOkNotes.ViewModels
         //Save the note to the file
         private async void SaveNote()
         {
-            using (MemoryStream ms = new MemoryStream())
+            try
             {
-                CurrentCanvasModel.Strokes.Save(ms);
-                byte[] fileContent = ms.ToArray();
-                await FileSavingServices.SaveFileAsync(currFilePath, fileContent);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    CurrentCanvasModel.Strokes.Save(ms);
+                    byte[] fileContent = ms.ToArray();
+                    bool saveResult = await FileSavingServices.SaveFileAsync(currFilePath, fileContent);
+                    
+                    if (!saveResult)
+                    {
+                        // Failed to save file
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Error saving note
             }
         }
 
@@ -529,9 +547,11 @@ namespace TwoOkNotes.ViewModels
         //Create new page
         private async void CreateNewPage(object? obj)
         {
-            //Validate the current section
-            if (currSection == null) return;
-
+            if (currSection == null)
+            {
+                return;
+            }
+            
             //Get a unique page name since pages now can be deleted, setting it to Page Length + 1 would confligt with the existing names and would not create new files
             string newPageName = GenerateUniquePageName();
             //Call the create page method from the saving services
@@ -542,7 +562,6 @@ namespace TwoOkNotes.ViewModels
                 Pages.Add(newPage);
                 SwitchPages(newPage);
             }
-            else Debug.WriteLine("Creating New Page");
         }
 
         //Create new section
@@ -609,37 +628,50 @@ namespace TwoOkNotes.ViewModels
         //Switch the sections
         private async void SwitchSections(object? obj)
         {
-            //Set the new index to -1 so if the incex is not found, it will not switch to another random page
-            int newIndex = -1;
-            
-            if (obj is string sectionName)
+            if (obj is NoteBookSection section)
             {
-                newIndex = Sections.ToList().FindIndex(s => s.Name == sectionName);
-            }
-            else if (obj is NoteBookSection secObj)
-            {
-                newIndex = Sections.IndexOf(secObj);
-            }
+                // If the section is already active, do nothing
+                if (section.IsActive)
+                    return;
 
-            if (newIndex >= 0)
-            {
-                // Save the current page content before switching
-                if (currSection != null && currPage != null)
+                // Save current page content before switching
+                SaveNote();
+
+                // Find the index of the section in the collection
+                int newIndex = Sections.IndexOf(section);
+                if (newIndex != -1)
                 {
-                    SaveNote();
-                }
+                    // Update the active section index
+                    _activeSectionIndex = newIndex;
+                    UpdateSectionActiveState();
 
-                // Deactivate current section if and activate and switch to the new one 
-                _activeSectionIndex = newIndex;
-                currSection = Sections[_activeSectionIndex];
-                
-                UpdateSectionActiveState();
-                
-                // Save metadata with updated active index
-                await _savingServices.UpdateSectionMetadata(_fileName, Sections, _activeSectionIndex);
-                
-                // Initialize pages with the new section
-                await InitializePages(currSection);
+                    // Update the current section
+                    currSection = section;
+
+                    // Load pages for the new section
+                    await InitializePages(section);
+
+                    // If there are pages, select the active one
+                    if (Pages.Count > 0)
+                    {
+                        var activePage = Pages.FirstOrDefault(p => p.IsActive);
+                        if (activePage != null)
+                        {
+                            await LoadPageContent(activePage);
+                        }
+                        else if (_activePageIndex >= 0 && _activePageIndex < Pages.Count)
+                        {
+                            await LoadPageContent(Pages[_activePageIndex]);
+                        }
+                        else
+                        {
+                            await LoadPageContent(Pages[0]);
+                        }
+                    }
+
+                    // Save the updated section metadata
+                    await _savingServices.UpdateSectionMetadata(_fileName, Sections, _activeSectionIndex);
+                }
             }
         }
 
@@ -655,7 +687,6 @@ namespace TwoOkNotes.ViewModels
             else if (obj is NoteBookPage pageObj)
             {
                 newIndex = Pages.IndexOf(pageObj);
-                Debug.WriteLine(newIndex);
             }
 
             if (newIndex >= 0 && currSection != null)

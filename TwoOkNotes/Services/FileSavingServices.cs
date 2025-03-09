@@ -33,12 +33,24 @@ namespace TwoOkNotes.Services
 
             _defaultNotesDirectoryLocation = Path.Combine(appFolder, "DefaultNotesStorage.json");
             ValidateDirLocationExists(_defaultNotesDirectoryLocation);
+            if (JsonHelper.IsJsonEmpty(File.ReadAllText(_defaultNotesDirectoryLocation)))
+            {
+                string getPath = GetDirectoryPathFromUser();
+                DefaultNotesStorage noteDirr = new()
+                {
+                    DefaultFilePath = getPath
+                };
+                File.WriteAllText(_defaultNotesDirectoryLocation, JsonSerializer.Serialize(noteDirr));
+            }
 
             DefaultNotesStorage noteDir = JsonSerializer.Deserialize<DefaultNotesStorage>(File.ReadAllText(_defaultNotesDirectoryLocation));
+            if (noteDir.DefaultFilePath == null || JsonHelper.isAttributeEmtpy(noteDir.DefaultFilePath))
+            {
+                noteDir.DefaultFilePath = GetDirectoryPathFromUser();
+                File.WriteAllText(_defaultNotesDirectoryLocation, JsonSerializer.Serialize(noteDir));
+            }
             _notesDirectory = noteDir.DefaultFilePath;
-
-
-
+            
             _globalMetaDataLocation = Path.Combine(_notesDirectory, "GlobalMetaData.json");
             ValidateFilePaths(_globalMetaDataLocation);
         }
@@ -157,75 +169,176 @@ namespace TwoOkNotes.Services
         public string GetCurrFilePath(string? noteBookName, string? sectionName, string pageName)
         {
             string path = Path.Combine(_notesDirectory, noteBookName ?? "", sectionName ?? "", pageName);
-            Debug.WriteLine($"Generated file path: {path}");
             return path;
         }
 
-        //TODO: when maning is implemented change return type to bool for name repete check 
         public static async Task<bool> CreateFile(string filePath)
         {
-            try
+            int maxRetries = 3;
+            int retryDelayMs = 100;
+            int currentRetry = 0;
+
+            while (currentRetry <= maxRetries)
             {
-                if (!File.Exists(filePath))
+                try
                 {
-                    await File.WriteAllTextAsync(filePath, string.Empty);
-                    return true;
+                    if (!File.Exists(filePath))
+                    {
+                        await File.WriteAllTextAsync(filePath, string.Empty);
+                        return true;
+                    }
+                    else
+                    {
+                        //TODO: Add a message box to ask to overwrite the file when file naming is implemented 
+                        return false;
+                    }
                 }
-                else
+                catch (IOException ex)
                 {
-                    //TODO: Add a message box to ask to overwrite the file when file naming is implemented 
-                    return false;
+                    // If it's the last retry, return false
+                    if (currentRetry == maxRetries)
+                        return false;
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // If it's the last retry, return false
+                    if (currentRetry == maxRetries)
+                        return false;
+                }
+                catch (Exception ex)
+                {
+                    // If it's the last retry, return false
+                    if (currentRetry == maxRetries)
+                        return false;
+                }
+
+                // Increment retry counter and wait before retrying
+                currentRetry++;
+                if (currentRetry <= maxRetries)
+                {
+                    await Task.Delay(retryDelayMs * currentRetry);
                 }
             }
-            catch (Exception)
-            {
-                return false;
-            }
+
+            return false;
         }
         public static async Task<bool> SaveFileAsync(string filePath, byte[] fileContent)
         {
-            try
-            {
-                await File.WriteAllBytesAsync(filePath, fileContent);
-                return true;
-            }
-            catch (FileNotFoundException)
-            {
+            int maxRetries = 3;
+            int retryDelayMs = 100;
+            int currentRetry = 0;
 
-                return false;
+            while (currentRetry <= maxRetries)
+            {
+                try
+                {
+                    await File.WriteAllBytesAsync(filePath, fileContent);
+                    return true;
+                }
+                catch (FileNotFoundException ex)
+                {
+                    // If it's the last retry, return false
+                    if (currentRetry == maxRetries)
+                        return false;
+                }
+                catch (IOException ex)
+                {
+                    // If it's the last retry, return false
+                    if (currentRetry == maxRetries)
+                        return false;
+                }
+                catch (Exception ex)
+                {
+                    // If it's the last retry, return false
+                    if (currentRetry == maxRetries)
+                        return false;
+                }
+
+                // Increment retry counter and wait before retrying
+                currentRetry++;
+                if (currentRetry <= maxRetries)
+                {
+                    await Task.Delay(retryDelayMs * currentRetry);
+                }
             }
+
+            return false;
         }
         private static async Task<T> LoadMetadataAsync<T>(string filePath) where T : new()
         {
-            if (File.Exists(filePath))
+            try
             {
-                string json = await File.ReadAllTextAsync(filePath);
-                if (!string.IsNullOrEmpty(json))
+                if (File.Exists(filePath))
                 {
-                    return JsonSerializer.Deserialize<T>(json) ?? new T();
+                    string json = await File.ReadAllTextAsync(filePath);
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        try
+                        {
+                            return JsonSerializer.Deserialize<T>(json) ?? new T();
+                        }
+                        catch (JsonException ex)
+                        {
+                            // Return a new instance if deserialization fails
+                            return new T();
+                        }
+                    }
                 }
+                return new T();
             }
-            return new T();
+            catch (IOException ex)
+            {
+                return new T();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return new T();
+            }
+            catch (Exception ex)
+            {
+                return new T();
+            }
         }
 
         //TODO: Looks like this save and the 5 second timer are clashing 
         private static async Task SaveMetadataAsync<T>(T metaData, string filePath)
         {
             string json = JsonSerializer.Serialize(metaData, new JsonSerializerOptions { WriteIndented = true });
-            int retryCount = 3;
+            int maxRetries = 3;
+            int retryDelayMs = 100;
+            int currentRetry = 0;
 
-            while (retryCount > 0)
+            while (currentRetry <= maxRetries)
             {
                 try
                 {
                     await File.WriteAllTextAsync(filePath, json);
-                    break;
+                    return;
                 }
-                catch (IOException)
+                catch (IOException ex)
                 {
-                    retryCount--;
-                    if (retryCount == 0) throw;
-                    await Task.Delay(100);
+                    // If it's the last retry, throw the exception
+                    if (currentRetry == maxRetries)
+                        throw;
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // If it's the last retry, throw the exception
+                    if (currentRetry == maxRetries)
+                        throw;
+                }
+                catch (Exception ex)
+                {
+                    // If it's the last retry, throw the exception
+                    if (currentRetry == maxRetries)
+                        throw;
+                }
+
+                // Increment retry counter and wait before retrying
+                currentRetry++;
+                if (currentRetry <= maxRetries)
+                {
+                    await Task.Delay(retryDelayMs * currentRetry);
                 }
             }
         }
@@ -259,19 +372,56 @@ namespace TwoOkNotes.Services
 
         public static async Task<StrokeCollection> GetFileContents(string filePath)
         {
-            if (File.Exists(filePath))
-            {
-                byte[] fileContent = await File.ReadAllBytesAsync(filePath);
+            StrokeCollection strokes = new StrokeCollection();
+            int maxRetries = 3;
+            int retryDelayMs = 100;
+            int currentRetry = 0;
 
-                if (fileContent.Length > 0)
+            while (currentRetry <= maxRetries)
+            {
+                try
                 {
-                    using (var memoryStream = new MemoryStream(fileContent))
+                    if (File.Exists(filePath))
                     {
-                        return new StrokeCollection(memoryStream);
+                        byte[] fileContent = await File.ReadAllBytesAsync(filePath);
+                        if (fileContent.Length > 0)
+                        {
+                            using (MemoryStream ms = new MemoryStream(fileContent))
+                            {
+                                strokes = new StrokeCollection(ms);
+                            }
+                        }
                     }
+                    return strokes;
+                }
+                catch (IOException ex)
+                {
+                    // If it's the last retry, return empty strokes
+                    if (currentRetry == maxRetries)
+                        return strokes;
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // If it's the last retry, return empty strokes
+                    if (currentRetry == maxRetries)
+                        return strokes;
+                }
+                catch (Exception ex)
+                {
+                    // If it's the last retry, return empty strokes
+                    if (currentRetry == maxRetries)
+                        return strokes;
+                }
+
+                // Increment retry counter and wait before retrying
+                currentRetry++;
+                if (currentRetry <= maxRetries)
+                {
+                    await Task.Delay(retryDelayMs * currentRetry);
                 }
             }
-            return new StrokeCollection();
+
+            return strokes;
         }
 
         public static string GetDirectoryPathFromUser()
@@ -311,10 +461,24 @@ namespace TwoOkNotes.Services
         //change it to bool for confirmation later 
         public void DeleteFile(string filePath)
         {
-            if (File.Exists(filePath))
+            try
             {
-                File.Delete(filePath);
-
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            }
+            catch (IOException ex)
+            {
+                // Handle IO error silently
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Handle access denied silently
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected error silently
             }
         }
 
@@ -343,14 +507,12 @@ namespace TwoOkNotes.Services
                 string sectionPath = Path.Combine(_notesDirectory, notebookName, sectionName);
                 if (!Directory.Exists(sectionPath))
                 {
-                    Debug.WriteLine($"Section directory not found: {sectionPath}");
                     return false;
                 }
 
                 string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
                 if (!File.Exists(metadataFilePath))
                 {
-                    Debug.WriteLine($"Notebook metadata file not found: {metadataFilePath}");
                     return false;
                 }
 
@@ -377,7 +539,6 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error deleting section: {ex.Message}");
                 return false;
             }
         }
@@ -389,14 +550,12 @@ namespace TwoOkNotes.Services
                 string pagePath = Path.Combine(_notesDirectory, notebookName, sectionName, pageName);
                 if (!File.Exists(pagePath))
                 {
-                    Debug.WriteLine($"Page file not found: {pagePath}");
                     return false;
                 }
 
                 string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
                 if (!File.Exists(metadataFilePath))
                 {
-                    Debug.WriteLine($"Section metadata file not found: {metadataFilePath}");
                     return false;
                 }
 
@@ -423,7 +582,6 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error deleting page: {ex.Message}");
                 return false;
             }
         }
@@ -438,23 +596,18 @@ namespace TwoOkNotes.Services
                 string oldPath = Path.Combine(_notesDirectory, notebookName, oldSectionName);
                 if (!Directory.Exists(oldPath))
                 {
-                    Debug.WriteLine($"Section directory not found: {oldPath}");
                     return false;
                 }
 
                 string newPath = Path.Combine(_notesDirectory, notebookName, newSectionName);
                 if (Directory.Exists(newPath))
                 {
-                    Debug.WriteLine($"Target section directory already exists: {newPath}");
                     return false;
                 }
-
-                Debug.WriteLine($"Renaming section from '{oldPath}' to '{newPath}'");
 
                 string metadataFilePath = Path.Combine(_notesDirectory, notebookName, "NoteBookMetaData.json");
                 if (!File.Exists(metadataFilePath))
                 {
-                    Debug.WriteLine($"Notebook metadata file not found: {metadataFilePath}");
                     return false;
                 }
 
@@ -471,12 +624,10 @@ namespace TwoOkNotes.Services
 
                 // Rename the directory
                 Directory.Move(oldPath, newPath);
-                Debug.WriteLine($"Section directory successfully renamed from '{oldSectionName}' to '{newSectionName}'");
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error renaming section: {ex.Message}");
                 return false;
             }
         }
@@ -495,21 +646,18 @@ namespace TwoOkNotes.Services
                 string oldPath = Path.Combine(_notesDirectory, notebookName, sectionName, oldPageName);
                 if (!File.Exists(oldPath))
                 {
-                    Debug.WriteLine($"Page file not found: {oldPath}");
                     return false;
                 }
 
                 string newPath = Path.Combine(_notesDirectory, notebookName, sectionName, newPageName);
                 if (File.Exists(newPath))
                 {
-                    Debug.WriteLine($"Target page file already exists: {newPath}");
                     return false;
                 }
 
                 string metadataFilePath = Path.Combine(_notesDirectory, notebookName, sectionName, "SectionMetaData.json");
                 if (!File.Exists(metadataFilePath))
                 {
-                    Debug.WriteLine($"Section metadata file not found: {metadataFilePath}");
                     return false;
                 }
 
@@ -530,7 +678,6 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error renaming page: {ex.Message}");
                 return false;
             }
         }
@@ -542,27 +689,22 @@ namespace TwoOkNotes.Services
                 string notebookPath = Path.Combine(_notesDirectory, notebookName);
                 if (!Directory.Exists(notebookPath))
                 {
-                    Debug.WriteLine($"Notebook directory not found: {notebookPath}");
                     return false;
                 }
 
                 // Load global metadata
                 var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
-
+                
                 // Remove the notebook from the metadata
-                if (metadata.NoteBooks.Contains(notebookName))
-                {
-                    metadata.NoteBooks.Remove(notebookName);
-                    await SaveMetadataAsync(metadata, _globalMetaDataLocation);
-                }
+                metadata.NoteBooks.Remove(notebookName);
+                await SaveMetadataAsync(metadata, _globalMetaDataLocation);
 
-                // Delete the directory and all its contents
+                // Delete the directory and its contents
                 Directory.Delete(notebookPath, true);
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error deleting notebook: {ex.Message}");
                 return false;
             }
         }
@@ -577,20 +719,19 @@ namespace TwoOkNotes.Services
                 string oldPath = Path.Combine(_notesDirectory, oldName);
                 if (!Directory.Exists(oldPath))
                 {
-                    Debug.WriteLine($"Notebook directory not found: {oldPath}");
                     return false;
                 }
 
                 string newPath = Path.Combine(_notesDirectory, newName);
                 if (Directory.Exists(newPath))
                 {
-                    Debug.WriteLine($"Target notebook directory already exists: {newPath}");
                     return false;
                 }
 
-                // Update notebook name in global metadata
+                // Load global metadata
                 var metadata = await LoadMetadataAsync<GlobalMetaData>(_globalMetaDataLocation);
                 
+                // Update notebook name in metadata
                 if (metadata.NoteBooks.Contains(oldName))
                 {
                     metadata.NoteBooks.Remove(oldName);
@@ -600,12 +741,10 @@ namespace TwoOkNotes.Services
 
                 // Rename the directory
                 Directory.Move(oldPath, newPath);
-                Debug.WriteLine($"Notebook directory successfully renamed from '{oldName}' to '{newName}'");
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error renaming notebook: {ex.Message}");
                 return false;
             }
         }
@@ -617,7 +756,6 @@ namespace TwoOkNotes.Services
                 string pagePath = Path.Combine(_notesDirectory, pageName);
                 if (!File.Exists(pagePath))
                 {
-                    Debug.WriteLine($"Orphan page not found: {pagePath}");
                     return false;
                 }
 
@@ -636,7 +774,6 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error deleting orphan page: {ex.Message}");
                 return false;
             }
         }
@@ -655,14 +792,12 @@ namespace TwoOkNotes.Services
                 string oldPath = Path.Combine(_notesDirectory, oldName);
                 if (!File.Exists(oldPath))
                 {
-                    Debug.WriteLine($"Orphan page not found: {oldPath}");
                     return false;
                 }
 
                 string newPath = Path.Combine(_notesDirectory, newName);
                 if (File.Exists(newPath))
                 {
-                    Debug.WriteLine($"Target page already exists: {newPath}");
                     return false;
                 }
 
@@ -682,7 +817,6 @@ namespace TwoOkNotes.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error renaming orphan page: {ex.Message}");
                 return false;
             }
         }

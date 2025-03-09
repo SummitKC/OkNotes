@@ -132,20 +132,16 @@ namespace TwoOkNotes.ViewModels
         }
 
         public Color PenColor
-
         {
             get => _penSettings.PenColor;
             set
             {
-                Debug.WriteLine(value);
                 _penSettings.PenColor = value;
                 SavePenSettings();
                 CreatePreviewStroke();
                 PenChanged?.Invoke(this, EventArgs.Empty);
                 OnPropertyChanged(nameof(PenColor));
-
             }
-
         }
         public double ThickNess
         {

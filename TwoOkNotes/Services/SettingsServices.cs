@@ -17,16 +17,40 @@ namespace TwoOkNotes.Services
         private readonly string _windowSettingsPath;
         public SettingsServices()
         {
-            //initilize file paths
-            string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string appFolder = Path.Combine(appDataFolder, "TwoOkNotes");
-            //Create the  file if it doesn't exist
-            if (!Directory.Exists(appFolder))
+            try
             {
-                Directory.CreateDirectory(appFolder);
+                //initilize file paths
+                string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string appFolder = Path.Combine(appDataFolder, "TwoOkNotes");
+                //Create the  file if it doesn't exist
+                if (!Directory.Exists(appFolder))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(appFolder);
+                    }
+                    catch (IOException ex)
+                    {
+                        // Handle IO error silently
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        // Handle access denied silently
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle unexpected error silently
+                    }
+                }
+                _settingsFilePath = Path.Combine(appFolder, "PenSettings.json");
+                _windowSettingsPath = Path.Combine(appFolder, "WindowSettings.json");
             }
-            _settingsFilePath = Path.Combine(appFolder, "PenSettings.json");
-            _windowSettingsPath = Path.Combine(appFolder, "WindowSettings.json");
+            catch (Exception ex)
+            {
+                // Fallback to default paths in case of error
+                _settingsFilePath = "PenSettings.json";
+                _windowSettingsPath = "WindowSettings.json";
+            }
         }
 
         public async Task SavePenSettings(PenSettingsModel settings)
@@ -37,18 +61,86 @@ namespace TwoOkNotes.Services
                 Converters = { new JsonStringEnumConverter() }
             };
             string json = JsonSerializer.Serialize(settings, options);
-            await File.WriteAllTextAsync(_settingsFilePath, json);
+            
+            int maxRetries = 3;
+            int retryDelayMs = 100;
+            int currentRetry = 0;
+
+            while (currentRetry <= maxRetries)
+            {
+                try
+                {
+                    await File.WriteAllTextAsync(_settingsFilePath, json);
+                    return;
+                }
+                catch (IOException ex)
+                {
+                    // If it's the last retry, just log the error
+                    if (currentRetry == maxRetries)
+                    {
+                        // Failed to save pen settings after multiple attempts
+                    }
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // If it's the last retry, just log the error
+                    if (currentRetry == maxRetries)
+                    {
+                        // Failed to save pen settings after multiple attempts
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If it's the last retry, just log the error
+                    if (currentRetry == maxRetries)
+                    {
+                        // Failed to save pen settings after multiple attempts
+                    }
+                }
+
+                // Increment retry counter and wait before retrying
+                currentRetry++;
+                if (currentRetry <= maxRetries)
+                {
+                    await Task.Delay(retryDelayMs * currentRetry);
+                }
+            }
         }
 
         public async Task<PenSettingsModel> LoadPenSettings()
         {
-            if (File.Exists(_settingsFilePath))
+            try
             {
-                string json = await File.ReadAllTextAsync(_settingsFilePath);
-                return JsonSerializer.Deserialize<PenSettingsModel>(json) ?? new PenSettingsModel();
+                if (File.Exists(_settingsFilePath))
+                {
+                    try
+                    {
+                        string json = await File.ReadAllTextAsync(_settingsFilePath);
+                        try
+                        {
+                            return JsonSerializer.Deserialize<PenSettingsModel>(json) ?? new PenSettingsModel();
+                        }
+                        catch (JsonException ex)
+                        {
+                            // Error deserializing pen settings JSON
+                            return new PenSettingsModel();
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        // IO error while reading pen settings file
+                        return new PenSettingsModel();
+                    }
+                }
+                else
+                {
+                    // Pen settings file not found, creating default settings
+                    return new PenSettingsModel();
+                }
             }
-            else
+            catch (Exception ex)
             {
+                // Unexpected error while loading pen settings
                 return new PenSettingsModel();
             }
         }
@@ -60,26 +152,86 @@ namespace TwoOkNotes.Services
                 WriteIndented = true,
             };
             string json = JsonSerializer.Serialize(settings, options);
-            try
+            
+            int maxRetries = 3;
+            int retryDelayMs = 100;
+            int currentRetry = 0;
+
+            while (currentRetry <= maxRetries)
             {
-                await File.WriteAllTextAsync(_windowSettingsPath, json);
-                Debug.WriteLine("Window settings saved successfully.");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to save window settings: {ex.Message}");
+                try
+                {
+                    await File.WriteAllTextAsync(_windowSettingsPath, json);
+                    return;
+                }
+                catch (IOException ex)
+                {
+                    // If it's the last retry, just log the error
+                    if (currentRetry == maxRetries)
+                    {
+                        // Failed to save window settings after multiple attempts
+                    }
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // If it's the last retry, just log the error
+                    if (currentRetry == maxRetries)
+                    {
+                        // Failed to save window settings after multiple attempts
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If it's the last retry, just log the error
+                    if (currentRetry == maxRetries)
+                    {
+                        // Failed to save window settings after multiple attempts
+                    }
+                }
+
+                // Increment retry counter and wait before retrying
+                currentRetry++;
+                if (currentRetry <= maxRetries)
+                {
+                    await Task.Delay(retryDelayMs * currentRetry);
+                }
             }
         }
 
         public async Task<WindowSettings> LoadEditingWindowSettings()
         {
-            if (File.Exists(_windowSettingsPath))
+            try
             {
-                string json = await File.ReadAllTextAsync(_windowSettingsPath);
-                return JsonSerializer.Deserialize<WindowSettings>(json) ?? new WindowSettings();
+                if (File.Exists(_windowSettingsPath))
+                {
+                    try
+                    {
+                        string json = await File.ReadAllTextAsync(_windowSettingsPath);
+                        try
+                        {
+                            return JsonSerializer.Deserialize<WindowSettings>(json) ?? new WindowSettings();
+                        }
+                        catch (JsonException ex)
+                        {
+                            // Error deserializing window settings JSON
+                            return new WindowSettings();
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        // IO error while reading window settings file
+                        return new WindowSettings();
+                    }
+                }
+                else
+                {
+                    // Window settings file not found, creating default settings
+                    return new WindowSettings();
+                }
             }
-            else
+            catch (Exception ex)
             {
+                // Unexpected error while loading window settings
                 return new WindowSettings();
             }
         }

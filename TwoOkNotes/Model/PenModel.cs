@@ -17,7 +17,7 @@ namespace TwoOkNotes.Model
     {
         public string Name { get; set; } = "Pen 1";
         public Color PenColor { get; set; } = Colors.White;
-        public double Thickness { get; set; } = 20.0;
+        public double Thickness { get; set; } = 2.5;
         public byte Opacity { get; set; } = (byte) 255;
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public StylusTip Tip { get; set; } = StylusTip.Ellipse;

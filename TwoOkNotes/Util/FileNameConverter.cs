@@ -13,36 +13,52 @@ namespace TwoOkNotes.Util
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string fileName)
+            try
             {
-                // Handle empty or null values
-                if (string.IsNullOrWhiteSpace(fileName))
+                if (value is string fileName)
                 {
-                    return string.Empty;
-                }
+                    // Handle empty or null values
+                    if (string.IsNullOrWhiteSpace(fileName))
+                    {
+                        return string.Empty;
+                    }
 
-                // Specific handling for .isf extension
-                if (fileName.EndsWith(".isf", StringComparison.OrdinalIgnoreCase))
-                {
-                    return fileName.Substring(0, fileName.Length - 4);
-                }
+                    // Specific handling for .isf extension
+                    if (fileName.EndsWith(".isf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return fileName.Substring(0, fileName.Length - 4);
+                    }
 
-                // General handling for other extensions
-                return Path.GetFileNameWithoutExtension(fileName);
+                    // General handling for other extensions
+                    return Path.GetFileNameWithoutExtension(fileName);
+                }
+                return value ?? string.Empty;
             }
-            return value ?? string.Empty;
+            catch (Exception ex)
+            {
+                // Return the original value or empty string in case of error
+                return value ?? string.Empty;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string displayName && parameter is string extension)
+            try
             {
-                // If we're converting back and an extension was provided
-                return $"{displayName}{extension}";
-            }
+                if (value is string displayName && parameter is string extension)
+                {
+                    // If we're converting back and an extension was provided
+                    return $"{displayName}{extension}";
+                }
 
-            // Default case - just return the display name
-            return value?.ToString() ?? string.Empty;
+                // Default case - just return the display name
+                return value?.ToString() ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                // Return the original value or empty string in case of error
+                return value?.ToString() ?? string.Empty;
+            }
         }
     }
 }
