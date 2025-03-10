@@ -1,6 +1,6 @@
 # OkNotes
 
-A modern note-taking application with hierarchical organization, rich pen tools, and auto-save functionality.
+A lightweight note-taking application was built using C# in .NET 8.0 and WPF for the UI.
 
 ## Table of Contents
 - [Features](#features)
