@@ -5,7 +5,6 @@ A lightweight note-taking application was built using C# in .NET 8.0 and WPF for
 ## Table of Contents
 - [Features](#features)
 - [Getting Started](#getting-started)
-  - [System Requirements](#system-requirements)
   - [Installation](#installation)
 - [Basic Usage](#basic-usage)
   - [Main Window](#main-window)
@@ -29,17 +28,11 @@ A lightweight note-taking application was built using C# in .NET 8.0 and WPF for
 - **Highlighter**: Built-in highlighter tool for emphasizing important content.
 - **Selection Tool**: Select and modify existing ink strokes.
 - **Auto-save**: Automatically saves your work as you go.
-- **Modern UI**: Clean interface with dark mode support.
+- **Modern UI**: Clean dark interface.
 
 ---
 
 ## Getting Started
-### System Requirements
-- Windows 10 or later
-- .NET 8.0 or later
-- 4GB RAM minimum (8GB recommended)
-- 50MB free disk space
-
 ### Installation
 - Go to [TwoOkNotesV1.0](https://github.com/SummitKC/OkNotes/releases/tag/v1.0) and download TwoOkNotesV1.0.zip. 
 - Extract the folder and open the extracted folder
